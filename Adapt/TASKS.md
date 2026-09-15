@@ -6,6 +6,7 @@
 - ✅ viewer: click a task with a sub-project to open that sub-project's tasks in a separate window · *2026-09-15* `t12`
 - 🔄 ❓ **git and GitHub integration: version the Adapt repo and publish the skills from GitHub** · *since 2026-09-14* `t5`
 - ⛔ ❓ a custom lightweight executable for the task and history viewer `t10`
+- 🔜 delete the stale OneDrive copy of Adapt `t14`
 - 🔜 review and revise the Adapt spec, Adaptive Tools.txt `t1`
 - 🔜 an installer script per skill that reads the manifest and terraforms a project `t2`
 - 🔜 fetch the embedding model when no preinstalled copy is found `t3`
@@ -26,6 +27,8 @@
 **t5** · Asked for by the user 2026-09-14. git init in Adapt with a .gitignore for machine state (search indexes, per-session state, rules-firings.jsonl, __pycache__), a GitHub remote through the gh CLI, and the rules and hooks that go with version control. GitHub also becomes the installer's source: install a skill from a tagged release. Done means Adapt is committed and pushed, and an install from GitHub works.
 
 **t10** · Blocked: waits until the user has settled the viewer's look and feel · Asked for by the user 2026-09-14. A small native window instead of a browser tab, hosting the same page and local server: candidates are a WebView2 host in C++ or C#, pywebview, or Tauri, judged on size, start time and no install step. It opens on a project, stays live, and closes its server with the window. Built only once the viewer's look and feel is settled. Done means one small executable that replaces the browser tab.
+
+**t14** · The user said yes to deleting C:\Users\ljcg3\OneDrive\Desktop\Adapt permanently (q7, 2026-09-15), so it cannot be confused with C:\dev\Adapt. Not done in the session that asked: that session ran from the OneDrive folder, and its hooks load from there. Done from a session started in C:\dev\Adapt: confirm nothing there is newer than C:\dev\Adapt, then Remove-Item -Recurse -Force, then log it.
 
 **t1** · Read the spec whole, then propose changes: gaps (request template, the round, manager and specialist scope), conflicts with what is built (rules, not a CLAUDE.md line; per-project records; the parked sub-agent rules work). ADDENDUM (the user, 2026-09-14): also weigh a claudeMdExcludes setting in Adapt, so no CLAUDE.md from a parent folder or the user level loads; none exists yet. Changes go to the user first. Done: an accepted revised spec.
 
