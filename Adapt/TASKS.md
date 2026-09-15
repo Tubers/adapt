@@ -4,7 +4,7 @@
 
 - ✅ viewer: click a task with a sub-project to open that sub-project's tasks in a separate window · *2026-09-15* `t12`
 - ✅ git and GitHub integration: version the Adapt repo and publish the skills from GitHub · *2026-09-15* `t5`
-- 🔄 ❓ **delete the stale OneDrive copy of Adapt** · *since 2026-09-15* `t14`
+- 🔄 **delete the stale OneDrive copy of Adapt** · *since 2026-09-15* `t14`
 - 🔜 review and revise the Adapt spec, Adaptive Tools.txt `t1`
 - 🔜 an installer script per skill that reads the manifest and terraforms a project `t2`
 - 🔜 fetch the embedding model when no preinstalled copy is found `t3`
