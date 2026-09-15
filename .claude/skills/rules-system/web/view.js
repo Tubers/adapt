@@ -96,7 +96,7 @@
         mine.map(function (q) { return isAction(q) ? actBlock(q) : qaBlock(q); }).join("") +
         kids.map(function (rel) {
           return '<p class="result sub"><span>Sub-project</span><a href="#" data-open="' + esc(rel) + '">' + esc(rel) +
-            "/</a> - open its tasks and history</p>";
+            "/</a> - open its tasks and history in a separate window</p>";
         }).join("") +
         (logged ? '<p class="result"><span>' + (k.status === "done" ? "Result" : "Logged") + "</span>" +
           esc(logged.result || logged.what || logged.title) + "</p>" : "");
@@ -109,7 +109,11 @@
         (k.question ? '<span class="q" title="A question for you: click to open the task and answer it">❓</span>' : "") +
         (k.action ? '<span class="q act" title="An action for you: click to open the task, do it, then mark it done">❗</span>' : "") +
         (sent && !k.question && !k.action ? '<span class="q" title="Your reply is sent; the instance is told">📨</span>' : "") +
-        (kids.length ? '<span class="q" title="This task has ' + kids.length + ' sub-project(s): open the task to follow them">🗂</span>' : "") +
+        // one sub-project: the icon itself opens it; several: the icon opens the task, which lists a link to each
+        (kids.length === 1 ? '<a href="#" class="q sub" data-open="' + esc(kids[0]) + '" title="Sub-project ' +
+          esc(kids[0]) + '/: click to open its tasks and history in a separate window">🗂</a>' : "") +
+        (kids.length > 1 ? '<span class="q" title="This task has ' + kids.length +
+          ' sub-projects: click to open the task, then open each one from its link">🗂</span>' : "") +
         '<span class="text">' + esc(k.text) + "</span>" + date + '<span class="chev">›</span>' +
         '</div><div class="details">' + det + "</div></li>";
     }).join("");
@@ -192,18 +196,27 @@
     if (changed.length) S.fresh = new Set(changed);
   }
 
-  // drill down to a sub-project, or back up to the parent: the server starts that project's viewer
+  // drill down to a sub-project, or back up to the parent: the server starts that project's viewer, and it opens in a
+  // separate window, so this one stays open (the user, 2026-09-15). The window is opened inside the click itself, since
+  // a browser blocks one opened later from a fetch; it is pointed at the viewer once the server answers. It is named
+  // after the project, so a second click brings the same window forward instead of opening another.
   document.addEventListener("click", function (ev) {
     var a = ev.target.closest && ev.target.closest("a[data-open]");
     if (!a) return;
     ev.preventDefault();
     ev.stopPropagation();
     if (!BOOT.token) { alert("Run: rules.py view " + a.dataset.open); return; }
+    var up = a.closest(".parent");
+    if (up && window.opener && !window.opener.closed) { window.opener.focus(); return; }   // back to the page that opened this one
+    var win = window.open("", "rules-view:" + a.dataset.open, "popup,width=1100,height=900");
     fetch("/open?project=" + encodeURIComponent(a.dataset.open), { method: "POST", cache: "no-store",
                                                                   headers: { "X-View-Token": BOOT.token } })
       .then(function (r) { return r.json(); })
-      .then(function (j) { if (j.url) location.href = j.url; else a.textContent += " (" + (j.error || "failed") + ")"; })
-      .catch(function () { a.textContent += " (the viewer is not running)"; });
+      .then(function (j) {
+        if (!j.url) { if (win) win.close(); a.textContent += " (" + (j.error || "failed") + ")"; return; }
+        if (win && !win.closed) { win.location.href = j.url; win.focus(); } else location.href = j.url;
+      })
+      .catch(function () { if (win) win.close(); a.textContent += " (the viewer is not running)"; });
   }, true);
 
   document.addEventListener("input", function (ev) {

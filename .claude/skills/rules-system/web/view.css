@@ -143,6 +143,8 @@ ul.tasklist, ol.entries { list-style: none; margin: 0; padding: 0; }
 .task .details .result span { color: var(--muted); font-size: .8rem; text-transform: uppercase; letter-spacing: .06em; margin-right: 8px; }
 .badge, .status, .chip, .task .icon { cursor: help; }
 .task .q { cursor: pointer; }
+.task a.q.sub { text-decoration: none; border-radius: 6px; padding: 0 2px; }
+.task a.q.sub:hover { background: color-mix(in srgb, var(--accent) 16%, transparent); }
 .badge.kind-q { background: color-mix(in srgb, var(--question) 18%, transparent); color: var(--question); }
 .badge.kind-a { background: color-mix(in srgb, var(--action) 16%, transparent); color: var(--action); }
 
