@@ -1,98 +1,167 @@
-Something also that is brand new that I think is a good additon and should belong at the global AOE folder level in the claude.md file is:    
-	I want to give a new instruction to all instances that use any skills. All instances must load the "Adapt" (without the surrounding quotes) skill at the start.
+ADAPT SPEC, REVISED
+
+This is the working revision of spec/original.txt. Open questions are tasks in the spec project: python .claude/skills/rules-system/scripts/rules.py tasks --in spec. A note such as "(open: t13)" marks a point that task still has to settle.
+
 
 Ethos:
-	When using skills think of skills as an ongoing effort. skills are not set in stone and are maleable and ever changing. I want to improve skill use and capability as time goes on and as they are used. 
+	When using skills think of skills as an ongoing effort. skills are not set in stone and are maleable and ever changing. I want to improve skill use and capability as time goes on and as they are used.
 
 "Adapt" skill is going to be a claude skill that is a meta level skill, a skill for skills.
 
- It will be the place where skills are born and skills are improved. It will subsume the current folders of 'skill_improvement' and 'skill_development'. The idea here is that this skill will be used by all agents to request new skills and to improve existing ones. As requests accrue, at some critical point, typically initiated by myself the human user (for now - but perhaps not in the future) the "Adapt" will execute a 'round', which is like a total sweep of processing from top to bottom where it performs actions based on its current state. 
- 
+ It will be the place where skills are born and skills are improved. The idea here is that this skill will be used by all agents to request new skills and to improve existing ones. As requests accrue, at some critical point, typically initiated by myself the human user (for now - but perhaps not in the future) the "Adapt" will execute a 'round', which is like a total sweep of processing from top to bottom where it performs actions based on its current state.
+
+
+Where Adapt lives:
+	Adapt is a skill inside another project, the host project, at <host>/.claude/skills/adapt/. The other skills in the host's .claude/skills/ are Adapt's sibling skills. They serve the host project, and they are the skills Adapt repairs, extends and adds to.
+	Adapt comes bundled with its own copies of two skills from this repo: rules-system and vector-search. It also carries a third skill of its own, META TOOLS. The handoff skill may join later; for now Adapt ships with these three.
+	The skills inside Adapt serve only the instances that inhabit Adapt. Instances working in the host project never use them. (open: t14)
+
+
+How a session learns of Adapt:
+	There is no CLAUDE.md file. Everything is scoped through rules. A gated rule in rules/INDEX.md tells a session about the Adapt skill when the session touches Adapt's files and folders, or when the user runs the Adapt init command. The rule is injected only when its gate matches, so a session that never touches Adapt pays nothing for it. The gate cannot match paths under .claude/skills/, so it matches the folders where Adapt keeps its working files.
+
+
+Adapt's own .claude tree:
+	The Adapt folder contains its own .claude tree, because Adapt is mainly run by a headless session started inside it. That session treats the Adapt folder as its project.
+	- .claude/settings.json: ordinary Claude Code settings. Its claudeMdExcludes setting lists glob patterns, matched against absolute paths, that stop every CLAUDE.md and CLAUDE.local.md above the Adapt folder from loading. A managed-policy CLAUDE.md cannot be excluded. The same file holds the hooks and permissions that keep each agent in its silo.
+	- .claude/agents/: the two specialist definitions.
+	- .claude/skills/: rules-system, vector-search and meta-tools.
+	- .claude/hooks/: the scripts the settings call.
+	There is no CLAUDE.md and no unscoped rule anywhere in this tree. Adapt's rules live in its own rules/ folder, gated by its own rules/INDEX.md.
+	Two launch cautions from the Claude Code docs (open: t13):
+	- The --bare flag skips hooks, skills, subagents, plugins, MCP servers, auto memory and CLAUDE.md. Only skills in a directory passed with --add-dir still load. A --bare manager therefore loses the hooks and agent definitions this design relies on, unless they are passed to it explicitly.
+	- Without --bare, a session started in the Adapt folder also loads project skills from every parent folder up to the repository root, which means the host's skills. It also loads the user's own ~/.claude files unless --setting-sources leaves out user. claudeMdExcludes covers CLAUDE.md and rules files, not skills.
+
+
+Sessions and agents:
+	THE MANAGER is a headless session, not a subagent. An Adapt command launches it inside the Adapt folder, on the Opus 5 model, bare bones (a requirement). Its home folder holds its continuity files (see THE MANAGER below).
+	The manager is the only instance that spawns or removes a subagent. It is also the only instance that creates the work items the specialists work on. It decides whether a skill is actually broken (REPAIR), needs extending (EXTEND), or whether a new skill is needed or is preferable to extending another (NEW).
+	There are two kinds of subagent. Both are defined in .claude/agents/ with minimal starting directives, and both are preloaded with rules-system, vector-search and meta-tools:
+	- Specialist, medium model (Sonnet). Each one is assigned one sibling skill and writes code for it. Specialists may work together on larger projects, such as building a brand new skill on request.
+	- Specialist, lower model (Haiku). It carries out small file and folder operations for a medium specialist. Its context is wiped between every action, so every task given to it must be stateless. Tasks may be lumped together and done in batches. A medium specialist asks the manager for one when none exists, and the manager decides whether invoking it is worth it relative to the work. At least one should be kept available.
+	This resembles Claude Code's agent teams. Agent teams do not run in a headless -p session, and teammates cannot spawn teammates, so Adapt builds the same shape from subagents plus files. (open: t15)
+	Adapt can nest: an Adapt skill may contain another Adapt, forming chains of agents that build tools to help build tools. (open: t23)
+
+
+Rules and protocols:
+	Rules are the main guiding force. They decide much of the interplay between instances and guide their decisions, so they need careful design.
+	- Adapt ships a starting set of rules. They can and probably will be modified, deleted and appended to.
+	- Some rules are constants: never removed or modified. A rules-system config names them. (open: t16)
+	- Protocols are rules assigned to every specialist when it is spawned. They give the specialist its workflow, and they can be tailored per specialist. (open: t18)
+	- Every specialist has its own folder in rules/, named after the skill it is responsible for. All of that specialist's findings live there. The specialist curates its own findings and turns them into rules gated to particular code files or skill documents. (open: t24)
+	- vector-search finds niche rules for a specialist to inject while it works on code. It also runs the audit tools that keep the rule set healthy: information independence (no redundancy), concise descriptions and proper scope.
+	- vector-search also helps specialists navigate the code of the skill they work on, and the documentation they have collected on it that does not merit a finding.
+	- Agent system prompts breadcrumb the knowledge each specialist needs, so it starts from a good point. (open: t17)
+
+
+Records and communication:
+	Everything is kept as files and text, so it is all recorded and easy to look into, even at runtime.
+	- Each specialist uses the rules-system commands. Its history log records its actions, its tasks file shows its status, and its questions file carries its communication with the manager. Built-in instance-to-instance messaging is the alternative for that last part. (open: t7)
+	- The manager has its own history log and tasks file, created at initialization. An instance in the host project reads them in filtered slices by running a command against the Adapt skill. (open: t22)
+
+
+Working on skills:
+	Specialists change skills only on copies, probably git worktrees. The manager decides when a copy is merged back into the skill.
+	When a specialist changes a sibling skill that Adapt also carries a copy of, the change is mirrored to Adapt's copy. A change to Adapt's copy is mirrored back the same way. (open: t20)
+
+
+Friction:
+	A friction entry is a history entry that records something cumbersome in an instance's own workflow while it modifies, repairs or builds skills.
+	- Instances weigh friction only as recurring or similar entries. A single entry is noise; a pattern may justify skill work that removes the friction for future work.
+	- A hook tells an instance when it has accrued a configurable number of friction entries since the last notice, so no instance is notified after every prompt.
+	- The manager looks into its own history and each specialist's history, filtered for friction. Diagnostic tools, and tools for boilerplate code that gets repeated often, are good candidates, whether the specialist or the manager spots them.
+	- Specialists may file requests to improve their own workflow. The manager reviews them.
+	- The main instance in the host project may use the same friction entries, with rules-system, to find which of its own skills are lacking or broken. It does not need them for this; it is a reuse of the skill at that level. (open: t19)
+
+
+Initialization:
+	Adapt goes through an install process the first time it is initialized. The init command has the manager spawn in and do the setup, together with many automated build scripts. It takes stock of the user's skill environment, creates the local data folders and other configuration it needs, loads its own skills, and creates the manager's history log and tasks file. Everything that needs setting up happens during this first init. (open: t21)
+
+
+Round (proposed; open: t12):
+	A round is one start-to-finish cycle of work on one work item that the manager created from the inbox:
+	1. The manager sorts the inbox and creates or updates the work item (see Amalgamation), filed under NEW, EXTEND or REPAIR.
+	2. It assigns specialists to the work item, spawning any that are missing.
+	3. The specialists work on a copy of the skill. They call on a lower-model specialist for batched, stateless chores.
+	4. The manager reviews the result, then merges it or sends it back.
+	5. The change is mirrored where needed and logged, and the inbox requests it covered are closed.
+	For now the user starts a round. Later the manager might start one itself. How much work a single round takes on is still open.
+
+
+Amalgamation (proposed; open: t9):
+	Inbox requests that name the same skill and the same need merge into one work item. The same need means the same defect for REPAIR, or the same missing capability for EXTEND or NEW. vector-search suggests likely matches by meaning, and the manager confirms each merge. The work item keeps every source request's id, and it appends each submitter's added details instead of rewriting them. This is also how a piggyback request joins an existing one.
+
+
  Root Sub Folders:
 	all the fully capitalized names are folders in the root of the "Adapt" folder
- 
+
  THE MANAGER:
- 
- The "Adapt", will itself will have a specific claude instance with context of its own that owns the skill and acts as a kind of manager / overseer of the development and progress of all the work conducted within the "Adapt" skill folder itself. This instance and its context are allowed a manager folder from which it can store: 
- 
+
+ The "Adapt", will itself will have a specific claude instance with context of its own that owns the skill and acts as a kind of manager / overseer of the development and progress of all the work conducted within the "Adapt" skill folder itself. This instance and its context are allowed a manager folder from which it can store:
+
  Notes:
 	(specific one off occurences that are more detailed and specific to the management of sub agents and the issues that subagents are encountering and the general running of the skill_Improvements inbound requests inbox folder, as well as any other housekeeping items not considered here)
- 
- Memories: 
+
+ Memories:
 	(long running context that is constantly condensed and mainly holds a running log of events) This is meant to be very terse, fact based and scant on details.
- 
+
  It can ofcourse create additional document files within its folder to help organize and keep abreast of information as it sees fit. This is a place where the manager has autonomy and can create as much documentation as it feels is necessary.
- 
- 
- INBOX: 
+ The manager's history log and tasks file also live in this folder. (open: t6)
+
+
+ INBOX:
 	A place for tool requests from llm-instances outside of the "Adapt" folder and from potentially THE MANAGER instance of the "Adapt" skill.
-	Sub-agents from the "Adapt" skill may also make requests but they must be routed through communication with THE MANAGER instance and approved by said instance. 
-	
+	Sub-agents from the "Adapt" skill may also make requests but they must be routed through communication with THE MANAGER instance and approved by said instance.
+
 Inbox Request submission:
-	So in this pursuit all instances should always consider after use of a skill what aspects of the skill were cumbersome in their workflow and how they might be improved to make work easier in the sense of comprehending the skill and how to use it, how efficient is the skill in terms of time (does it require a lot of effort to get out of it what you want), and how efficient is it in terms of expressing intent (does it require a lot of your input and code that you write to get what you want from it.) Also any other vectors that can be considered not listed here. 
-	
+	So in this pursuit all instances should always consider after use of a skill what aspects of the skill were cumbersome in their workflow and how they might be improved to make work easier in the sense of comprehending the skill and how to use it, how efficient is the skill in terms of time (does it require a lot of effort to get out of it what you want), and how efficient is it in terms of expressing intent (does it require a lot of your input and code that you write to get what you want from it.) Also any other vectors that can be considered not listed here.
+
 Mechanics of Request Submission:
-	This is a python generated template that any instance in the repo that has loaded the "Adapt" skill may use to submit their request.
-	
-	
-	
+	This is a python generated template that any instance in the repo that has loaded the "Adapt" skill may use to submit their request. (open: t10)
+
 Where the requests go:
 	THE MANAGER instance sorts from the inbox and amalgamates requests into single submissions into their respective folders.
 
 NEW:
-	Where all requests for new skills and improvements are depositied. 
-	
+	Where all requests for new skills and improvements are depositied.
+
 EXTEND:
 	Where all requests for improvements or feature extensions to existing skills are deposited.
 
 REPAIR:
 	Where issues are announced, detailed, (what are the offending inputs, circumstances),
 	What should have occured but didn't. What happened that was in error? What do you think is the root cause for the issue? (optional) How to fix the issue. (optional)
-	
-		
- 
- 
- 
+
 SPECIALISTS:
 This is a folder that contains all the sub-agent managed directories.
 The SPECIALISTS folder has sub folders within it that are organized by the name of the skill that the sub-agents are responsible for.
- 
+
  META TOOLS:
  An interesting part of the "Adapt" skill is its circular recursive nature. The skill manager and its sub agents are allowed to request features (new skills and skill improvements) to their own suite of skills that are stored within the META TOOLS folder. This folder will contain tools that THE MANAGER and the sub-agents can use to perform their given tasks and goals. The tools within this folder are typically python scripts that are engineered by the sub-agents for their own use in carrying out INBOX requests. If sub-agents find themselves doing a particular pattern of activity that changes in only a few select ways or never, then it can identify the task as a good candidate for a meta tool and build out this meta tool and store the source script, exe, interface api, documentation all within this folder as a new sub folder with an expressive folder name for the tool. Sub-agents are allowed to use each other's meta tools to work on their own specific task if the tool is useful to their own work domain.
- 
- 
+ META TOOLS is also a skill that every specialist is preloaded with. (open: t25)
+
  RULES:
- "Adapt" skill Wide Rules:
- 
+ Scope: the Documentation Dogma below applies only to the rules that govern THE MANAGER and the SPECIALISTS sub-agents, and to the documents they keep. It does not apply to the skills themselves or to the rest of the repo.
+
  Documentation Dogma:
 	1) Information Independence
 		There should be very little crossover of information between files.
-	 Information files should strive for information independence similar to the idea of linear independence in linear algebra where vectors are independent of one another and cannot inform or construct the others due to the uniqueness they encode. The documents may have references to eachother but no more than that, so that information novelty is preserved and redundancy is killed. 
-	 
+	 Information files should strive for information independence similar to the idea of linear independence in linear algebra where vectors are independent of one another and cannot inform or construct the others due to the uniqueness they encode. The documents may have references to eachother but no more than that, so that information novelty is preserved and redundancy is killed.
+
 	2) Condense, Compress, Refactor
 		Always strive to express information in as dense a way as possible while still preserving meaning and comprehension.
-		
+
 	3) Context Is Tax Free
-		Be holistic in expressing ideas. Details are important and you can never have too few details. This seems to run counter to number 2, but the desire is to encode enough information such that a brand new llm-instance may come across the contents of a file or folder where it is to live and work within and have enough information provided that it can use only what's there to completely resurrect past instances' context and start off as effectively as though it were the same instance.  
- 
- 
- 
-
- 
+		Be holistic in expressing ideas. Details are important and you can never have too few details. This seems to run counter to number 2, but the desire is to encode enough information such that a brand new llm-instance may come across the contents of a file or folder where it is to live and work within and have enough information provided that it can use only what's there to completely resurrect past instances' context and start off as effectively as though it were the same instance.
 
 
-
-	
-	
-
-  
   When to Trigger:
 	Conditions
 	1) after an llm-instance uses a skill (not before and certianly not required after each use)
-	2) decides that there is friction in the skill use or in the absence of a suitable skill for the task that they are occupied with they should consult the skill_improvments folder first to see if a similar request has been made already 
-		if it has been made already they can modify the request to further include additional details not yet mentioned and to touch on things specific to its use case. 
-		
-		And obviously if a similar request is not already included then it can be made fresh within this folder as a request. 
-		
+	2) decides that there is friction in the skill use or in the absence of a suitable skill for the task that they are occupied with they should consult the INBOX first to see if a similar request has been made already
+		if it has been made already they can modify the request to further include additional details not yet mentioned and to touch on things specific to its use case.
+
+		And obviously if a similar request is not already included then it can be made fresh within this folder as a request.
+
 	We want to include a request form that can be
   generated with python that has appropriate headers and initial seed pompts that help guide the process of a skill request by guiding the instance to provide the right and neccessary feedback. These request forms should also be used for the piggyback and support of existing skill requests / improvements.
