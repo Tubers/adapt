@@ -88,7 +88,8 @@ COMMANDS = {
     "tasks": ("[show|add|start|done|block|unblock|drop|detail|goal|ask|answer|act|acted|questions|wait|answers|withdraw] ... [--in <folder>]",
               "read or change a project's TASKS.md and QUESTIONS.jsonl; the only way they are written",
               "show (default); add \"<task>\" --details P [--at N]; start <id>; done [<id>] [--result R] "
-              "[--kind K] [--evidence P] [--refs R] [--no-rule WHY]; block <id> --reason WHY; unblock <id>; "
+              "[--kind K] [--evidence P] [--refs R] [--no-rule WHY]; block <id> --reason WHY; unblock <id> [--at N] "
+              "(N places it among the not-started tasks; past the end puts it last); "
               "drop <id> --reason WHY; detail <id> \"<paragraph>\"; goal \"<goal>\". Every task carries its "
               "paragraph. Questions: ask <task id> \"<question>\" (the task shows ❓ until answered); "
               "answer <q id> \"<the user's answer>\"; questions lists them; wait [--timeout S] returns when the user "
@@ -917,7 +918,7 @@ def cmd_tasks(root, args):
             r = tasks.block(root, project, rest[0] if rest else "", _opt(args, "--reason"))
             print("blocked %s" % r["task"]["id"] + ("; started %s" % r["started"]["id"] if r["started"] else ""))
         elif verb == "unblock":
-            print("unblocked %s" % tasks.unblock(root, project, rest[0] if rest else "")["id"])
+            print("unblocked %s" % tasks.unblock(root, project, rest[0] if rest else "", at=_opt(args, "--at") or None)["id"])
         elif verb == "drop":
             r = tasks.drop(root, project, rest[0] if rest else "", _opt(args, "--reason"))
             print("dropped %s, logged as %s" % (r["task"]["id"], r["entry"]["id"]))

@@ -1184,6 +1184,18 @@ def test_tasks_commands(tmp: Path):
     check("unblock returns it to not started", {k["id"]: k["status"] for k in tasks.load(root, "mech/newthing")["tasks"]}[now["id"]] == "next")
     check("unblock takes the reason off and keeps the paragraph",
           tasks.load(root, "mech/newthing")["details"][now["id"]] == "a rewritten paragraph for the blocked task")
+    extra = [tasks.add(root, "mech/newthing", "a queued task number %d" % i, details="only here to test where unblock places a task")["id"]
+             for i in (1, 2)]
+    nexts = lambda: [k["id"] for k in sorted(tasks.load(root, "mech/newthing")["tasks"], key=lambda k: tasks.RANK[k["status"]])
+                     if k["status"] == "next"]
+    tasks.block(root, "mech/newthing", extra[0], "waiting only for this check")
+    tasks.unblock(root, "mech/newthing", extra[0], at=99)
+    check("unblock --at past the end puts the task last among the not-started", nexts()[-1] == extra[0], nexts())
+    tasks.block(root, "mech/newthing", extra[0], "waiting only for this check")
+    tasks.unblock(root, "mech/newthing", extra[0], at=1)
+    check("unblock --at 1 puts it first among the not-started", nexts()[0] == extra[0], nexts())
+    for tid in extra:
+        tasks.drop(root, "mech/newthing", tid, "only here to test unblock --at")
     tasks.add(root, "mech/newthing", "a task that turns out not to be needed", details="kept only to be dropped by the next check")
     last = tasks.load(root, "mech/newthing")["tasks"][-1]["id"]
     dr = tasks.drop(root, "mech/newthing", last, "superseded by the new plan")

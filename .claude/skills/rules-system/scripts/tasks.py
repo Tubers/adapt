@@ -344,7 +344,10 @@ def block(root, project, tid, reason) -> dict:
     return {"task": k, "started": started}
 
 
-def unblock(root, project, tid) -> dict:
+def unblock(root, project, tid, at=None) -> dict:
+    """Back to not started. `at` places it among the not-started tasks, 1 first, as add --at does; a number past
+    the end puts it last, for a task put back "on the stack for the future" (the user, 2026-09-15). Without it the
+    task keeps its place, which is ahead of every not-started task, so it would be the next one to start."""
     p = load(root, project)
     k = _find(p, tid)
     if k["status"] != "blocked":
@@ -355,6 +358,12 @@ def unblock(root, project, tid) -> dict:
         p["details"][tid] = rest
     else:
         p["details"].pop(tid, None)     # blocked before paragraphs were required: check will ask for one
+    if at:
+        order = [x for x in sorted(p["tasks"], key=lambda x: RANK[x["status"]]) if x is not k]
+        first_next = next((i for i, x in enumerate(order) if x["status"] == "next"), len(order))
+        nexts = sum(1 for x in order if x["status"] == "next")
+        order.insert(first_next + max(0, min(int(at) - 1, nexts)), k)
+        p["tasks"] = order
     _promote_next(p)
     save(root, project, p)
     return k
