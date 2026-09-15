@@ -2,8 +2,8 @@
 
 **Goal:** revise the Adapt skill spec with the user: spec/original.txt is the untouched first draft, spec/revised.txt the working revision
 
-- ✅ fix where Adapt sits: skill folder, project folder, or both · *2026-09-15* `t5`
 - ✅ define SPECIALISTS as per-skill context folders · *2026-09-15* `t8`
+- ✅ keep Adapt's inner skills away from host-project instances · *2026-09-15* `t14`
 - 🔄 **fold in the user's own changes to the spec** · *since 2026-09-15* `t1`
 - 🔜 reconcile Documentation Dogma with the existing writing rules `t4`
 - 🔜 define THE MANAGER without a persistent instance `t6`
@@ -13,7 +13,6 @@
 - 🔜 fix When to Trigger and the duplicate check `t11`
 - 🔜 define a round `t12`
 - 🔜 manager launch: --bare or a normal session fenced by settings `t13`
-- 🔜 keep Adapt's inner skills away from host-project instances `t14`
 - 🔜 specialists as subagents, not agent teams; haiku worker lifecycle `t15`
 - 🔜 constant rules: a rules-system config for rules never removed or modified `t16`
 - 🔜 agent system prompts for manager, specialist-medium and specialist-low `t17`
@@ -30,9 +29,9 @@
 
 ## Details
 
-**t5** · rules/INDEX.md forbids any gate matching .claude/skills/**, so Adapt-wide RULES stored inside the skill cannot be gated rules. repo/dependency-direction: a skill never depends on the project or a sibling skill, yet Adapt edits other skills. Adapt task t4 (bundling rules-system, vector-search and Adapt into one skill) bears on this. Done when the spec fixes the location and the dependency direction.
-
 **t8** · The original calls SPECIALISTS sub-agent managed directories. Sub-agents do not persist, so each subfolder is the context a fresh agent reads to work on that one skill. Done when the spec lists what a specialist folder holds and who writes it.
+
+**t14** · Docs: a nested <subdir>/.claude/skills/ loads the first time a session reads or edits a file there; issue 40640 reported that broken. A git boundary may block it too. Options: host settings from init (skillOverrides off, Skill(...) deny); Read and Edit deny on Adapt's inner tree, only if a denied read does not trigger discovery (untested); a hook blocking host reads inside Adapt; an Adapt command as the only interface. Done when chosen and tested.
 
 **t1** · The user has many changes of their own: some needed, some functional alternatives judged better than the original. Take each in chat, write it into spec/revised.txt, and split out any that opens a new question as its own task. Done when the user says the list is exhausted.
 
@@ -50,9 +49,7 @@
 
 **t12** · User leans: a round is a start-to-finish cycle on one manager-created work item from the inbox. Proposal with five steps now in spec/revised.txt. Open: how much work one round takes on, and when the manager may start one itself. Done when the user accepts or changes it.
 
-**t13** · Decided: no --bare. Checked 2026-09-15: skills and agents walk up to the repo root; no setting stops it; --setting-sources is settings files only; project settings are not inherited; claudeMdExcludes covers CLAUDE.md and rules. Fences to test: Adapt as its own git repo (issue reports say the walk stops at the git root); skillOverrides off or Skill(name) deny per host skill; CLAUDE_CONFIG_DIR for user-level files. Done when chosen and tested.
-
-**t14** · Docs: a nested <subdir>/.claude/skills/ loads the first time a session reads or edits a file there; issue 40640 (Mar 2026) reported that broken, closed as duplicate. If Adapt is its own git repo, the boundary may also block it. Options: host settings written at init (skillOverrides off, deny Skill(...)), a hook blocking host reads inside Adapt, an Adapt command as the only interface. Done when chosen and tested.
+**t13** · Decided: configuration B, manager without --bare, started in a workspace outside the host; host files via permissions.additionalDirectories. Open: fence the user's personal ~/.claude skills and agents (skillOverrides or Skill deny by name, or a CLAUDE_CONFIG_DIR of Adapt's own); whether to add C, the plugin packaging; the launch command itself. Done when the launch command is fixed and a probe shows no host or personal skills in the manager.
 
 **t15** · Docs: agent teams need an interactive session, never -p. Subagents may spawn subagents by default, 3 layers deep; CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH=1 turns it off and so enforces manager-only spawning. The skills field preloads full content but does not restrict; omit Skill from tools to restrict. omitClaudeMd exists. A fresh haiku subagent per batch is stateless. Done when spec fixes the agent model and haiku lifecycle.
 
@@ -64,9 +61,9 @@
 
 **t19** · Needs a friction kind in rules-system history; a hook that notifies an instance after N new friction entries since its last notice, N configurable; grouping of similar entries by meaning with vector-search; manager commands to read specialist histories filtered for friction. Done when kind, hook, config and grouping are defined.
 
-**t20** · Specialists work on copies; the manager approves merges; two-way mirror with Adapt's inner copies. Docs: isolation worktree makes a worktree of the session's repo, branched from its default branch. If Adapt is its own git repo (t13), that copies Adapt, not the host, so host skill copies need worktrees made in the host repo by script. Needed: branch naming, conflicts, which side wins. Done when the flow is defined.
+**t20** · Specialists work on copies; the manager approves merges; two-way mirror with Adapt's inner copies. Under B a host skill copy is a git worktree made in the host repo by script, placed outside the workspace start folder and reached through additionalDirectories; isolation worktree would copy the workspace repo instead. Needed: branch naming, conflicts, which side wins. Done when the flow is defined.
 
-**t21** · First init spawns the manager and runs build scripts: inventory the user's skill environment, create local data folders and configs, load Adapt's own skills, create the manager's records, write any host-side settings. Needed: the step list, idempotent re-init, and what later inits do. Relates to Adapt t2. Done when the step list is defined.
+**t21** · First init creates the workspace outside the host repo as its own git repo, writes the shim into the host's .claude/skills/adapt/, spawns the manager, and runs build scripts: inventory the user's skills, create data folders and configs, load Adapt's own skills, create the manager's records. Needed: where the workspace lives (~/.adapt/<host> or beside the host), idempotent re-init, what later inits do. Done when defined.
 
 **t22** · What a host-project instance can run against Adapt: init, submit a request (the form), read the manager's tasks and history in filtered slices, start a round. Done when the command list and each command's output are defined.
 

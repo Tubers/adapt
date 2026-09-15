@@ -11,38 +11,46 @@ Ethos:
  It will be the place where skills are born and skills are improved. The idea here is that this skill will be used by all agents to request new skills and to improve existing ones. As requests accrue, at some critical point, typically initiated by myself the human user (for now - but perhaps not in the future) the "Adapt" will execute a 'round', which is like a total sweep of processing from top to bottom where it performs actions based on its current state.
 
 
-Where Adapt lives:
-	Adapt is a skill inside another project, the host project, at <host>/.claude/skills/adapt/. The other skills in the host's .claude/skills/ are Adapt's sibling skills. They serve the host project, and they are the skills Adapt repairs, extends and adds to.
-	Adapt comes bundled with its own copies of two skills from this repo: rules-system and vector-search. It also carries a third skill of its own, META TOOLS. The handoff skill may join later; for now Adapt ships with these three.
-	The skills inside Adapt serve only the instances that inhabit Adapt. Instances working in the host project never use them. (open: t14)
+Where Adapt lives (configuration B, the current best contender):
+	Adapt comes in two parts. The goal of a self-contained skill folder is dropped.
+	- The shim: a thin skill inside the host project, at <host>/.claude/skills/adapt/. It holds only SKILL.md and the scripts a host instance runs: init, submit a request, read the manager's records, start a round (open: t22). It has no .claude tree of its own.
+	- The workspace: everything else, in a folder outside the host repository, created at first init. Examples are ~/.adapt/<host name>/ or a folder beside the host; the exact place is open (t21). It holds Adapt's own .claude tree, its rules, and the capitalized root folders below.
+	The other skills in the host's .claude/skills/ are Adapt's sibling skills. They serve the host project, and they are the skills Adapt repairs, extends and adds to.
+	Adapt comes bundled with its own copies of two skills from this repo: rules-system and vector-search. It also carries a third skill of its own, META TOOLS. The handoff skill may join later; for now Adapt ships with these three. All three live in the workspace.
+	Why B: every fence rests on documented Claude Code behavior.
+	- The manager starts in the workspace. The host is not above it, so the skill and agent search, which walks up from the start folder, never reaches the host's skills or agents.
+	- The manager reaches host files through the permissions.additionalDirectories setting. That setting grants file access and never loads the folder's skills, CLAUDE.md or rules. The --add-dir flag does load skills, so Adapt does not use it.
+	- Adapt's inner skills are not under the host tree, so a host session can never discover them. They serve only the instances that inhabit Adapt.
+	Set aside:
+	- A: everything inside the skill folder, made its own git repository. It rests on untested behavior: discovery stopping at a git root, and lazy nested skill discovery.
+	- D: a --bare manager. It needs an API key billed directly instead of the subscription login.
+	- C, packaging the workspace's skills, agents and hooks as a plugin loaded with --plugin-dir, can still be added on top of B (open: t13).
 
 
 How a session learns of Adapt:
-	There is no CLAUDE.md file. Everything is scoped through rules. A gated rule in rules/INDEX.md tells a session about the Adapt skill when the session touches Adapt's files and folders, or when the user runs the Adapt init command. The rule is injected only when its gate matches, so a session that never touches Adapt pays nothing for it. The gate cannot match paths under .claude/skills/, so it matches the folders where Adapt keeps its working files.
+	There is no CLAUDE.md file. Everything is scoped through rules. A gated rule in rules/INDEX.md tells a session about the Adapt skill when the session touches Adapt's files and folders, or when the user runs the Adapt init command. The rule is injected only when its gate matches, so a session that never touches Adapt pays nothing for it. The gate cannot match paths under .claude/skills/, so it matches the commands the shim runs, and the workspace.
 
 
-Adapt's own .claude tree:
-	The Adapt folder contains its own .claude tree, because Adapt is mainly run by a headless session started inside it. That session treats the Adapt folder as its project.
-	- .claude/settings.json: ordinary Claude Code settings. Its claudeMdExcludes setting lists glob patterns, matched against absolute paths, that stop every CLAUDE.md and CLAUDE.local.md above the Adapt folder from loading. A managed-policy CLAUDE.md cannot be excluded. The same file holds the hooks and permissions that keep each agent in its silo.
+The workspace's .claude tree:
+	The workspace contains its own .claude tree, because Adapt is mainly run by a headless session started inside it. That session treats the workspace as its project.
+	- .claude/settings.json: ordinary Claude Code settings. Its claudeMdExcludes setting lists glob patterns, matched against absolute paths, that stop every CLAUDE.md and CLAUDE.local.md above the workspace from loading. A managed-policy CLAUDE.md cannot be excluded. Its permissions.additionalDirectories names the host folders the manager may edit. The same file holds the hooks and permissions that keep each agent in its silo.
 	- .claude/agents/: the two specialist definitions.
 	- .claude/skills/: rules-system, vector-search and meta-tools.
 	- .claude/hooks/: the scripts the settings call.
-	There is no CLAUDE.md and no unscoped rule anywhere in this tree. Adapt's rules live in its own rules/ folder, gated by its own rules/INDEX.md.
-	Two launch cautions from the Claude Code docs (open: t13):
-	- The --bare flag skips hooks, skills, subagents, plugins, MCP servers, auto memory and CLAUDE.md. Only skills in a directory passed with --add-dir still load. A --bare manager therefore loses the hooks and agent definitions this design relies on, unless they are passed to it explicitly with --settings, --agents or --plugin-dir. A --bare session also never reads the subscription login, so it needs ANTHROPIC_API_KEY or an apiKeyHelper.
-	- Without --bare, a session started in the Adapt folder also loads project skills from every parent folder up to the repository root, which means the host's skills. It also loads the user's own ~/.claude files unless --setting-sources leaves out user. claudeMdExcludes covers CLAUDE.md and rules files, not skills.
-	What the docs and issue reports say (checked 2026-09-15):
+	There is no CLAUDE.md and no unscoped rule anywhere in this tree. Adapt's rules live in the workspace's rules/ folder, gated by its own rules/INDEX.md.
+	The workspace is the root of its own git repository and never sits inside another one, so the documented walk up to the repository root ends at the workspace itself.
+	What the Claude Code docs and issue reports say (checked 2026-09-15):
 	- Skills and agent definitions are found by walking up from the start folder to the repository root. No setting stops that walk.
-	- Project settings are not inherited from parent folders, so the host's settings and hooks do not reach the manager.
+	- Project settings are not inherited from parent folders.
 	- claudeMdExcludes stops CLAUDE.md and rules files. --setting-sources affects settings files only, not skills, agents, CLAUDE.md, rules or hooks.
-	Candidate fences for the non-bare manager, all to be tested:
-	- Make the Adapt folder the root of its own git repository. User issue reports, not the docs, say discovery stops at the git root, so the walk would never reach the host's .claude/skills/ or .claude/agents/.
-	- In Adapt's settings, turn off or deny every host skill by name (skillOverrides "off", or a deny rule on Skill(name)). This hides a skill; it does not stop it loading. The first-run inventory knows the names.
-	- Point CLAUDE_CONFIG_DIR at a config folder of Adapt's own, to leave out the user's personal skills, agents and CLAUDE.md. That folder then needs its own subscription login. Untested.
+	- Permission deny rules gate Claude's own tool calls, not Claude Code's startup discovery, so a Read deny cannot stop a skill from loading.
+	- The --bare flag skips hooks, skills, subagents, plugins, MCP servers, auto memory and CLAUDE.md, and never reads the subscription login, so it needs ANTHROPIC_API_KEY or an apiKeyHelper.
+	Still open for the manager (t13):
+	- The user's personal ~/.claude skills, agents and CLAUDE.md load in any session started without --bare. claudeMdExcludes can drop the personal CLAUDE.md. For personal skills and agents: hide each by name (skillOverrides "off", or a deny rule on Skill(name)), or give the manager its own CLAUDE_CONFIG_DIR, which then needs its own subscription login. Untested.
 
 
 Sessions and agents:
-	THE MANAGER is a headless session, not a subagent. An Adapt command launches it inside the Adapt folder, on the Opus 5 model, bare bones (a requirement). For now it is not launched with --bare, so it can use the subscription login instead of an API key billed directly. It is kept bare by its settings and its folder's place in git instead (open: t13). Its home folder holds its continuity files (see THE MANAGER below).
+	THE MANAGER is a headless session, not a subagent. An Adapt command launches it inside the workspace, on the Opus 5 model, bare bones (a requirement). For now it is not launched with --bare, so it can use the subscription login instead of an API key billed directly. It is kept bare instead by the workspace sitting outside the host, and by its settings (open: t13). Its home folder holds its continuity files (see THE MANAGER below).
 	The manager is the only instance that spawns or removes a subagent. By default a subagent may spawn its own subagents, up to three layers deep, so Adapt's settings set CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH to 1 to enforce this. It is also the only instance that creates the work items the specialists work on. It decides whether a skill is actually broken (REPAIR), needs extending (EXTEND), or whether a new skill is needed or is preferable to extending another (NEW).
 	There are two kinds of subagent. Both are defined in .claude/agents/ with minimal starting directives, and both are preloaded with rules-system, vector-search and meta-tools:
 	- Specialist, medium model (Sonnet). Each one is assigned one sibling skill and writes code for it. Specialists may work together on larger projects, such as building a brand new skill on request.
@@ -70,6 +78,8 @@ Records and communication:
 
 Working on skills:
 	Specialists change skills only on copies, probably git worktrees. The manager decides when a copy is merged back into the skill.
+	A copy of a host skill is a git worktree made in the host repository by script. The isolation: worktree subagent field would copy the workspace repository instead, so Adapt does not use it for host skills.
+	Copies live outside the manager's start folder and are reached through additionalDirectories. A copy under the start folder would let the session lazily load that copy's .claude/skills/.
 	When a specialist changes a sibling skill that Adapt also carries a copy of, the change is mirrored to Adapt's copy. A change to Adapt's copy is mirrored back the same way. (open: t20)
 
 
@@ -83,7 +93,7 @@ Friction:
 
 
 Initialization:
-	Adapt goes through an install process the first time it is initialized. The init command has the manager spawn in and do the setup, together with many automated build scripts. It takes stock of the user's skill environment, creates the local data folders and other configuration it needs, loads its own skills, and creates the manager's history log and tasks file. Everything that needs setting up happens during this first init. (open: t21)
+	Adapt goes through an install process the first time it is initialized. The init command has the manager spawn in and do the setup, together with many automated build scripts. It takes stock of the user's skill environment, creates the local data folders and other configuration it needs, loads its own skills, and creates the manager's history log and tasks file. It creates the workspace outside the host repository and writes the shim into the host's .claude/skills/adapt/. Everything that needs setting up happens during this first init. (open: t21)
 
 
 Round (proposed; open: t12):
@@ -102,6 +112,7 @@ Amalgamation (proposed; open: t9):
 
  Root Sub Folders:
 	all the fully capitalized names are folders in the root of the "Adapt" folder
+	(Under configuration B, the "Adapt" folder means the workspace.)
 
  THE MANAGER:
 
