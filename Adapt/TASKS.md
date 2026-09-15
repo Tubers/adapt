@@ -4,7 +4,7 @@
 
 - ✅ trust the Adapt workspace once, so its permissions.allow list takes effect · *2026-09-15* `t9`
 - ✅ viewer: click a task with a sub-project to open that sub-project's tasks in a separate window · *2026-09-15* `t12`
-- 🔄 **git and GitHub integration: version the Adapt repo and publish the skills from GitHub** · *since 2026-09-14* `t5`
+- 🔄 ❓ **git and GitHub integration: version the Adapt repo and publish the skills from GitHub** · *since 2026-09-14* `t5`
 - ⛔ ❓ a custom lightweight executable for the task and history viewer `t10`
 - 🔜 review and revise the Adapt spec, Adaptive Tools.txt `t1`
 - 🔜 an installer script per skill that reads the manifest and terraforms a project `t2`
