@@ -2,10 +2,9 @@
 
 **Goal:** build the Adapt environment and the Adapt skill: its spec, how its skills are bundled, installed, configured, versioned and shown
 
-- ✅ trust the Adapt workspace once, so its permissions.allow list takes effect · *2026-09-15* `t9`
 - ✅ viewer: click a task with a sub-project to open that sub-project's tasks in a separate window · *2026-09-15* `t12`
-- 🔄 ❓ **git and GitHub integration: version the Adapt repo and publish the skills from GitHub** · *since 2026-09-14* `t5`
-- 🔜 delete the stale OneDrive copy of Adapt `t14`
+- ✅ git and GitHub integration: version the Adapt repo and publish the skills from GitHub · *2026-09-15* `t5`
+- 🔄 ❓ **delete the stale OneDrive copy of Adapt** · *since 2026-09-15* `t14`
 - 🔜 review and revise the Adapt spec, Adaptive Tools.txt `t1`
 - 🔜 an installer script per skill that reads the manifest and terraforms a project `t2`
 - 🔜 fetch the embedding model when no preinstalled copy is found `t3`
@@ -19,8 +18,6 @@
 ---
 
 ## Details
-
-**t9** · Blocked: a user action: only the user can accept the trust dialog · Claude Code ignores a project's allow list until the workspace is trusted; hooks run regardless. Adapt moved to C:\dev\Adapt on 2026-09-15, so trust is needed at the new path. The user opens Claude Code there once and accepts the trust dialog. Done means a headless session there no longer prints the 'workspace has not been trusted' warning.
 
 **t12** · Asked for by the user 2026-09-14. Today a sub-project link replaces the current page. Instead, clicking a task with a sub-project (the 🗂 marker) opens a second window on that sub-project's viewer, so parent and sub-tasks stay visible side by side. Decide: the task line or a button, one window per sub-project or one reused. Done means drill-down opens its own window and both stay live.
 
@@ -42,6 +39,6 @@
 
 **t8** · The user, 2026-09-14. A friction entry records any time a plan was thwarted and had to divert: a pivot, a detour, a new path, what forced it and what it cost. It also covers a cumbersome, slow or input-heavy skill, command or rule. history add --kind friction, a rule for when to log one and how it differs from dead-end (an approach dropped for good), a viewer chip, upkeep counts. Feeds Adapt's improvement requests. Done: kind, rule, viewer support.
 
-**t13** · So a skill, hook or rule improved here reaches every other project that uses the Adapt skills without copying by hand. Candidates to weigh: a Claude Code plugin marketplace served from the GitHub repo (skills and hooks as a plugin, updated with /plugin update), a git submodule or subtree of .claude/ per project, or the t2 installer pulling a tagged release plus an update command. Project records stay local. Done: a change pushed here reaches a second project with one command.
+**t13** · So a skill, hook or rule improved here reaches every other project that uses the Adapt skills without copying by hand; carries t5's second goal (q8): a project installs the skills from github.com/Tubers/adapt. Candidates: a Claude Code plugin marketplace served from the repo (/plugin update), a git submodule or subtree of .claude/ per project, or the t2 installer pulling a tagged release. Project records stay local. Done: a change pushed here reaches a second project with one command.
 
 **t10** · Asked for by the user 2026-09-14. A small native window instead of a browser tab, hosting the same page and local server: candidates are a WebView2 host in C++ or C#, pywebview, or Tauri, judged on size, start time and no install step. For the future: the user is still iterating on the viewer (q5, 2026-09-15), so it waits at the back of the queue until they call the look settled. Done means one small executable that replaces the browser tab.
