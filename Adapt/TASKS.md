@@ -25,7 +25,7 @@
 
 **t14** · The user said yes to deleting C:\Users\ljcg3\OneDrive\Desktop\Adapt permanently (q7, 2026-09-15), so it cannot be confused with C:\dev\Adapt. Not done in the session that asked: that session ran from the OneDrive folder, and its hooks load from there. Done from a session started in C:\dev\Adapt: confirm nothing there is newer than C:\dev\Adapt, then Remove-Item -Recurse -Force, then log it.
 
-**t1** · Read the spec whole, then propose changes: gaps (request template, the round, manager and specialist scope), conflicts with what is built (rules, not a CLAUDE.md line; per-project records; the parked sub-agent rules work). ADDENDUM (the user, 2026-09-14): also weigh a claudeMdExcludes setting in Adapt, so no CLAUDE.md from a parent folder or the user level loads; none exists yet. Changes go to the user first. Done: an accepted revised spec.
+**t1** · Review and revise the Adapt spec with the user. Now run as its own project: spec/ (spec/original.txt, spec/revised.txt); its TASKS.md holds every open item. Done when the spec project is done.
 
 **t2** · Copies the skill, merges its hooks and settings into .claude/settings.json without clobbering, writes its rules and gate lines, creates data folders, checks Python packages, and installs a required skill first. Idempotent, with a dry run and an uninstall. Done means installing into an empty folder reproduces this setup.
 
