@@ -50,11 +50,11 @@
 
 **t12** · User leans: a round is a start-to-finish cycle on one manager-created work item from the inbox. Proposal with five steps now in spec/revised.txt. Open: how much work one round takes on, and when the manager may start one itself. Done when the user accepts or changes it.
 
-**t13** · Docs: --bare skips hooks, skills, subagents, plugins, MCP, auto memory and CLAUDE.md; only --add-dir skills load. Without --bare, a session in the Adapt folder loads host skills from every parent up to repo root, and user ~/.claude files unless --setting-sources drops user. Verify whether --settings and --agents restore hooks and agents under --bare; tests/ t2 overlaps. Done when the launch command is fixed and tested.
+**t13** · Decided: no --bare. Checked 2026-09-15: skills and agents walk up to the repo root; no setting stops it; --setting-sources is settings files only; project settings are not inherited; claudeMdExcludes covers CLAUDE.md and rules. Fences to test: Adapt as its own git repo (issue reports say the walk stops at the git root); skillOverrides off or Skill(name) deny per host skill; CLAUDE_CONFIG_DIR for user-level files. Done when chosen and tested.
 
-**t14** · Docs: a nested <subdir>/.claude/skills/ loads the first time a session reads or edits a file in that subdir; nested rules and CLAUDE.md load the same way. A host session touching Adapt files would gain rules-system, vector-search and meta-tools. Options: host settings written at init (skillOverrides off, deny Skill(...)), a hook that blocks host reads inside Adapt, an Adapt command as the only interface. Done when chosen and tested.
+**t14** · Docs: a nested <subdir>/.claude/skills/ loads the first time a session reads or edits a file there; issue 40640 (Mar 2026) reported that broken, closed as duplicate. If Adapt is its own git repo, the boundary may also block it. Options: host settings written at init (skillOverrides off, deny Skill(...)), a hook blocking host reads inside Adapt, an Adapt command as the only interface. Done when chosen and tested.
 
-**t15** · Docs: agent teams need an interactive session; in -p no teammates spawn; teammates cannot nest; a definition's skills field is not applied to teammates. So specialists are subagents of the manager, persistent only through files. Verify subagents cannot spawn subagents and that the skills field preloads. A fresh haiku subagent per batch is stateless by construction; no idle instance needed. Done when spec fixes both.
+**t15** · Docs: agent teams need an interactive session, never -p. Subagents may spawn subagents by default, 3 layers deep; CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH=1 turns it off and so enforces manager-only spawning. The skills field preloads full content but does not restrict; omit Skill from tools to restrict. omitClaudeMd exists. A fresh haiku subagent per batch is stateless. Done when spec fixes the agent model and haiku lifecycle.
 
 **t16** · User wants some rules fixed for good. Needed: the config file and format naming them, and the enforcement point, likely the existing rule-approval hook refusing edits, moves and deletes of a listed rule. Done when format and enforcement are defined.
 
@@ -64,7 +64,7 @@
 
 **t19** · Needs a friction kind in rules-system history; a hook that notifies an instance after N new friction entries since its last notice, N configurable; grouping of similar entries by meaning with vector-search; manager commands to read specialist histories filtered for friction. Done when kind, hook, config and grouping are defined.
 
-**t20** · Specialists work on copies, probably git worktrees (verify the subagent isolation worktree field). The manager approves each merge. Changes mirror between a host sibling skill and Adapt's inner copy both ways. Needed: branch naming, conflict handling, which side wins. Relates to Adapt t13. Done when the flow is defined.
+**t20** · Specialists work on copies; the manager approves merges; two-way mirror with Adapt's inner copies. Docs: isolation worktree makes a worktree of the session's repo, branched from its default branch. If Adapt is its own git repo (t13), that copies Adapt, not the host, so host skill copies need worktrees made in the host repo by script. Needed: branch naming, conflicts, which side wins. Done when the flow is defined.
 
 **t21** · First init spawns the manager and runs build scripts: inventory the user's skill environment, create local data folders and configs, load Adapt's own skills, create the manager's records, write any host-side settings. Needed: the step list, idempotent re-init, and what later inits do. Relates to Adapt t2. Done when the step list is defined.
 

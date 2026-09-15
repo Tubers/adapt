@@ -29,13 +29,21 @@ Adapt's own .claude tree:
 	- .claude/hooks/: the scripts the settings call.
 	There is no CLAUDE.md and no unscoped rule anywhere in this tree. Adapt's rules live in its own rules/ folder, gated by its own rules/INDEX.md.
 	Two launch cautions from the Claude Code docs (open: t13):
-	- The --bare flag skips hooks, skills, subagents, plugins, MCP servers, auto memory and CLAUDE.md. Only skills in a directory passed with --add-dir still load. A --bare manager therefore loses the hooks and agent definitions this design relies on, unless they are passed to it explicitly.
+	- The --bare flag skips hooks, skills, subagents, plugins, MCP servers, auto memory and CLAUDE.md. Only skills in a directory passed with --add-dir still load. A --bare manager therefore loses the hooks and agent definitions this design relies on, unless they are passed to it explicitly with --settings, --agents or --plugin-dir. A --bare session also never reads the subscription login, so it needs ANTHROPIC_API_KEY or an apiKeyHelper.
 	- Without --bare, a session started in the Adapt folder also loads project skills from every parent folder up to the repository root, which means the host's skills. It also loads the user's own ~/.claude files unless --setting-sources leaves out user. claudeMdExcludes covers CLAUDE.md and rules files, not skills.
+	What the docs and issue reports say (checked 2026-09-15):
+	- Skills and agent definitions are found by walking up from the start folder to the repository root. No setting stops that walk.
+	- Project settings are not inherited from parent folders, so the host's settings and hooks do not reach the manager.
+	- claudeMdExcludes stops CLAUDE.md and rules files. --setting-sources affects settings files only, not skills, agents, CLAUDE.md, rules or hooks.
+	Candidate fences for the non-bare manager, all to be tested:
+	- Make the Adapt folder the root of its own git repository. User issue reports, not the docs, say discovery stops at the git root, so the walk would never reach the host's .claude/skills/ or .claude/agents/.
+	- In Adapt's settings, turn off or deny every host skill by name (skillOverrides "off", or a deny rule on Skill(name)). This hides a skill; it does not stop it loading. The first-run inventory knows the names.
+	- Point CLAUDE_CONFIG_DIR at a config folder of Adapt's own, to leave out the user's personal skills, agents and CLAUDE.md. That folder then needs its own subscription login. Untested.
 
 
 Sessions and agents:
-	THE MANAGER is a headless session, not a subagent. An Adapt command launches it inside the Adapt folder, on the Opus 5 model, bare bones (a requirement). Its home folder holds its continuity files (see THE MANAGER below).
-	The manager is the only instance that spawns or removes a subagent. It is also the only instance that creates the work items the specialists work on. It decides whether a skill is actually broken (REPAIR), needs extending (EXTEND), or whether a new skill is needed or is preferable to extending another (NEW).
+	THE MANAGER is a headless session, not a subagent. An Adapt command launches it inside the Adapt folder, on the Opus 5 model, bare bones (a requirement). For now it is not launched with --bare, so it can use the subscription login instead of an API key billed directly. It is kept bare by its settings and its folder's place in git instead (open: t13). Its home folder holds its continuity files (see THE MANAGER below).
+	The manager is the only instance that spawns or removes a subagent. By default a subagent may spawn its own subagents, up to three layers deep, so Adapt's settings set CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH to 1 to enforce this. It is also the only instance that creates the work items the specialists work on. It decides whether a skill is actually broken (REPAIR), needs extending (EXTEND), or whether a new skill is needed or is preferable to extending another (NEW).
 	There are two kinds of subagent. Both are defined in .claude/agents/ with minimal starting directives, and both are preloaded with rules-system, vector-search and meta-tools:
 	- Specialist, medium model (Sonnet). Each one is assigned one sibling skill and writes code for it. Specialists may work together on larger projects, such as building a brand new skill on request.
 	- Specialist, lower model (Haiku). It carries out small file and folder operations for a medium specialist. Its context is wiped between every action, so every task given to it must be stateless. Tasks may be lumped together and done in batches. A medium specialist asks the manager for one when none exists, and the manager decides whether invoking it is worth it relative to the work. At least one should be kept available.
