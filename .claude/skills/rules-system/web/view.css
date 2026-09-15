@@ -10,6 +10,7 @@
   --blocked: #c0392b;
   --next: #8a8f96;
   --question: #b7791f;
+  --action: #d9480f;
   --chip: #efece5;
   --shadow: 0 1px 2px rgba(0, 0, 0, .05), 0 4px 16px rgba(0, 0, 0, .04);
   --radius: 12px;
@@ -29,6 +30,7 @@
     --blocked: #ff7b6b;
     --next: #8f959c;
     --question: #e5b454;
+    --action: #ff8c5a;
     --chip: #262a2f;
     --shadow: none;
   }
@@ -142,6 +144,7 @@ ul.tasklist, ol.entries { list-style: none; margin: 0; padding: 0; }
 .badge, .status, .chip, .task .icon { cursor: help; }
 .task .q { cursor: pointer; }
 .badge.kind-q { background: color-mix(in srgb, var(--question) 18%, transparent); color: var(--question); }
+.badge.kind-a { background: color-mix(in srgb, var(--action) 16%, transparent); color: var(--action); }
 
 /* what the last poll found new or changed: a soft glow that stays until the next change replaces it */
 .fresh {
@@ -206,7 +209,18 @@ p.goal.fresh { border-radius: var(--radius); padding: 6px 10px; }
   color: #fff;
   cursor: pointer;
 }
-.qa .send:disabled { opacity: .6; cursor: default; }
+.qa .send:disabled, .qa .did:disabled { opacity: .6; cursor: default; }
+.qa .qid.aid { color: var(--action); }
+.qa .did {
+  font: inherit;
+  font-size: .9rem;
+  padding: 6px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--action);
+  background: var(--action);
+  color: #fff;
+  cursor: pointer;
+}
 .qa .qmsg { color: var(--muted); font-size: .85rem; }
 .qa .qdone { margin: 0; color: var(--muted); }
 .qa .qdone span { color: var(--ink); font-weight: 600; margin-right: 8px; }

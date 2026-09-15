@@ -1017,6 +1017,10 @@ def test_viewer(tmp: Path):
     now = [t for t in p["tasks"] if t["status"] == "now"][0]
     check("tasks parse: heading, goal and every status", p["project"] == "mech/inv" and p["goal"].startswith("make items")
           and [t["status"] for t in p["tasks"]] == ["done", "now", "blocked", "next", "next", "next"], p)
+    act_line = tasks.parse(TASKS.replace("- ⛔ blocked on", "- ⛔ ❗ blocked on"))
+    check("tasks parse: the action mark after the status icon", [t["action"] for t in act_line["tasks"]]
+          == [False, False, True, False, False, False] and act_line["tasks"][2]["text"] == "blocked on a data mod rebuild",
+          act_line["tasks"])
     check("tasks parse: question, bold, since-date and id", now["question"] and now["bold"] and now["since"]
           and now["date"] == "2026-09-13" and now["id"] == "t2" and now["text"] == "the thing in progress", now)
     check("a details paragraph joins its lines", p["details"]["t2"] == "What is happening, over two source lines.", p["details"])
@@ -1076,6 +1080,27 @@ def test_viewer(tmp: Path):
               post({"id": q["id"], "answer": "the large map instead"})[0] == 400)
         check("the payload carries the questions for the page",
               _json.loads(urllib.request.urlopen(base + "/data", timeout=5).read())["questions"][0]["id"] == q["id"])
+        act = _q.act(root, "mech/inv", "t3", "rebuild the data mod, which only the user can do")
+        live = _json.loads(urllib.request.urlopen(base + "/data", timeout=5).read())
+        check("the payload marks a task with an open action",
+              [k for k in live["tasks"]["tasks"] if k["id"] == "t3"][0]["action"] is True)
+
+        def post_done(body, tok=token):
+            req = urllib.request.Request(base + "/done", data=_json.dumps(body).encode("utf-8"), method="POST",
+                                         headers={"Content-Type": "application/json", "X-View-Token": tok})
+            try:
+                with urllib.request.urlopen(req, timeout=5) as r:
+                    return r.status, _json.loads(r.read())
+            except urllib.error.HTTPError as e:
+                return e.code, e.read()
+
+        check("marking an action done without the page's token is refused", post_done({"id": act["id"]}, tok="x")[0] == 403)
+        check("an answer sent to an action is refused", post({"id": act["id"], "answer": "done it just now"})[0] == 400)
+        code, body = post_done({"id": act["id"], "note": "rebuilt with the new dataset"})
+        done = [x for x in _q.read(root, "mech/inv") if x["id"] == act["id"]][0]
+        check("marking done from the page writes the time and the note", code == 200 and done.get("done")
+              and done.get("note") == "rebuilt with the new dataset", (code, body, done))
+        check("marking it done twice is refused", post_done({"id": act["id"]})[0] == 400)
         check("running() finds no viewer for a project that has none", viewer.running(root, "mech/nothing") is None)
     finally:
         server.shutdown()
@@ -1217,6 +1242,41 @@ def test_tasks_commands(tmp: Path):
     questions.answer(root, proj, q3["id"], "yes, it returns at once")
     check("wait returns at once when an answer is waiting",
           [q["id"] for q in questions.wait(root, proj, timeout=5)] == [q3["id"]])
+    questions.consume(root, proj)
+
+    # actions: something only the user can do, marked ❗ until the user marks it done (the user, 2026-09-15)
+    check("an action needs a task in the window", "no task" in refused(questions.act, root, proj, "t99", "log in to GitHub once"))
+    a = questions.act(root, proj, now, "run gh auth login once in a terminal")
+    check("act writes a numbered action tied to its task", a["id"] == "a1" and a["task"] == now and a["kind"] == "action")
+    raw = (root / proj / "TASKS.md").read_text(encoding="utf-8")
+    check("the task line shows the exclamation mark while the action is open", "❗" in raw and "❓" not in raw, raw)
+    check("the parsed window carries the action mark", [k for k in tasks.load(root, proj)["tasks"] if k["id"] == now][0]["action"])
+    check("the folder state counts the open action", "1 action for the user" in history.folder_state(root, proj))
+    check("an action is not answered like a question", "is an action" in refused(questions.answer, root, proj, a["id"], "done it now"))
+    check("a question is not marked done like an action", "is a question" in refused(
+        questions.acted, root, proj, questions.ask(root, proj, now, "which of the two maps loads faster?")["id"]))
+    both = (root / proj / "TASKS.md").read_text(encoding="utf-8")
+    check("a task can carry both marks, question first", "❓ ❗" in both, both)
+    check("render and parse round-trip with both marks", tasks.parse(tasks.render(tasks.load(root, proj)))["tasks"]
+          == tasks.load(root, proj)["tasks"])
+    questions.withdraw(root, proj, [q for q in questions.read(root, proj) if not questions.is_action(q)][0]["id"],
+                       "only here to test the two marks together")
+    check("wait does not return for an action still open", questions.wait(root, proj, timeout=0.1, interval=0.05) == [])
+    questions.acted(root, proj, a["id"], "logged in as the repo owner")
+    check("acted is refused twice", "already done" in refused(questions.acted, root, proj, a["id"]))
+    check("a done action takes the exclamation mark off", "❗" not in (root / proj / "TASKS.md").read_text(encoding="utf-8"))
+    check("wait returns at once when an action is done", [x["id"] for x in questions.wait(root, proj, timeout=5)] == [a["id"]])
+    got = questions.consume(root, proj)
+    note = [e for e in history.entries(root, proj) if e.get("action") == a["id"]]
+    check("answers logs a done action as a note keyed by action and task, with the user's note",
+          len(got) == 1 and got[0]["action"]["id"] == a["id"] and len(note) == 1 and note[0]["kind"] == "note"
+          and note[0]["task"] == now and "logged in as the repo owner" in note[0]["what"], note)
+    check("and removes it from the file", questions.read(root, proj) == [])
+    check("action ids are never reused once consumed", questions.next_aid(root, proj) == "a2")
+    aw = questions.act(root, proj, now, "an action that turns out not to be needed")
+    w = questions.withdraw(root, proj, aw["id"], "the instance could do it after all")
+    check("withdraw takes back an open action and logs why", w["entry"]["action"] == aw["id"]
+          and "Withdrawn because" in w["entry"]["what"] and questions.read(root, proj) == [])
 
 
 def test_review_fixes(tmp: Path):

@@ -85,7 +85,7 @@ COMMANDS = {
              "TASKS.md or the candidates change, keeps its filters and open entries, and its server stops "
              "three minutes after the page closes. Running it again for the same project reuses the page's "
              "server. --static writes a snapshot to the temp folder instead. The page only reads."),
-    "tasks": ("[show|add|start|done|block|unblock|drop|detail|goal|ask|answer|questions|wait|answers|withdraw] ... [--in <folder>]",
+    "tasks": ("[show|add|start|done|block|unblock|drop|detail|goal|ask|answer|act|acted|questions|wait|answers|withdraw] ... [--in <folder>]",
               "read or change a project's TASKS.md and QUESTIONS.jsonl; the only way they are written",
               "show (default); add \"<task>\" --details P [--at N]; start <id>; done [<id>] [--result R] "
               "[--kind K] [--evidence P] [--refs R] [--no-rule WHY]; block <id> --reason WHY; unblock <id>; "
@@ -94,7 +94,10 @@ COMMANDS = {
               "answer <q id> \"<the user's answer>\"; questions lists them; wait [--timeout S] returns when the user "
               "has answered one in the viewer (run it in the background after asking); withdraw <q id> --reason WHY takes back an unanswered question, "
               "logged in history; answers reads the answered ones and "
-              "consumes them, each logged as a history decision and removed from the file. Without --in it "
+              "consumes them, each logged as a history decision and removed from the file. Actions, for what only "
+              "the user can do (log in, accept a dialog): act <task id> \"<what to do>\" (the task shows ❗ until "
+              "done); acted <a id> [\"<note>\"] marks it done, as the viewer's button does; questions, wait, "
+              "withdraw and answers handle actions too, a done action logged as a history note. Without --in it "
               "acts on the project the command runs inside or this session last worked in; a subfolder walks "
               "up. done logs the task in the project's history at once, starts the next task, and lets the "
               "oldest done task leave the window."),
@@ -933,28 +936,41 @@ def cmd_tasks(root, args):
         elif verb == "answer":
             q = questions.answer(root, project, rest[0] if rest else "", " ".join(rest[1:]))
             print("answer recorded for %s. An instance reads it with: rules.py tasks answers" % q["id"])
+        elif verb == "act":
+            a = questions.act(root, project, rest[0] if rest else "", " ".join(rest[1:]))
+            print("asked the user to act, %s on %s: %s" % (a["id"], a["task"], a["action"]))
+            import viewer
+            print("the viewer is open, so the user sees it there and marks it done" if viewer.running(root, project)
+                  else "no viewer is open for %s: tell the user in chat as well, or open it: rules.py view" % project)
+        elif verb == "acted":
+            a = questions.acted(root, project, rest[0] if rest else "", " ".join(rest[1:]))
+            print("%s marked done. An instance reads it with: rules.py tasks answers" % a["id"])
         elif verb == "questions":
             print(questions.show(root, project))
             return 0
         elif verb == "withdraw":
             r = questions.withdraw(root, project, rest[0] if rest else "", _opt(args, "--reason"))
-            print("withdrew %s, logged as %s" % (r["question"]["id"], r["entry"]["id"]))
+            print("withdrew %s, logged as %s" % (r["item"]["id"], r["entry"]["id"]))
         elif verb == "wait":
             got = questions.wait(root, project, timeout=float(_opt(args, "--timeout") or 43200))
-            print(("the user answered %s in the viewer. Read them: rules.py tasks --in %s answers"
+            print(("the user replied to %s in the viewer. Read them: rules.py tasks --in %s answers"
                    % (", ".join(q["id"] for q in got), project)) if got else "no answer arrived before the timeout")
             return 0
         elif verb == "answers":
             got = questions.consume(root, project)
             if not got:
-                print("no answered questions waiting in %s/" % project)
+                print("no answered questions or done actions waiting in %s/" % project)
                 print(questions.show(root, project))
                 return 0
             for r in got:
-                q = r["question"]
+                q = r.get("question") or r["action"]
                 print("%s  on %s %s" % (q["id"], q.get("task", ""), r["task_text"]))
-                print("  Q: %s" % q["question"])
-                print("  A: %s" % q["answer"])
+                if "action" in r:
+                    print("  ❗ %s" % q["action"])
+                    print("  done %s%s" % (q["done"], (": " + q["note"]) if q.get("note") else ""))
+                else:
+                    print("  Q: %s" % q["question"])
+                    print("  A: %s" % q["answer"])
                 print("  logged as %s; removed from QUESTIONS.jsonl" % r["entry"]["id"])
             return 0
         else:

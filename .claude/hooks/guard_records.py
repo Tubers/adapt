@@ -3,7 +3,7 @@
 
     HISTORY.jsonl      rules.py history <folder> ... | history show <id> | history add <folder> ...
     TASKS.md           rules.py tasks [show|add|start|done|block|unblock|drop|detail|goal] | init <folder>
-    QUESTIONS.jsonl    rules.py tasks ask | answer | questions | answers
+    QUESTIONS.jsonl    rules.py tasks ask | answer | act | acted | questions | answers
     candidates.jsonl   rules.py candidates --repo <repo> [next] | park | decide
 
 WHY
@@ -56,11 +56,13 @@ RECORDS = {
                   RULES_PY + ' tasks unblock <id> | drop <id> --reason WHY | detail <id> "<paragraph>" | goal "<goal>"',
                   RULES_PY + ' init <project folder> --goal "<goal>"   (a new project)',
                   RULES_PY + " view   (the tasks, history and candidates in the browser)"]),
-    "QUESTIONS.jsonl": ("a project's questions for the user",
+    "QUESTIONS.jsonl": ("a project's questions and actions for the user",
                         [RULES_PY + ' tasks ask <task id> "<question>"   (the task shows ❓ until answered)',
                          RULES_PY + ' tasks answer <q id> "<the user\'s answer>"',
+                         RULES_PY + ' tasks act <task id> "<what the user must do>"   (the task shows ❗ until done)',
+                         RULES_PY + ' tasks acted <a id> ["<note>"]   (the user did it)',
                          RULES_PY + " tasks questions   (list them)",
-                         RULES_PY + " tasks answers   (read the answers; each is logged as a decision and removed)"]),
+                         RULES_PY + " tasks answers   (read the replies; each is logged in history and removed)"]),
     "candidates.jsonl": ("the master copy of the rule candidates",
                          [RULES_PY + " candidates --repo <repo> [next|--all]",
                           RULES_PY + " decide <id> approve|reject --repo <repo> ...",

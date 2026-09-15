@@ -17,6 +17,8 @@
     decision: "Decision: a choice that was made, and why. Answered questions and dropped tasks land here.",
     question: "Question: one you answered, recorded as a decision once the instance read it. Questions still open " +
       "sit on their task in the Tasks tab. Research unknowns are notes tagged open-question.",
+    action: "Action: something only you could do, recorded as a note once you marked it done and the instance read it. " +
+      "Actions still open sit on their task in the Tasks tab, marked ❗.",
     change: "Change: a lasting change to files, such as code, rules, docs or data. Finished tasks land here.",
     "dead-end": "Dead end: an approach that was tried and abandoned, so no one tries it again.",
     note: "Note: context worth keeping that is none of the other kinds.",
@@ -86,12 +88,12 @@
       var para = k.id ? t.details[k.id] : "";
       var mine = (S.data.questions || []).filter(function (q) { return q.task === k.id; });
       var kids = (S.data.children || {})[k.id] || [];
-      var sent = mine.filter(function (q) { return q.answer; }).length;
+      var sent = mine.filter(replied).length;
       // a done task also shows what came of it: the history entry its `done` logged, keyed by the task id
       var logged = k.id ? S.data.history.filter(function (e) { return e.task === k.id; }).pop() : null;
       var det = (para ? "<p>" + esc(para) + "</p>" : '<p class="missing">No paragraph yet: rules.py tasks detail ' +
         esc(k.id) + ' "&lt;paragraph&gt;"</p>') +
-        mine.map(qaBlock).join("") +
+        mine.map(function (q) { return isAction(q) ? actBlock(q) : qaBlock(q); }).join("") +
         kids.map(function (rel) {
           return '<p class="result sub"><span>Sub-project</span><a href="#" data-open="' + esc(rel) + '">' + esc(rel) +
             "/</a> - open its tasks and history</p>";
@@ -105,7 +107,8 @@
         '" data-key="' + esc(key) + '"><div class="line"><span class="icon" title="' + esc(TASK_HELP[k.status]) + '">' +
         ICON[k.status] + "</span>" +
         (k.question ? '<span class="q" title="A question for you: click to open the task and answer it">❓</span>' : "") +
-        (sent && !k.question ? '<span class="q" title="Your answer is sent; the instance is told">📨</span>' : "") +
+        (k.action ? '<span class="q act" title="An action for you: click to open the task, do it, then mark it done">❗</span>' : "") +
+        (sent && !k.question && !k.action ? '<span class="q" title="Your reply is sent; the instance is told">📨</span>' : "") +
         (kids.length ? '<span class="q" title="This task has ' + kids.length + ' sub-project(s): open the task to follow them">🗂</span>' : "") +
         '<span class="text">' + esc(k.text) + "</span>" + date + '<span class="chev">›</span>' +
         '</div><div class="details">' + det + "</div></li>";
@@ -124,9 +127,29 @@
       var el = box.querySelector('textarea[data-q="' + keep.q + '"]');
       if (el) { el.focus(); el.setSelectionRange(keep.a, keep.b); }
     }
-    var open = (S.data.questions || []).filter(function (q) { return !q.answer; }).length;
+    var waiting = (S.data.questions || []).filter(function (q) { return !replied(q); });
+    var open = waiting.filter(function (q) { return !isAction(q); }).length, todo = waiting.length - open;
     $("#n-tasks").textContent = (t.tasks.filter(function (k) { return k.status !== "done"; }).length || "") +
-      (open ? " · ❓" + open : "");
+      (open ? " · ❓" + open : "") + (todo ? " · ❗" + todo : "");
+  }
+
+  // QUESTIONS.jsonl holds two kinds: a question the user answers, and an action the user does and marks done
+  function isAction(q) { return q.kind === "action"; }
+  function replied(q) { return isAction(q) ? !!q.done : !!q.answer; }
+
+  // ---------------------------------------------------------------- an action for the user, inside its task
+  function actBlock(a) {
+    var id = esc(a.id);
+    var body = a.done
+      ? '<p class="qdone"><span>Done</span>' + esc(a.note || "") +
+        "<em>marked " + esc(String(a.done).replace("T", " ")) + " · the instance is told</em></p>"
+      : BOOT.token
+        ? '<textarea rows="2" data-q="' + id + '" placeholder="A note for the instance (optional)">' +
+          esc(S.drafts[a.id] || "") + '</textarea><div class="qact"><button type="button" class="did" data-a="' + id +
+          '">Mark done</button><span class="qmsg" data-q="' + id + '"></span></div>'
+        : '<p class="qdone">Open the live viewer (rules.py view) to mark it done.</p>';
+    return '<div class="qa action' + (a.done ? " answered" : "") + '"><div class="qhead"><span class="qid aid">❗ ' + id +
+      "</span>an action for you</div>" + '<p class="qtext">' + esc(a.action) + "</p>" + body + "</div>";
   }
 
   // ---------------------------------------------------------------- a question for the user, inside its task
@@ -151,8 +174,9 @@
     if (d.tasks) {
       if (d.tasks.goal) f.goal = d.tasks.goal;
       d.tasks.tasks.forEach(function (k) {
-        f["task:" + (k.id || k.text)] = JSON.stringify([k.status, k.text, k.date, k.question, d.tasks.details[k.id] || "",
-          qs.filter(function (q) { return q.task === k.id; }).map(function (q) { return [q.id, q.answer || ""]; })]);
+        f["task:" + (k.id || k.text)] = JSON.stringify([k.status, k.text, k.date, k.question, k.action,
+          d.tasks.details[k.id] || "",
+          qs.filter(function (q) { return q.task === k.id; }).map(function (q) { return [q.id, q.answer || "", q.done || ""]; })]);
       });
     }
     (d.history || []).forEach(function (e) { f["h:" + e.id] = JSON.stringify([e.status || "", e.title]); });
@@ -200,6 +224,24 @@
       .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
       .then(function (res) {
         if (res.ok) { delete S.drafts[id]; msg.textContent = "sent · the instance is told"; schedule(0); }
+        else { btn.disabled = false; msg.textContent = res.j.error || "not saved"; }
+      })
+      .catch(function () { btn.disabled = false; msg.textContent = "the viewer is not running: rules.py view"; });
+  });
+
+  document.addEventListener("click", function (ev) {
+    var btn = ev.target.closest && ev.target.closest("button.did");
+    if (!btn) return;
+    var id = btn.dataset.a, note = (S.drafts[id] || "").trim();
+    var msg = document.querySelector('.qmsg[data-q="' + id + '"]');
+    btn.disabled = true;
+    msg.textContent = "sending…";
+    fetch("/done", { method: "POST", cache: "no-store",
+                     headers: { "Content-Type": "application/json", "X-View-Token": BOOT.token },
+                     body: JSON.stringify({ id: id, note: note }) })
+      .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
+      .then(function (res) {
+        if (res.ok) { delete S.drafts[id]; msg.textContent = "marked done · the instance is told"; schedule(0); }
         else { btn.disabled = false; msg.textContent = res.j.error || "not saved"; }
       })
       .catch(function () { btn.disabled = false; msg.textContent = "the viewer is not running: rules.py view"; });
@@ -265,6 +307,9 @@
     // not a kind of its own: an answered question is a decision entry carrying a `question` key
     var asked = H.filter(function (e) { return e.question; }).length;
     if (asked) counts.question = asked;
+    // nor is a done action: a note entry carrying an `action` key
+    var did = H.filter(function (e) { return e.action; }).length;
+    if (did) counts.action = did;
     var kinds = KIND_ORDER.filter(function (k) { return counts[k]; })
       .concat(Object.keys(counts).filter(function (k) { return KIND_ORDER.indexOf(k) < 0; }));
     $("#f-kinds").innerHTML = kinds.map(function (k) {
@@ -283,7 +328,8 @@
 
   function matches(e) {
     var f = S.f;
-    if (f.kinds.size && !f.kinds.has(e.kind) && !(e.question && f.kinds.has("question"))) return false;
+    if (f.kinds.size && !f.kinds.has(e.kind) && !(e.question && f.kinds.has("question")) &&
+        !(e.action && f.kinds.has("action"))) return false;
     if (f.status && e.status !== f.status) return false;
     if (f.from && String(e.ts) < f.from) return false;
     if (f.to && String(e.ts) > f.to) return false;
@@ -338,6 +384,8 @@
         '<div class="row"><span class="date">' + esc(e.ts) + '</span><span class="badge" title="' + esc(KIND_HELP[e.kind] || e.kind) + '">' + esc(e.kind) + "</span>" +
         (e.question ? '<span class="badge kind-q" title="' + esc(KIND_HELP.question) + '">question ' +
           esc(e.question) + "</span>" : "") +
+        (e.action ? '<span class="badge kind-a" title="' + esc(KIND_HELP.action) + '">action ' +
+          esc(e.action) + "</span>" : "") +
         '<span class="title">' + esc(e.title) + "</span>" +
         (sub ? '<span class="sub" title="the subfolder this entry was logged from">' + esc(sub) + "</span>" : "") +
         (e.status ? '<span class="status ' + esc(e.status) + '" title="' + esc(STATUS_HELP[e.status] || e.status) + '">' +

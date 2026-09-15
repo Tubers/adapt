@@ -134,9 +134,11 @@ def payload(root, project) -> dict:
     import questions
     asked = questions.read(root, project)
     if parsed:
-        waiting = {q.get("task") for q in asked if not q.get("answer")}
+        waiting = {q.get("task") for q in asked if not questions.is_action(q) and not q.get("answer")}
+        doing = {q.get("task") for q in asked if questions.is_action(q) and not q.get("done")}
         for k in parsed["tasks"]:
             k["question"] = k["id"] in waiting
+            k["action"] = k["id"] in doing
     cands = []
     master = history.master_path(root)
     if master.is_file():
@@ -197,8 +199,9 @@ def make_server(root, project, port=0, idle=IDLE_EXIT, first_wait=FIRST_WAIT, ma
     """(server, start_watchdog). The watchdog shuts the server down once nobody is looking."""
     import secrets
     root = Path(root)
-    # The page's one write, an answer to a question, carries this token in a custom header. Only the page this
-    # server served knows it, and a custom header makes any other site's request fail its CORS preflight.
+    # The page's writes, an answer to a question and an action marked done, carry this token in a custom header.
+    # Only the page this server served knows it, and a custom header makes any other site's request fail its CORS
+    # preflight.
     token = secrets.token_hex(16)
     page = build_page({"mode": "live", "poll": POLL_MS, "token": token}).encode("utf-8")
     activity = {"last": time.time(), "seen": False}
@@ -238,14 +241,15 @@ def make_server(root, project, port=0, idle=IDLE_EXIT, first_wait=FIRST_WAIT, ma
                 self._send(404, "text/plain; charset=utf-8", b"not found")
 
         def do_POST(self):
-            """POST /answer {"id": "q3", "answer": "..."}: the user's reply, written through questions.answer."""
+            """POST /answer {"id": "q3", "answer": "..."}: the user's reply, written through questions.answer.
+            POST /done {"id": "a2", "note": "..."}: the user did the action, written through questions.acted."""
             port_ = self.server.server_address[1]
             if self.headers.get("Host", "") not in ("127.0.0.1:%d" % port_, "localhost:%d" % port_) \
                     or self.headers.get("X-View-Token", "") != token:
                 self._send(403, "text/plain; charset=utf-8", b"forbidden")
                 return
             route = urlparse(self.path).path
-            if route not in ("/answer", "/open"):
+            if route not in ("/answer", "/done", "/open"):
                 self._send(404, "text/plain; charset=utf-8", b"not found")
                 return
 
@@ -276,14 +280,17 @@ def make_server(root, project, port=0, idle=IDLE_EXIT, first_wait=FIRST_WAIT, ma
                 return
             try:
                 body = json.loads(self.rfile.read(n).decode("utf-8"))
-                qid, text = str(body["id"]), str(body["answer"])
-            except (ValueError, KeyError, TypeError):
-                reply(400, {"error": "send {\"id\": ..., \"answer\": ...}"})
+                qid = str(body["id"])
+                text = str(body.get("note") or "") if route == "/done" else str(body["answer"])
+            except (ValueError, KeyError, TypeError, AttributeError):
+                reply(400, {"error": "send {\"id\": ..., \"answer\": ...}" if route == "/answer"
+                            else "send {\"id\": ..., \"note\": ...}"})
                 return
             activity["last"] = time.time()
             import questions
             try:
-                q = questions.answer(root, project, qid, text)
+                q = questions.acted(root, project, qid, text) if route == "/done" \
+                    else questions.answer(root, project, qid, text)
             except ValueError as e:
                 reply(400, {"error": str(e)})
                 return

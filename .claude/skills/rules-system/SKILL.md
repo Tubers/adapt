@@ -30,6 +30,7 @@ All are `python .claude/skills/rules-system/scripts/rules.py <command>`.
 | `history <folder> [runs\|findings\|changes\|...] [--last 5\|--first 5]` | a folder's history in slices, one line each, opening with the folder's state |
 | `tasks [show\|add\|start\|done\|block\|unblock\|drop\|detail\|goal] [--in F]` | read or change a project's TASKS.md; the only way it is written |
 | `tasks ask <task> "<q>"` / `answer <q> "<a>"` / `questions` / `answers` | a project's questions for the user; `answers` logs each answer as a decision and removes it |
+| `tasks act <task> "<what to do>"` / `acted <a> ["<note>"]` | an action only the user can do; the task shows ❗ until the user marks it done; `answers` logs it as a note |
 | `init <folder> --goal G` | start a project: HISTORY.jsonl, TASKS.md, QUESTIONS.jsonl |
 | `view [folder]` | a project's tasks, history and candidates as one live browser page; no folder needed inside a project |
 | `history show <id>` | one history entry in full |

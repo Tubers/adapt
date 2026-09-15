@@ -568,7 +568,8 @@ def unlogged_reminder(root: Path, session_id: str, now_project) -> str | None:
 
 
 def answers_waiting(root: Path, session_id: str, project) -> str | None:
-    """Once per answer: the user replied to a question in the viewer and this session has not been told yet.
+    """Once per reply: the user answered a question or marked an action done in the viewer, and this session has
+    not been told yet.
     The backstop to `rules.py tasks wait`, for a session that asked and did not start one."""
     if not session_id:
         return None
@@ -585,7 +586,7 @@ def answers_waiting(root: Path, session_id: str, project) -> str | None:
             q = json.loads(line)
         except ValueError:
             continue
-        if isinstance(q, dict) and q.get("answer") and q.get("id"):
+        if isinstance(q, dict) and (q.get("answer") or q.get("done")) and q.get("id"):
             ids.append(str(q["id"]))
     p = _state_path(session_id)
     p = p.with_name(p.stem + ".answers.json")
@@ -600,7 +601,7 @@ def answers_waiting(root: Path, session_id: str, project) -> str | None:
         p.write_text(json.dumps(sorted(told | set(new))), encoding="utf-8")
     except OSError:
         pass
-    return ("ANSWERS WAITING: the user answered %s in the viewer for %s/. Read them before acting on those decisions: "
+    return ("ANSWERS WAITING: the user replied to %s in the viewer for %s/. Read them before acting on those decisions: "
             "python .claude/skills/rules-system/scripts/rules.py tasks --in %s answers"
             % (", ".join(new), project, project))
 

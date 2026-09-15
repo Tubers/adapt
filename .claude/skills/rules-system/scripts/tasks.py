@@ -10,8 +10,10 @@ from the rule without the check saying so:
 
     - ✅ <done task> · *<date>* `t1`                      at most 2
     - 🔄 ❓ **<the task in progress>** · *since <date>* `t3`  exactly 1; ❓ marks an open question
-    - ⛔ <blocked task> `t4`                             its reason is in its details
+    - ⛔ ❗ <blocked task> `t4`                           its reason is in its details; ❗ marks an action for the user
     - 🔜 <not started task> `t5`                         any number, no date
+
+❓ and ❗ follow QUESTIONS.jsonl (questions.py) and are never set by hand; a task may carry both, ❓ first.
 
     ---
 
@@ -38,19 +40,20 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 ICONS = {"✅": "done", "🔄": "now", "⛔": "blocked", "🔜": "next"}
 ICON_OF = {v: k for k, v in ICONS.items()}
 QUESTION = "❓"
+ACTION = "❗"                                    # an action only the user can do (the user, 2026-09-15)
 MAX_DONE, NOW_COUNT, MAX_NEXT = 2, 1, None     # no cap on not-started tasks (the user, 2026-09-14)
 
 HEAD = re.compile(r"^#\s+(?:📋\s+)?TASKS\s+·\s+(?P<project>\S.*?)\s*$")
 GOAL = re.compile(r"^\*\*Goal:\*\*\s*(?P<goal>.*\S)\s*$")
 # a sub-project's link to the parent task it serves (the user, 2026-09-14): **Parent:** <project>/ · <task id>
 PARENT = re.compile(r"^\*\*Parent:\*\*\s*(?P<project>\S+?)/?\s+·\s+(?P<task>t\d+)\s*$")
-LINE = re.compile(r"^-\s+(?P<icon>✅|🔄|⛔|🔜)\s+(?P<q>❓\s+)?(?P<text>.*?)"
+LINE = re.compile(r"^-\s+(?P<icon>✅|🔄|⛔|🔜)\s+(?P<q>❓\s+)?(?P<a>❗\s+)?(?P<text>.*?)"
                   r"(?:\s+·\s+\*(?P<date>[^*]+)\*)?(?:\s+`(?P<id>t\d+)`)?\s*$")
 DETAIL = re.compile(r"^\*\*(?P<id>t\d+)\*\*\s+·\s+(?P<text>.*\S)\s*$")
 
 
 def parse(text: str) -> dict:
-    """{project, goal, tasks: [{status, question, text, bold, date, since, id}], details: {id: text}, problems}"""
+    """{project, goal, tasks: [{status, question, action, text, bold, date, since, id}], details: {id: text}, problems}"""
     out = {"project": None, "goal": "", "parent": None, "tasks": [], "details": {}, "problems": []}
     in_details, current = False, None
     for raw in text.splitlines():
@@ -78,7 +81,7 @@ def parse(text: str) -> dict:
                 date = (m.group("date") or "").strip()
                 since = date.startswith("since ")
                 out["tasks"].append({"status": ICONS[m.group("icon")], "question": bool(m.group("q")),
-                                     "text": body[2:-2].strip() if bold else body, "bold": bold,
+                                     "action": bool(m.group("a")), "text": body[2:-2].strip() if bold else body, "bold": bold,
                                      "date": date[len("since "):] if since else date, "since": since,
                                      "id": m.group("id") or ""})
             elif s and s != "---":
@@ -158,8 +161,8 @@ def render(p: dict) -> str:
             date = " · *%s*" % k["date"]
         elif k["status"] == "now" and k.get("date"):
             date = " · *since %s*" % k["date"]
-        lines.append("- %s%s %s%s `%s`" % (ICON_OF[k["status"]], " " + QUESTION if k.get("question") else "",
-                                           text, date, k["id"]))
+        lines.append("- %s%s%s %s%s `%s`" % (ICON_OF[k["status"]], " " + QUESTION if k.get("question") else "",
+                                             " " + ACTION if k.get("action") else "", text, date, k["id"]))
     details = ["**%s** · %s" % (k["id"], p["details"][k["id"]]) for k in tasks if k["id"] in p["details"]]
     out = "# 📋 TASKS · %s\n\n**Goal:** %s\n\n" % (p["project"], p["goal"])
     if p.get("parent"):
@@ -182,20 +185,23 @@ def load(root, project) -> dict:
         raise ValueError("%s/ has no TASKS.md. Start the project with: rules.py init %s --goal \"<goal>\"" % (project, project))
     p = parse(path.read_text(encoding="utf-8", errors="replace"))
     import questions
-    asking = questions.open_tasks(root, project)      # ❓ follows QUESTIONS.jsonl, never set by hand
+    asking = questions.open_tasks(root, project)      # ❓ and ❗ follow QUESTIONS.jsonl, never set by hand
+    doing = questions.open_actions(root, project)
     for k in p["tasks"]:
         k["question"] = k["id"] in asking
+        k["action"] = k["id"] in doing
     return p
 
 
 def sync(root, project) -> None:
-    """Rewrite the window when its ❓ marks no longer match the open questions."""
+    """Rewrite the window when its ❓ and ❗ marks no longer match the open questions and actions."""
     path = _path(root, project)
     if not path.is_file():
         return
     on_disk = parse(path.read_text(encoding="utf-8", errors="replace"))
     p = load(root, project)
-    if [k["question"] for k in on_disk["tasks"]] != [k["question"] for k in p["tasks"]]:
+    marks = lambda w: [(k["question"], k["action"]) for k in w["tasks"]]
+    if marks(on_disk) != marks(p):
         save(root, project, p)
 
 
@@ -263,7 +269,7 @@ def add(root, project, text, details="", at=None) -> dict:
     nexts = [k for k in p["tasks"] if k["status"] == "next"]
     if MAX_NEXT is not None and len(nexts) >= MAX_NEXT and _now(p):
         raise ValueError("the window already holds %d not-started tasks. Finish, drop or block one first" % MAX_NEXT)
-    k = {"status": "next", "question": False, "text": _clean(text), "bold": False, "date": "", "since": False,
+    k = {"status": "next", "question": False, "action": False, "text": _clean(text), "bold": False, "date": "", "since": False,
          "id": next_id(root, project, p)}
     order = sorted(p["tasks"], key=lambda x: RANK[x["status"]])
     first_next = next((i for i, x in enumerate(order) if x["status"] == "next"), len(order))
@@ -308,7 +314,7 @@ def done(root, project, tid=None, result="", kind="change", evidence=(), refs=()
         raise ValueError("%s is already done" % k["id"])
     entry = history.add(root, project, kind, k["text"], result=result, evidence=evidence, refs=refs,
                         no_rule=no_rule, extra={"task": k["id"]})["entry"]
-    k["status"], k["date"], k["since"], k["question"] = "done", today(), False, False
+    k["status"], k["date"], k["since"], k["question"], k["action"] = "done", today(), False, False, False
     dropped = []
     while sum(1 for x in p["tasks"] if x["status"] == "done") > MAX_DONE:
         oldest = next(x for x in p["tasks"] if x["status"] == "done")
@@ -497,8 +503,8 @@ def show(root, project) -> str:
     for k in sorted(p["tasks"], key=lambda k: RANK[k["status"]]):
         date = (" (since %s)" if k["since"] else " (%s)") % k["date"] if k["date"] else ""
         sub = ("   -> sub-project " + ", ".join(x + "/" for x in kids[k["id"]])) if k["id"] in kids else ""
-        out.append("  %s %-4s %s%s%s%s" % (ICON_OF[k["status"]], k["id"], QUESTION + " " if k["question"] else "",
-                                           k["text"], date, sub))
+        out.append("  %s %-4s %s%s%s%s%s" % (ICON_OF[k["status"]], k["id"], QUESTION + " " if k["question"] else "",
+                                             ACTION + " " if k.get("action") else "", k["text"], date, sub))
     now = _now(p)
     if now and now["id"] in p["details"]:
         out.append("  now: %s" % p["details"][now["id"]])
