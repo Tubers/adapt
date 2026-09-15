@@ -32,6 +32,7 @@ Hooks: `.claude/hooks/`, listed in `repo/hooks`. Firing log: `.claude/rules-firi
 - **writing/fact-ownership.rule.md** | `**/docs/**`, `**/NOTES.md`, `**/README.md` | every fact is written once, in the document that owns it; everywhere else a pointer
 - **writing/history-log.rule.md** | `**/HISTORY.jsonl`, `cmd:HISTORY\.jsonl`, `cmd:rules\.py\W+(history|init)\b` | a project's record of findings, decisions and changes: written by history add, read in slices, never by hand
 - **writing/tasks.rule.md** | `**/TASKS.md`, `**/QUESTIONS.jsonl`, `cmd:TASKS\.md`, `cmd:QUESTIONS\.jsonl`, `cmd:rules\.py\W+(tasks|view)\b` | a project's live task window and its questions for the user, written only by command; the viewer opens without a word and takes the questions while it is open
+- **writing/viewer-replies.rule.md** | `**/TASKS.md`, `**/QUESTIONS.jsonl`, `cmd:rules\.py\W+(tasks|view)\b` | the user answered in the viewer or marked an action done there: respond through the viewer's records, never in chat, unless the viewer cannot carry it
 - **writing/rule-candidates.rule.md** | `**/HISTORY.jsonl`, `cmd:rules\.py\W+(park|decide|candidates)\b` | park a possible new rule, recorded in its folder and the master copy; approve or reject it past one embedding pass
 - **writing/query-log.rule.md** | `**/QUERIES.jsonl`, `cmd:ask\.py` | what was asked and what came back; a record, never a task list
 - **lifecycle/handoff.rule.md** | `**/HANDOFF*.md`, `cmd:handoffs\.py` | a handoff is written once, read once, then retired into the handoff skill's data folder
