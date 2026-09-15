@@ -1,0 +1,628 @@
+{
+  "schema": 1,
+  "generated_from": "Adapt",
+  "install_order": [
+    "rules-system",
+    "vector-search",
+    "handoff",
+    "caveman",
+    "caveman-compress",
+    "caveman-help"
+  ],
+  "project": {
+    "claude_md": "forbidden at any path: settings deny it, guard_docs.py refuses it, post_write_checks.py renames one",
+    "workspace_trust": "Claude Code ignores a project's permissions.allow until the workspace is trusted: run Claude Code in the project once and accept the trust dialog. Hooks run regardless. The installer must say so.",
+    "rules_dir": "rules/ at the project root, never .claude/rules/ (auto-loaded like CLAUDE.md)",
+    "settings_merge": "merge, never overwrite: hook entries are added to the group with the same event and matcher, in the order listed; skillOverrides and permissions are unioned; outputStyle is set only if unset",
+    "bundled_skill_overrides": {
+      "claude-api": "user-invocable-only",
+      "code-review": "user-invocable-only",
+      "simplify": "user-invocable-only",
+      "security-review": "user-invocable-only",
+      "update-config": "user-invocable-only",
+      "fewer-permission-prompts": "user-invocable-only",
+      "claude-in-chrome": "user-invocable-only",
+      "dataviz": "off",
+      "design": "off",
+      "artifact-design": "off",
+      "artifact-diagramming": "off",
+      "artifact-capabilities": "off",
+      "loop": "off",
+      "schedule": "off",
+      "workflow-authoring": "off",
+      "run": "off",
+      "init": "off",
+      "keybindings-help": "off"
+    },
+    "python": ">=3.10 (tested 3.12.4)"
+  },
+  "skills": {
+    "rules-system": {
+      "summary": "path-gated rules injected by hook; per-project history, tasks and questions; rule candidates; the live viewer; the session's rule set (rules.py use)",
+      "requires": {
+        "skills": [],
+        "python": ">=3.10",
+        "packages": []
+      },
+      "optional": {
+        "vector-search": "the cosine pass for park/decide, rules.py audit and its reports, upkeep's INDEX class; without it they say the pass is unavailable"
+      },
+      "hook_files": [
+        "_bootstrap.py",
+        "rule_router.py",
+        "guard_records.py",
+        "guard_docs.py",
+        "ask_rule_approval.py",
+        "post_write_checks.py"
+      ],
+      "hook_tests": [
+        "test_hooks.py",
+        "test_ask_rule_approval.py"
+      ],
+      "rules": [
+        {
+          "rule": "rules/repo/rule-lifecycle.rule.md",
+          "gate": [
+            "- **repo/rule-lifecycle.rule.md** | `rules/**`, `cmd:rules\\.py\\W+(move|audit|reconcile|decide)\\b` | how a rule is observed, created, changed, moved and deleted, and who is asked first"
+          ]
+        },
+        {
+          "rule": "rules/repo/no-claude-md.rule.md",
+          "gate": [
+            "- **repo/no-claude-md.rule.md** | `**/CLAUDE*.md`, `.claude/rules/**`, `cmd:CLAUDE\\.md` | no CLAUDE.md of any kind; conventions live in gated rules instead"
+          ]
+        },
+        {
+          "rule": "rules/repo/hooks.rule.md",
+          "gate": [
+            "- **repo/hooks.rule.md** | `.claude/hooks/**`, `.claude/settings*.json` | what each hook enforces, and the one gate that may never exist"
+          ]
+        },
+        {
+          "rule": "rules/repo/automatic-checks.rule.md",
+          "gate": [
+            "- **repo/automatic-checks.rule.md** | `rules/**/*.rule.md`, `rules/INDEX.md` | what already runs on a write: the rule cap, the index re-sync, the CLAUDE.md sweep"
+          ]
+        },
+        {
+          "rule": "rules/repo/dependency-direction.rule.md",
+          "gate": [
+            "- **repo/dependency-direction.rule.md** | `.claude/hooks/**`, `cmd:(?i)\\bimport\\b.*skills` | project code may depend on a skill; a skill never depends on the project or a sibling skill"
+          ]
+        },
+        {
+          "rule": "rules/repo/no-silent-changes.rule.md",
+          "gate": [
+            "- **repo/no-silent-changes.rule.md** | `**/HISTORY.jsonl`, `cmd:(?i)\\b(mv|move-item|rename-item|rm|rmdir|remove-item|shutil\\.(move|rmtree|copytree)|os\\.(rename|replace|remove|unlink))\\b`, `cmd:rules\\.py\\W+move\\b` | log every move, rename, deletion or lasting edit in the project it touched, even one that is not yours"
+          ]
+        },
+        {
+          "rule": "rules/writing/readme-and-rules.rule.md",
+          "gate": [
+            "- **writing/readme-and-rules.rule.md** | `**/README.md`, `rules/**/*.rule.md`, `rules/INDEX.md` | a README is rule paths then a short orientation; rule files cap at 10 lines / 2048 bytes; where a folder fact goes"
+          ]
+        },
+        {
+          "rule": "rules/writing/fact-ownership.rule.md",
+          "gate": [
+            "- **writing/fact-ownership.rule.md** | `**/docs/**`, `**/NOTES.md`, `**/README.md` | every fact is written once, in the document that owns it; everywhere else a pointer"
+          ]
+        },
+        {
+          "rule": "rules/writing/history-log.rule.md",
+          "gate": [
+            "- **writing/history-log.rule.md** | `**/HISTORY.jsonl`, `cmd:HISTORY\\.jsonl`, `cmd:rules\\.py\\W+(history|init)\\b` | a project's record of findings, decisions and changes: written by history add, read in slices, never by hand"
+          ]
+        },
+        {
+          "rule": "rules/writing/tasks.rule.md",
+          "gate": [
+            "- **writing/tasks.rule.md** | `**/TASKS.md`, `**/QUESTIONS.jsonl`, `cmd:TASKS\\.md`, `cmd:QUESTIONS\\.jsonl`, `cmd:rules\\.py\\W+(tasks|view)\\b` | a project's live task window and its questions for the user, written only by command; the viewer opens without a word and takes the questions while it is open"
+          ]
+        },
+        {
+          "rule": "rules/writing/rule-candidates.rule.md",
+          "gate": [
+            "- **writing/rule-candidates.rule.md** | `**/HISTORY.jsonl`, `cmd:rules\\.py\\W+(park|decide|candidates)\\b` | park a possible new rule, recorded in its folder and the master copy; approve or reject it past one embedding pass"
+          ]
+        },
+        {
+          "rule": "rules/lifecycle/archive-folders.rule.md",
+          "gate": [
+            "- **lifecycle/archive-folders.rule.md** | `**/archive/**` | finished business; not a task list; never edited, never imported"
+          ]
+        }
+      ],
+      "creates": [
+        "rules/INDEX.md (header and the GENERATED readme-triggers markers)",
+        ".claude/skills/rules-system/data/<repo>/ (candidates, accepted findings, audit worklist)",
+        ".claude/rules-firings.jsonl (written by the router)"
+      ],
+      "settings": {
+        "skillOverrides": {
+          "rules-system": "name-only"
+        },
+        "permissions": {
+          "allow": [
+            "Bash(python *)",
+            "Bash(py *)",
+            "PowerShell(python *)",
+            "Skill(rules-system)"
+          ],
+          "deny": [
+            "Edit(**/CLAUDE.md)",
+            "Edit(**/CLAUDE.local.md)"
+          ]
+        }
+      },
+      "env": {
+        "CLAUDE_PROJECT_DIR": "set by Claude Code; hooks find the project with it",
+        "CLAUDE_CODE_SESSION_ID": "set by Claude Code; keys the session's rule set, focus and once-per-session state",
+        "CLAUDE_RULE_STATE_DIR": "optional; where per-session state lives (default: the system temp folder)"
+      },
+      "post_install": [
+        "python .claude/skills/rules-system/scripts/rules.py sync",
+        "python .claude/skills/rules-system/scripts/rules.py reconcile",
+        "python .claude/skills/rules-system/scripts/rules.py budget"
+      ],
+      "tests": [
+        "python .claude/skills/rules-system/scripts/run_tests.py",
+        "python .claude/hooks/test_hooks.py",
+        "python .claude/hooks/test_ask_rule_approval.py"
+      ],
+      "selftest": "Adapt/selftest/rules-system/test_rules_system.py",
+      "files": [
+        ".claude/skills/rules-system/SKILL.md",
+        ".claude/skills/rules-system/docs/records.md",
+        ".claude/skills/rules-system/docs/refactoring.md",
+        ".claude/skills/rules-system/docs/rules.md",
+        ".claude/skills/rules-system/docs/upkeep.md",
+        ".claude/skills/rules-system/scripts/accepted.py",
+        ".claude/skills/rules-system/scripts/audit_worklist.py",
+        ".claude/skills/rules-system/scripts/candidates.py",
+        ".claude/skills/rules-system/scripts/history.py",
+        ".claude/skills/rules-system/scripts/questions.py",
+        ".claude/skills/rules-system/scripts/reconcile.py",
+        ".claude/skills/rules-system/scripts/rules.py",
+        ".claude/skills/rules-system/scripts/rules_lib.py",
+        ".claude/skills/rules-system/scripts/run_tests.py",
+        ".claude/skills/rules-system/scripts/sync_index.py",
+        ".claude/skills/rules-system/scripts/tasks.py",
+        ".claude/skills/rules-system/scripts/upkeep.py",
+        ".claude/skills/rules-system/scripts/viewer.py",
+        ".claude/skills/rules-system/web/view.css",
+        ".claude/skills/rules-system/web/view.html",
+        ".claude/skills/rules-system/web/view.js"
+      ],
+      "hooks": [
+        {
+          "event": "PreToolUse",
+          "matcher": "Read|Write|Edit|NotebookEdit|Bash|PowerShell",
+          "position": 0,
+          "entry": {
+            "type": "command",
+            "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/rule_router.py\"",
+            "timeout": 15,
+            "statusMessage": "checking which project rules apply here"
+          }
+        },
+        {
+          "event": "PreToolUse",
+          "matcher": "Read|Write|Edit|NotebookEdit|Grep|Glob|Bash|PowerShell",
+          "position": 0,
+          "entry": {
+            "type": "command",
+            "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/guard_records.py\"",
+            "timeout": 10,
+            "statusMessage": "checking a record is reached through its command"
+          }
+        },
+        {
+          "event": "PreToolUse",
+          "matcher": "Write|Edit|NotebookEdit|Bash|PowerShell",
+          "position": 1,
+          "entry": {
+            "type": "command",
+            "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/guard_docs.py\"",
+            "timeout": 10,
+            "statusMessage": "checking no CLAUDE.md and no README rewrite"
+          }
+        },
+        {
+          "event": "PreToolUse",
+          "matcher": "Write|Edit|NotebookEdit|Bash|PowerShell",
+          "position": 2,
+          "entry": {
+            "type": "command",
+            "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/ask_rule_approval.py\"",
+            "timeout": 10,
+            "statusMessage": "checking a rule change has the user's approval"
+          }
+        },
+        {
+          "event": "PostToolUse",
+          "matcher": "Write|Edit|NotebookEdit|Bash|PowerShell",
+          "position": 0,
+          "entry": {
+            "type": "command",
+            "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/post_write_checks.py\"",
+            "timeout": 20,
+            "statusMessage": "checking rule budgets and the rules index"
+          }
+        }
+      ]
+    },
+    "vector-search": {
+      "summary": "search rules, project history and every skill's docs and code by meaning; the refactoring reports rules-system's audit runs",
+      "requires": {
+        "skills": [
+          "rules-system"
+        ],
+        "python": ">=3.10",
+        "packages": {
+          "numpy": ">=2.0 (tested 2.5.2)",
+          "onnxruntime": ">=1.18 (tested 1.30.0)",
+          "tokenizers": ">=0.15 (tested 0.23.2)"
+        }
+      },
+      "requires_why": {
+        "rules-system": "corpus.py and report.py import rules_lib from .claude/skills/rules-system/scripts to parse rules/INDEX.md and match gates: a known exception to repo/dependency-direction; it also reads rules.py use's session state file"
+      },
+      "external": {
+        "model": {
+          "name": "voyage-4-nano, ONNX int8 export (Apache 2.0)",
+          "source": "https://huggingface.co/onnx-community/voyage-4-nano-ONNX",
+          "files": [
+            "config.json",
+            "tokenizer.json",
+            "tokenizer_config.json",
+            "onnx/model_quantized.onnx",
+            "onnx/model_quantized.onnx_data"
+          ],
+          "size_mb": 431,
+          "graph_sha256_16": "e2999ae63b575e34",
+          "graph_sha256_16_of": "onnx/model_quantized.onnx (what embed.fingerprint_for hashes)",
+          "locate": [
+            "$RULE_SEARCH_MODEL",
+            "C:\\Users\\<user>\\OneDrive\\Desktop\\models\\voyage-4-nano-onnx (embed.DEFAULT_MODEL)"
+          ],
+          "if_missing": "download the files above into the default path, or into a folder named by RULE_SEARCH_MODEL, then check the graph hash"
+        }
+      },
+      "hook_files": [
+        "query_log.py",
+        "query_opened.py"
+      ],
+      "hook_tests": [],
+      "rules": [
+        {
+          "rule": "rules/repo/vector-search.rule.md",
+          "gate": [
+            "- **repo/vector-search.rule.md** | `**/*.py`, `**/*.md`, `cmd:vector-search` | search rules, history and skill code by meaning: does a tool exist, is there a rule for this, was this already tried"
+          ]
+        },
+        {
+          "rule": "rules/writing/query-log.rule.md",
+          "gate": [
+            "- **writing/query-log.rule.md** | `**/QUERIES.jsonl`, `cmd:ask\\.py` | what was asked and what came back; a record, never a task list"
+          ]
+        }
+      ],
+      "ships_data": [
+        "golden.jsonl (the golden questions, rewritten per project)"
+      ],
+      "creates": [
+        ".claude/skills/vector-search/data/ (indexes, file cache, model hash memo, query logs)"
+      ],
+      "settings": {
+        "skillOverrides": {
+          "vector-search": "name-only"
+        },
+        "permissions": {
+          "allow": [
+            "Skill(vector-search)"
+          ],
+          "deny": []
+        }
+      },
+      "env": {
+        "RULE_SEARCH_MODEL": "optional; the model folder",
+        "RULE_SEARCH_THREADS": "optional; default 8"
+      },
+      "post_install": [
+        "python .claude/skills/vector-search/scripts/index.py --ns all"
+      ],
+      "tests": [
+        "python .claude/skills/vector-search/scripts/run_tests.py"
+      ],
+      "selftest": null,
+      "files": [
+        ".claude/skills/vector-search/SKILL.md",
+        ".claude/skills/vector-search/golden.jsonl",
+        ".claude/skills/vector-search/scripts/ask.py",
+        ".claude/skills/vector-search/scripts/corpus.py",
+        ".claude/skills/vector-search/scripts/embed.py",
+        ".claude/skills/vector-search/scripts/index.py",
+        ".claude/skills/vector-search/scripts/qlog.py",
+        ".claude/skills/vector-search/scripts/report.py",
+        ".claude/skills/vector-search/scripts/run_tests.py",
+        ".claude/skills/vector-search/scripts/search.py"
+      ],
+      "hooks": [
+        {
+          "event": "PostToolUse",
+          "matcher": "Write|Edit|NotebookEdit|Bash|PowerShell",
+          "position": 2,
+          "entry": {
+            "type": "command",
+            "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/query_log.py\"",
+            "timeout": 10,
+            "statusMessage": "surfacing the search answer"
+          }
+        },
+        {
+          "event": "PostToolUse",
+          "matcher": "Read",
+          "position": 1,
+          "entry": {
+            "type": "command",
+            "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/query_opened.py\"",
+            "timeout": 10,
+            "statusMessage": "recording which hit was opened"
+          }
+        }
+      ]
+    },
+    "handoff": {
+      "summary": "a handoff is written once, read once by the session the user assigns, then retired and reviewed",
+      "requires": {
+        "skills": [],
+        "python": ">=3.10",
+        "packages": []
+      },
+      "optional": {
+        "rules-system": "the writing doc tells a writer to park rule candidates with rules.py park"
+      },
+      "hook_files": [
+        "announce_handoff.py",
+        "gate_handoff_read.py",
+        "block_handoff_write.py",
+        "handoff_skills.py",
+        "handoff_registry.py",
+        "handoff_lib.py"
+      ],
+      "hook_tests": [
+        "test_block_handoff_write.py"
+      ],
+      "hook_imports": {
+        "handoff_registry.py": ".claude/skills/handoff/scripts/handoff_data.py",
+        "gate_handoff_read.py": "handoff_lib.py",
+        "handoff_skills.py": "handoff_lib.py (and reads skillOverrides in .claude/settings.json)"
+      },
+      "rules": [
+        {
+          "rule": "rules/lifecycle/handoff.rule.md",
+          "gate": [
+            "- **lifecycle/handoff.rule.md** | `**/HANDOFF*.md`, `cmd:handoffs\\.py` | a handoff is written once, read once, then retired into the handoff skill's data folder"
+          ]
+        }
+      ],
+      "creates": [
+        ".claude/skills/handoff/data/ (log.jsonl and one folder per retired handoff)"
+      ],
+      "settings": {
+        "skillOverrides": {
+          "handoff": "user-invocable-only"
+        },
+        "permissions": {
+          "allow": [
+            "Skill(handoff)"
+          ],
+          "deny": []
+        }
+      },
+      "env": {
+        "HANDOFF_DATA_DIR": "optional; tests only, redirects the record"
+      },
+      "post_install": [
+        "python .claude/skills/handoff/scripts/handoffs.py check"
+      ],
+      "tests": [
+        "python .claude/skills/handoff/scripts/run_tests.py",
+        "python .claude/hooks/test_block_handoff_write.py"
+      ],
+      "selftest": "Adapt/selftest/handoff/test_handoff.py",
+      "files": [
+        ".claude/skills/handoff/SKILL.md",
+        ".claude/skills/handoff/docs/answering.md",
+        ".claude/skills/handoff/docs/internals.md",
+        ".claude/skills/handoff/docs/reading.md",
+        ".claude/skills/handoff/docs/review.md",
+        ".claude/skills/handoff/docs/writing.md",
+        ".claude/skills/handoff/scripts/handoff_data.py",
+        ".claude/skills/handoff/scripts/handoffs.py",
+        ".claude/skills/handoff/scripts/run_tests.py"
+      ],
+      "hooks": [
+        {
+          "event": "SessionStart",
+          "matcher": null,
+          "position": 0,
+          "entry": {
+            "type": "command",
+            "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/announce_handoff.py\"",
+            "timeout": 10,
+            "statusMessage": "checking for a waiting handoff"
+          }
+        },
+        {
+          "event": "PreToolUse",
+          "matcher": "Read|Grep|Bash|PowerShell",
+          "position": 0,
+          "entry": {
+            "type": "command",
+            "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/gate_handoff_read.py\"",
+            "timeout": 10,
+            "statusMessage": "checking a live handoff is not read without approval"
+          }
+        },
+        {
+          "event": "PreToolUse",
+          "matcher": "Write|Edit|NotebookEdit|Bash|PowerShell",
+          "position": 0,
+          "entry": {
+            "type": "command",
+            "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/block_handoff_write.py\"",
+            "timeout": 10,
+            "statusMessage": "checking a handoff is not being modified"
+          }
+        },
+        {
+          "event": "PostToolUse",
+          "matcher": "Read",
+          "position": 0,
+          "entry": {
+            "type": "command",
+            "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/handoff_skills.py\"",
+            "timeout": 10,
+            "statusMessage": "loading the skills a handoff asks for"
+          }
+        },
+        {
+          "event": "PostToolUse",
+          "matcher": "Write|Edit|NotebookEdit|Bash|PowerShell",
+          "position": 1,
+          "entry": {
+            "type": "command",
+            "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/handoff_registry.py\"",
+            "timeout": 10,
+            "statusMessage": "recording the handoff record"
+          }
+        }
+      ]
+    },
+    "caveman": {
+      "summary": "the compressed communication style; ships the project's output style",
+      "requires": {
+        "skills": [],
+        "python": null,
+        "packages": []
+      },
+      "output_style": {
+        "file": ".claude/output-styles/caveman.md",
+        "level": "ultra",
+        "settings": {
+          "outputStyle": "caveman"
+        }
+      },
+      "hook_files": [],
+      "hook_tests": [],
+      "rules": [
+        {
+          "rule": "rules/writing/compressed-register.rule.md",
+          "gate": [
+            "- **writing/compressed-register.rule.md** | `**/HANDOFF*.md`, `rules/**/*.rule.md` | handoffs, history lines and rules are written compressed, never in ultra"
+          ]
+        }
+      ],
+      "settings": {
+        "skillOverrides": {
+          "caveman": "user-invocable-only"
+        },
+        "permissions": {
+          "allow": [
+            "Skill(caveman)"
+          ],
+          "deny": []
+        }
+      },
+      "post_install": [],
+      "tests": [],
+      "selftest": null,
+      "files": [
+        ".claude/skills/caveman/README.md",
+        ".claude/skills/caveman/SKILL.md"
+      ],
+      "hooks": []
+    },
+    "caveman-compress": {
+      "summary": "compress a memory or doc file into caveman register, with a backup and a validator",
+      "requires": {
+        "skills": [
+          "caveman"
+        ],
+        "python": ">=3.10",
+        "packages": []
+      },
+      "optional": {
+        "anthropic": "used when ANTHROPIC_API_KEY is set; otherwise it shells out to the claude CLI",
+        "tiktoken": "benchmark.py only"
+      },
+      "hook_files": [],
+      "hook_tests": [],
+      "rules": [],
+      "settings": {
+        "skillOverrides": {
+          "caveman-compress": "user-invocable-only"
+        },
+        "permissions": {
+          "allow": [
+            "Skill(caveman-compress)"
+          ],
+          "deny": []
+        }
+      },
+      "env": {
+        "ANTHROPIC_API_KEY": "optional; routes compression through the SDK"
+      },
+      "post_install": [],
+      "tests": [],
+      "selftest": null,
+      "files": [
+        ".claude/skills/caveman-compress/README.md",
+        ".claude/skills/caveman-compress/SECURITY.md",
+        ".claude/skills/caveman-compress/SKILL.md",
+        ".claude/skills/caveman-compress/scripts/__init__.py",
+        ".claude/skills/caveman-compress/scripts/__main__.py",
+        ".claude/skills/caveman-compress/scripts/benchmark.py",
+        ".claude/skills/caveman-compress/scripts/cli.py",
+        ".claude/skills/caveman-compress/scripts/compress.py",
+        ".claude/skills/caveman-compress/scripts/detect.py",
+        ".claude/skills/caveman-compress/scripts/validate.py"
+      ],
+      "hooks": []
+    },
+    "caveman-help": {
+      "summary": "a quick reference card for the caveman skills",
+      "requires": {
+        "skills": [
+          "caveman"
+        ],
+        "python": null,
+        "packages": []
+      },
+      "hook_files": [],
+      "hook_tests": [],
+      "rules": [],
+      "settings": {
+        "skillOverrides": {
+          "caveman-help": "user-invocable-only"
+        },
+        "permissions": {
+          "allow": [
+            "Skill(caveman-help)"
+          ],
+          "deny": []
+        }
+      },
+      "post_install": [],
+      "tests": [],
+      "selftest": null,
+      "files": [
+        ".claude/skills/caveman-help/README.md",
+        ".claude/skills/caveman-help/SKILL.md"
+      ],
+      "hooks": []
+    }
+  }
+}

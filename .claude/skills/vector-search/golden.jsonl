@@ -1,0 +1,21 @@
+{"q": "where do I write down what happened in this folder", "want": "writing/history-log.rule.md"}
+{"q": "how do I add a task and mark it done", "want": "writing/tasks.rule.md"}
+{"q": "I found a fact that could become a rule", "want": "writing/rule-candidates.rule.md"}
+{"q": "how long may a rule file be", "want": ["writing/readme-and-rules.rule.md", "repo/automatic-checks.rule.md"]}
+{"q": "can I create a CLAUDE.md file for instructions", "want": "repo/no-claude-md.rule.md"}
+{"q": "how do I delete or rename a rule", "want": "repo/rule-lifecycle.rule.md"}
+{"q": "what does each hook enforce", "want": "repo/hooks.rule.md"}
+{"q": "I moved a file to another folder, do I need to record it", "want": "repo/no-silent-changes.rule.md"}
+{"q": "may a skill import code from the project", "want": "repo/dependency-direction.rule.md"}
+{"q": "is someone allowed to read a handoff", "want": "lifecycle/handoff.rule.md"}
+{"q": "is an old archived folder still a task list", "want": "lifecycle/archive-folders.rule.md"}
+{"q": "should I copy a finding into several documents", "want": "writing/fact-ownership.rule.md"}
+{"q": "which register do I write rule files in", "want": "writing/compressed-register.rule.md"}
+{"q": "how do I search the rules by meaning", "want": "repo/vector-search.rule.md"}
+{"q": "what is the capital city of Portugal", "want": null}
+{"q": "bake a loaf of sourdough bread", "want": null}
+{"ns": "skills", "q": "move a finished handoff into the archive", "want": ["handoff/scripts/handoffs.py", "handoff/SKILL.md"]}
+{"ns": "skills", "q": "rename a rule file and rewrite every reference to it", "want": ["rules-system/scripts/rules_lib.py", "rules-system/scripts/rules.py", "rules-system/SKILL.md"]}
+{"ns": "skills", "q": "compress a memory file into caveman register", "want": ["caveman-compress/SKILL.md", "caveman-compress/scripts/compress.py", "caveman-compress/README.md"]}
+{"ns": "skills", "q": "how do I renew a passport online", "want": null}
+{"ns": "skills", "q": "write a cover letter for a job", "want": null}

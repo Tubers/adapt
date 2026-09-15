@@ -1,0 +1,9 @@
+# Keep LF in the working tree on every machine. The records (HISTORY.jsonl, TASKS.md,
+# QUESTIONS.jsonl) and the scripts are written with LF, and Git for Windows would
+# otherwise check them out as CRLF because of the system-wide core.autocrlf=true.
+* text=auto eol=lf
+
+*.npz binary
+*.onnx binary
+*.png binary
+*.ico binary

@@ -1,0 +1,17 @@
+# Python bytecode
+__pycache__/
+*.pyc
+
+# Machine state: rebuilt or appended per machine, never shared.
+# Rule firings log, appended by the rule router on every gated tool call.
+.claude/rules-firings.jsonl
+# Search indexes, file cache and search logs; rebuilt by vector-search/scripts/index.py.
+.claude/skills/vector-search/data/
+# Audit worklist, valid for 24 hours after rules.py audit.
+.claude/skills/rules-system/data/*/audit-worklist.json
+# Personal Claude Code settings.
+.claude/settings.local.json
+.claude/_backup/
+
+# Staging files a caveman-compress run can leave behind.
+*.caveman-staged

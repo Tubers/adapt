@@ -1,0 +1,161 @@
+{
+  "outputStyle": "caveman",
+  "_comment_skills": "rules-system and vector-search are visible to every instance by name, so an instance can load them itself. The other skills are user-invocable-only: hidden from the model, typed by the user as /name. Bundled skills this project does not use are switched off.",
+  "skillOverrides": {
+    "rules-system": "name-only",
+    "vector-search": "name-only",
+    "handoff": "user-invocable-only",
+    "caveman": "user-invocable-only",
+    "caveman-compress": "user-invocable-only",
+    "caveman-help": "user-invocable-only",
+    "claude-api": "user-invocable-only",
+    "code-review": "user-invocable-only",
+    "simplify": "user-invocable-only",
+    "security-review": "user-invocable-only",
+    "update-config": "user-invocable-only",
+    "fewer-permission-prompts": "user-invocable-only",
+    "claude-in-chrome": "user-invocable-only",
+    "dataviz": "off",
+    "design": "off",
+    "artifact-design": "off",
+    "artifact-diagramming": "off",
+    "artifact-capabilities": "off",
+    "loop": "off",
+    "schedule": "off",
+    "workflow-authoring": "off",
+    "run": "off",
+    "init": "off",
+    "keybindings-help": "off"
+  },
+  "permissions": {
+    "allow": [
+      "Bash(python *)",
+      "Bash(py *)",
+      "PowerShell(python *)",
+      "Skill(rules-system)",
+      "Skill(vector-search)",
+      "Skill(handoff)",
+      "Skill(caveman)",
+      "Skill(caveman-compress)",
+      "Skill(caveman-help)"
+    ],
+    "deny": [
+      "Edit(**/CLAUDE.md)",
+      "Edit(**/CLAUDE.local.md)"
+    ]
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/announce_handoff.py\"",
+            "timeout": 10,
+            "statusMessage": "checking for a waiting handoff"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Read|Write|Edit|NotebookEdit|Grep|Glob|Bash|PowerShell",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/guard_records.py\"",
+            "timeout": 10,
+            "statusMessage": "checking a record is reached through its command"
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit|NotebookEdit|Bash|PowerShell",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/block_handoff_write.py\"",
+            "timeout": 10,
+            "statusMessage": "checking a handoff is not being modified"
+          },
+          {
+            "type": "command",
+            "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/guard_docs.py\"",
+            "timeout": 10,
+            "statusMessage": "checking no CLAUDE.md and no README rewrite"
+          },
+          {
+            "type": "command",
+            "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/ask_rule_approval.py\"",
+            "timeout": 10,
+            "statusMessage": "checking a rule change has the user's approval"
+          }
+        ]
+      },
+      {
+        "matcher": "Read|Write|Edit|NotebookEdit|Bash|PowerShell",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/rule_router.py\"",
+            "timeout": 15,
+            "statusMessage": "checking which project rules apply here"
+          }
+        ]
+      },
+      {
+        "matcher": "Read|Grep|Bash|PowerShell",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/gate_handoff_read.py\"",
+            "timeout": 10,
+            "statusMessage": "checking a live handoff is not read without approval"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Read",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/handoff_skills.py\"",
+            "timeout": 10,
+            "statusMessage": "loading the skills a handoff asks for"
+          },
+          {
+            "type": "command",
+            "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/query_opened.py\"",
+            "timeout": 10,
+            "statusMessage": "recording which hit was opened"
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit|NotebookEdit|Bash|PowerShell",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/post_write_checks.py\"",
+            "timeout": 20,
+            "statusMessage": "checking rule budgets and the rules index"
+          },
+          {
+            "type": "command",
+            "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/handoff_registry.py\"",
+            "timeout": 10,
+            "statusMessage": "recording the handoff record"
+          },
+          {
+            "type": "command",
+            "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/query_log.py\"",
+            "timeout": 10,
+            "statusMessage": "surfacing the search answer"
+          }
+        ]
+      }
+    ]
+  }
+}
