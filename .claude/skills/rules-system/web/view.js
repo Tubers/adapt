@@ -106,6 +106,9 @@
         (S.fresh.has(key) ? " fresh" : "") +
         '" data-key="' + esc(key) + '"><div class="line"><span class="icon" title="' + esc(TASK_HELP[k.status]) + '">' +
         ICON[k.status] + "</span>" +
+        // the id instances name in chat and in questions ("t5"), so the user can match them to a line
+        (k.id ? '<span class="tid" title="Task id ' + esc(k.id) + ': the name instances use for this task">' +
+          esc(k.id) + "</span>" : "") +
         (k.question ? '<span class="q" title="A question for you: click to open the task and answer it">❓</span>' : "") +
         (k.action ? '<span class="q act" title="An action for you: click to open the task, do it, then mark it done">❗</span>' : "") +
         (sent && !k.question && !k.action ? '<span class="q" title="Your reply is sent; the instance is told">📨</span>' : "") +
