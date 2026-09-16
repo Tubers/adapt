@@ -118,7 +118,7 @@
 
 **t43** · Everything runs on Windows, where settings.local.json is not kept at the repository root, cross-session messaging uses named pipes with a required auth line, and worktrees, symlinks and long paths behave differently. Needed: one pass over the launch, worktree and messaging paths before building. Done when each footnote is checked and the spec says what it means here.
 
-**t44** · Answered in part: vector-search keeps a separate index per kind of agent, so a specialist never carries rules that do not apply to it. Still needed: when each index is rebuilt and by whom, whether a specialist re-indexes its own skill after a merge, and what the embedding pass costs in time. Done when the trigger and the owner are written.
+**t44** · Separate index per kind of agent, and in time a per-specialist index over that specialist's notes, so it can find detail it would otherwise miss. Still needed: when each index is rebuilt and by whom, whether a specialist re-indexes its own skill after a merge, what the note index costs to keep current, and the embedding pass cost in time. Done when the triggers and the owner are written.
 
 **t45** · Each specialist owns one skill, but a change can touch a shared file or a second skill. Needed: who arbitrates, whether the manager serialises that work, and what stops two worktrees merging conflicting edits. Done when the arbitration is written.
 
@@ -128,4 +128,4 @@
 
 **t48** · The manager writes a question whenever it does not know what to do, without waiting for an answer. Later review turns each into a structural fix: a rule, a protocol line, a better briefing, or a tool. Needed: the instruction that makes the manager write instead of guess, how the entries are reviewed and grouped, and how a recurring question becomes a rule candidate. Relates to t18 and t31. Done when the loop runs once.
 
-**t49** · Each agent gets a notes folder it organises itself and writes to without reservation. It is never read whole at session start; it is looked up. Needed: where it lives, whether vector-search indexes it and under which index, how a note graduates into a finding or rule, and whether anything prunes it. Relates to t31 and t44. Done when the folder has a place, an index and a graduation path.
+**t49** · Each agent gets a freeform notes folder it organises itself, never read whole at session start. Use is counted per note, and a high count surfaces it to the manager as a candidate finding; graduating one moves its information into a rule scoped to where it will be needed and removes the note. Each specialist gets vector-search files of its own over its notes. Needed: where the folders live, the counter, the graduation path, and the per-specialist index. Done when all four exist.
