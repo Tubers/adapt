@@ -143,7 +143,9 @@ Records and communication:
 	- In time each specialist gets vector-search files of its own over its notes, so it can find the detail it would otherwise never locate, or assume was never written down.
 	- The skill will be refined while it runs, so the records carry enough detail to refine from. The history logs and task windows are that detail; nothing separate is written for the user's benefit.
 	- The manager's questions file doubles as a diagnostic while the design settles. When the manager does not know what to do, it writes the question there rather than guessing, and nobody has to answer at the time. The questions are read afterwards and answered structurally: a rule, a line in a protocol, a better briefing, or a tool. A question that keeps returning is a hole in the design, not a failing of the manager (open: t48).
-	- The manager has its own history log and tasks file, created at initialization. An instance in the host project reads them in filtered slices by running a command against the Adapt skill. (open: t22)
+	- The manager has its own history log, task file and questions file, created at initialization. An instance in the host project reads them in filtered slices by running a command against the Adapt skill. (open: t22)
+	- Those three belong to the current round only. When a round starts, the previous round's copies move into that round's folder and the manager starts with empty ones (see Round). The manager's notes folder is not rotated; it persists across rounds.
+	- The manager's task file lists all of its work, not only work items: spinning up agents, research, design considerations, and anything else it does. Each task ends with one line saying what was attempted and a single-word status, so nobody has to decipher the history log to learn how a task went.
 	- The manager's task file IS the status surface. The user watches it in the viewer; a host instance reads it through the shim. Adapt builds no second status channel, because the manager has to keep that file anyway and status comes free with it.
 
 
@@ -268,7 +270,7 @@ Making sure a round delivered (open: t30):
 	4. A separate verifier subagent, with a fresh context, receives the work item, the acceptance criteria and the diff, and never the specialist's narrative. It re-runs the tests in a clean copy and tries to break the claim. Its job is to fail the work, not to agree with it.
 	5. The manager merges on the verifier's pass and on the criteria being covered, never on either agent saying it is done. It sends the work back otherwise.
 	6. After the merge, the host-side check runs the skill's own tests where it actually lives. A failure reverts the merge, and the round reopens rather than closing.
-	7. The round closes by restating the original request and saying which criterion answered it. The submitter is told what changed, in the terms they asked in.
+	7. There is no closing report (user, 2026-09-16). The manager's task for the work item ends with its one-line outcome and single-word status, and the host agent reads that from the manager's task file.
 	Rollback is always available because the work is done on a copy: an unmerged branch is discarded, and a merged one is reverted.
 
 Budget (open: t37):
@@ -312,6 +314,11 @@ Round (proposed; open: t12):
 	A round can grow: the manager may ratify a request raised inside the round and add it as an item.
 	A round can be reordered: when the manager promotes an internal tool above the external request, the external request waits for the next round.
 	For now the user starts a round. Later the manager might start one itself. How much work a single round takes on is still open.
+	Rounds are stateless with respect to each other (user, 2026-09-16). The instances of a round concern themselves only with that round's work, and a round never carries a follow-up of an earlier round's work. What does persist between rounds is the inbox, the work folders, the home folders and the rules; a later manager ratifying an earlier manager's request is reading the inbox, not inheriting a round. A host agent unhappy with a delivered result therefore files a new request (inferred from statelessness; not yet confirmed).
+	Each round leaves a folder behind, generated automatically, in a rounds folder that belongs to the manager:
+	- a file of references to the work items the round touched, by id or path;
+	- the manager's history log, task file and questions file from that round, moved there when the next round starts, so the new round begins with empty ones.
+	The round folders are diagnostic material: for the user refining the skill, and for the instances refining their own workflows. A round with no work items to do may, by the manager's protocol, read back through the round folders and propose improvements to the system from what it finds, as requests like any other.
 
 
 Amalgamation (proposed; open: t9):
