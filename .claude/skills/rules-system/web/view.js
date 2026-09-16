@@ -166,7 +166,7 @@
       ? '<p class="qdone"><span>Your answer</span>' + esc(q.answer) +
         "<em>sent " + esc(String(q.answered || "").replace("T", " ")) + " · the instance is told</em></p>"
       : BOOT.token
-        ? '<textarea rows="3" data-q="' + id + '" placeholder="Your answer">' + esc(S.drafts[q.id] || "") +
+        ? '<textarea rows="10" data-q="' + id + '" placeholder="Your answer">' + esc(S.drafts[q.id] || "") +
           '</textarea><div class="qact"><button type="button" class="send" data-q="' + id + '">Send answer</button>' +
           '<span class="qmsg" data-q="' + id + '"></span></div>'
         : '<p class="qdone">Open the live viewer (rules.py view) to answer.</p>';

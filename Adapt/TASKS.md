@@ -2,10 +2,9 @@
 
 **Goal:** build the Adapt environment and the Adapt skill: its spec, how its skills are bundled, installed, configured, versioned and shown
 
-- ✅ viewer: click a task with a sub-project to open that sub-project's tasks in a separate window · *2026-09-15* `t12`
 - ✅ git and GitHub integration: version the Adapt repo and publish the skills from GitHub · *2026-09-15* `t5`
-- 🔄 **delete the stale OneDrive copy of Adapt** · *since 2026-09-15* `t14`
-- 🔜 review and revise the Adapt spec, Adaptive Tools.txt `t1`
+- ✅ delete the stale OneDrive copy of Adapt · *2026-09-16* `t14`
+- 🔄 **review and revise the Adapt spec, Adaptive Tools.txt** · *since 2026-09-16* `t1`
 - 🔜 an installer script per skill that reads the manifest and terraforms a project `t2`
 - 🔜 fetch the embedding model when no preinstalled copy is found `t3`
 - 🔜 consider bundling rules-system, vector-search and the Adapt skill into one skill named adapt `t4`
@@ -19,8 +18,6 @@
 ---
 
 ## Details
-
-**t12** · Asked for by the user 2026-09-14. Today a sub-project link replaces the current page. Instead, clicking a task with a sub-project (the 🗂 marker) opens a second window on that sub-project's viewer, so parent and sub-tasks stay visible side by side. Decide: the task line or a button, one window per sub-project or one reused. Done means drill-down opens its own window and both stay live.
 
 **t5** · Asked for by the user 2026-09-14. git init in Adapt with a .gitignore for machine state (search indexes, per-session state, rules-firings.jsonl, __pycache__), a GitHub remote through the gh CLI, and the rules and hooks that go with version control. GitHub also becomes the installer's source: install a skill from a tagged release. Done means Adapt is committed and pushed, and an install from GitHub works.
 

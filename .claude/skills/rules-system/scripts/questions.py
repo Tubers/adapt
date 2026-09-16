@@ -39,7 +39,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 QUESTIONS_NAME = "QUESTIONS.jsonl"
-MIN_TEXT, MAX_QUESTION, MAX_ANSWER = 8, 400, 1000
+MIN_TEXT, MAX_QUESTION, MAX_ANSWER = 8, 1200, 10000
 ACTION = "action"
 
 

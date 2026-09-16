@@ -275,8 +275,8 @@ def make_server(root, project, port=0, idle=IDLE_EXIT, first_wait=FIRST_WAIT, ma
                 n = int(self.headers.get("Content-Length", "0"))
             except ValueError:
                 n = -1
-            if not 0 < n <= 16384:
-                reply(400, {"error": "an answer is one short JSON body"})
+            if not 0 < n <= 65536:
+                reply(400, {"error": "an answer is one JSON body, at most 64KB"})
                 return
             try:
                 body = json.loads(self.rfile.read(n).decode("utf-8"))
