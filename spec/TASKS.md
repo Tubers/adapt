@@ -56,6 +56,7 @@
 - 🔜 ❓ a surface document per maintained skill `t60`
 - 🔜 ❓ counters: one metrics store or three `t61`
 - 🔜 ❓ a host project that is not a git repository `t62`
+- 🔜 rule gates that reach code outside the workspace `t63`
 
 ---
 
@@ -109,7 +110,7 @@
 
 **t28** · A specialist needs code intelligence for its skill's language. Plugins can carry .lsp.json, and the official marketplace has TypeScript, Python, Go and Rust plugins. Plugins load at session start, so an install reaches the next session. Investigate: claude plugin CLI subcommands, writing enabledPlugins and marketplaces into the workspace settings, --plugin-dir at launch, and skills-directory plugins that auto-load. Done when a specialist can request one and the next launch has it.
 
-**t29** · Tool found: graphify (PyPI graphifyy 0.9.63), trialled in scratch; code-only extract works with no key. Plan: install uv, then a pinned environment in the workspace; copy only the .claude/skills/graphify folder, never run graphify install, which writes always-loaded instruction files and PreToolUse hooks; always pass --out into the specialist's home. Needed: uv (user approval), a pinned version, preload for code specialists only. Done when a specialist can query a graph.
+**t29** · graphify (graphifyy 0.9.63), uv installed. Exception granted: run graphify install in the workspace; keep its two instruction files on disk but excluded from loading; mine them into a gated rule for code specialists (draft in spec/drafts); move its hooks into the code specialist's agent definition, calling the pinned graphify by absolute path; always pass --out into the specialist's home. Depends on t63. Done when a specialist queries a graph and the rule fires.
 
 **t30** · Layers sketched in spec/revised.txt: acceptance criteria in the work item before assignment; a failing test first for a REPAIR; evidence not claims from the specialist; a verifier subagent with fresh context that re-runs tests and never sees the specialist's narrative; the manager merging only on that pass; a host-side check after the merge that reverts on failure; the round closed against the original request. Done when each step has a concrete form, a command and a rule.
 
@@ -168,3 +169,5 @@
 **t61** · Note lookups, friction entries and rule firings are all counted by different parts of the spec. Needed: whether they share one small store, where it lives, who increments it, and whether it is per agent or per workspace. Relates to t19, t49. Done when the store and its writers are defined.
 
 **t62** · Worktrees, mirroring and rollback all assume git. Needed: what init does when the host is not a repository: refuse, offer to initialise one, or fall back to copies without worktrees, and what that costs the rollback path. Relates to t20, t21, t38. Done when the fallback is written.
+
+**t63** · A specialist's skill copy is a host worktree outside the workspace, but the rules router gates on paths relative to its own repository. The graphify rule, and every rule scoped to a skill's code, must fire when a specialist touches that copy. Options: absolute or mapped gates, a gate written per specialist when its copy is made, or copies placed where the router sees them without lazy skill loading. Done when a gated rule fires on a copy.
