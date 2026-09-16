@@ -2,8 +2,8 @@
 
 **Goal:** revise the Adapt skill spec with the user: spec/original.txt is the untouched first draft, spec/revised.txt the working revision
 
-- ✅ rule gates that reach code outside the workspace · *2026-09-16* `t63`
 - ✅ define the work item: fields, id, states and where it lives · *2026-09-16* `t53`
+- ✅ define the inbox: file shape, ids, states, and who moves a request · *2026-09-16* `t54`
 - 🔄 **fold in the user's own changes to the spec** · *since 2026-09-15* `t1`
 - 🔜 reconcile Documentation Dogma with the existing writing rules `t4`
 - 🔜 define THE MANAGER without a persistent instance `t6`
@@ -46,7 +46,6 @@
 - 🔜 retirement: the evidence, the path, and what archiving means `t50`
 - 🔜 trial: a low-model instance running the request interview from a decision tree `t51`
 - 🔜 draft the starting protocols: manager round, specialist work, chore worker `t52`
-- 🔜 ❓ define the inbox: file shape, ids, states, and who moves a request `t54`
 - 🔜 ❓ define the round record: its id and what it leaves behind `t55`
 - 🔜 ❓ the verifier: a third agent kind, or a mode of the specialist `t56`
 - 🔜 ❓ assignment and parallelism inside a round `t57`
@@ -65,9 +64,9 @@
 
 ## Details
 
-**t63** · A specialist's skill copy is a host worktree outside the workspace, but the rules router gates on paths relative to its own repository. The graphify rule, and every rule scoped to a skill's code, must fire when a specialist touches that copy. Options: absolute or mapped gates, a gate written per specialist when its copy is made, or copies placed where the router sees them without lazy skill loading. Done when a gated rule fires on a copy.
-
 **t53** · Everything hangs off the work item: acceptance criteria, assignment, verification, the closing report. It has no shape yet. Needed: its fields, its id, its states (drafted, ratified, assigned, in verification, merged, closed, parked), its place on disk, and whether it is a task in the manager's task window or a separate file a task points at. Done when one can be created, moved through every state and closed.
+
+**t54** · The inbox is described as a place, not a structure. Needed: one file per request or one appended log, the id scheme, the states a request passes through (new, triaged, amalgamated, ratified, rejected, archived), who moves it, and whether NEW, EXTEND and REPAIR hold requests or the work items they became. Relates to t9, t34. Done when a request can be filed, triaged and archived.
 
 **t1** · The user has many changes of their own: some needed, some functional alternatives judged better than the original. Take each in chat, write it into spec/revised.txt, and split out any that opens a new question as its own task. Done when the user says the list is exhausted.
 
@@ -75,7 +74,7 @@
 
 **t6** · User defined the manager: a headless Opus 5 session launched in the Adapt folder, bare bones, only spawner of subagents and only creator of work items, with a home folder of continuity files plus its own history log and tasks file. Open: Notes and Memories overlap the history log and tasks file; decide which record owns each kind of fact.
 
-**t9** · The manager's choice of shape is now written: repair, extend, wrap several skills behind one surface, or build a brand new skill when the functionality is entirely foreign; the last two are NEW. Still open: NEW says new skills and improvements, which overlaps EXTEND, and the amalgamation proposal in spec/revised.txt awaits the user. Done when the categories no longer overlap and the merge rule is accepted.
+**t9** · Categories settled: NEW holds work folders for entirely new skills, wrappers included; EXTEND for extensions of an existing skill; REPAIR for fixes; the original NEW wording is marked revised in the spec. Still open: the amalgamation proposal, merging requests that name the same skill and need into one work folder, awaits the user. Done when it is accepted or changed.
 
 **t10** · The form is an interview invoked from the shim's SKILL.md, with different questions for a new capability, an extension and a repair. It captures the surface: inputs and what they deliver, or for a repair input x, actual z, expected y. It never asks about implementation. It is dynamic, routing on parsed answers (t51), and aims to capture everything in one pass. Needed: the question sets, the generator, where the filled form lands. Done when a request can be filed end to end.
 
@@ -152,8 +151,6 @@
 **t51** · The dynamic request form routes on parsed answers. One candidate is a Haiku-class instance running the interview against a decision tree. It may be too much for that model. Needed: the decision tree, a trial on real requests, and a measure of whether the asking instance was routed down the right branch. The fallback is a scripted form with fixed branches. Done when the trial has a verdict.
 
 **t52** · Answered (q18): work from both ends, iteratively. Each protocol is a collection of rules in a protocols folder with a manager branch and a specialist branch; the chore protocol sits with the specialists'. Each specialist gets its own copy on first assignment, changed only by request. Both protocols must describe the copy map and the made-up path of the agent's copy. Draft all three against the settled workflow, alongside t53 to t55. Done when three first drafts exist.
-
-**t54** · The inbox is described as a place, not a structure. Needed: one file per request or one appended log, the id scheme, the states a request passes through (new, triaged, amalgamated, ratified, rejected, archived), who moves it, and whether NEW, EXTEND and REPAIR hold requests or the work items they became. Relates to t9, t34. Done when a request can be filed, triaged and archived.
 
 **t55** · A round id makes several rules enforceable: fresh-context ratification, the crash markers, the archive, the closing report. Needed: whether a round has its own folder or lives only in the manager's history, what is stamped with its id, and how the next round finds the last one. Relates to t12, t35, t38. Done when a round can be identified after the fact.
 

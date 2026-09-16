@@ -236,6 +236,13 @@ Reading the inbox, and the answer that needs no engineering:
 	- To answer that first question, the manager keeps a high-level understanding of the surface of every sibling skill, and can look into a skill's internals through its graph. A skill with no specialist yet has no graph in a specialist home, so the manager can build and read one itself (open: t67).
 
 
+The inbox and the three work folders (user, 2026-09-16):
+	- INBOX holds raw requests, exactly as the guided request tool produced them, straight from the host. One file per request.
+	- An automated log records everything that happens in the inbox folder: a request arriving, being read, amalgamated, answered from an existing skill, or turned into a work item.
+	- NEW, EXTEND and REPAIR hold work folders, never raw requests. The manager creates a work folder from one or more inbox requests and places it in the folder for its kind: NEW for an entirely new skill, a wrapper skill included; EXTEND for an extension of an existing skill; REPAIR for a fix.
+	- The original request is copied into its work folder, alongside what the manager writes there and what is generated there automatically, such as the group channel and the log.
+
+
 The work item (user, 2026-09-16):
 	A work item is a folder, and it is machine-facing: something a specialist can pick up and understand at once. Its contents are structured data where structure helps; JSON is the working suggestion, open to better.
 	The folder exists to keep the information of one piece of work apart from the home folders. What belongs to this request, this repair, this extension stays in the work folder. What turns out to be useful beyond it is deposited into the manager's or a specialist's home, or promoted to a rule through the candidate process.
@@ -344,6 +351,7 @@ Where the requests go:
 
 NEW:
 	Where all requests for new skills and improvements are depositied.
+	(Revised 2026-09-16: NEW holds the work folders for entirely new skills only. Improvements to an existing skill are EXTEND. See The inbox and the three work folders.)
 
 EXTEND:
 	Where all requests for improvements or feature extensions to existing skills are deposited.
