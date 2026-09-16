@@ -141,6 +141,7 @@ Scope, and the home folders:
 	Adapt is insular. Its reach is deliberately local, and each agent has complete control over exactly one place: its own home folder.
 	- The manager's home is adapt/manager_home/.
 	- A specialist's home is adapt/specialists/<skill name>/<its home folder>. These are the folders the sections below call THE MANAGER and SPECIALISTS.
+	- A specialist's home and its rules folder come into being on its first assignment, not at init. Inventory lists the sibling skills; it does not create a home for each. A skill nobody has asked about has no specialist and no folder.
 	- Network access is kept to a minimum. The exception is the manager reading up on a topic when it needs to understand one well enough to write the right build request for its specialists.
 	- Nothing outside a home folder is changed on an agent's own authority. This covers the host's hooks, rules, settings and source code, and Adapt's own internal structures as much as the host's.
 	- An agent that believes one of those is wrong may say so, and should: it files a request. The request is adjudicated by a manager whose context is fresh, which means a new round or a newly spun-up manager instance, and it is implemented only on that manager's approval.
