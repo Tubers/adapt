@@ -26,6 +26,8 @@
 - 🔜 place META TOOLS: root folder, inner skill, or both `t25`
 - 🔜 launcher: regenerate the personal exclusions at every manager launch `t26`
 - 🔜 strip the manager down: bundled skills, built-in agents, user plugins `t27`
+- 🔜 let a specialist add its own LSP plugin without the interactive plugin command `t28`
+- 🔜 code graph tooling for specialists, on top of LSP `t29`
 
 ---
 
@@ -51,7 +53,7 @@
 
 **t12** · User leans: a round is a start-to-finish cycle on one manager-created work item from the inbox. Proposal with five steps now in spec/revised.txt. Open: how much work one round takes on, and when the manager may start one itself. Done when the user accepts or changes it.
 
-**t13** · Configuration B, manager without --bare, started in a workspace outside the host. A probe proved the host fence works and that personal skills and agents still load. Chosen: regenerated exclusions (t26), not a config folder of Adapt's own. Left here: the launch command itself, and testing --setting-sources project,local for the personal settings file and its hooks. Done when the launch command is fixed and a run shows no host or personal skills.
+**t13** · Configuration B, no --bare, one claude -p run per round started in the workspace, no resume. Exclusions regenerated per launch (t26); bundled skills, built-in agents, user plugins, auto memory and MCP off (t27). Left here: write the launch command, test --setting-sources project,local for the personal settings file and its hooks, and decide whether plugin packaging (C) is added. Done when the command is fixed and a run shows no host or personal skills.
 
 **t15** · Docs: agent teams need an interactive session, never -p. Subagents may spawn subagents by default, 3 layers deep; CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH=1 turns it off and so enforces manager-only spawning. The skills field preloads full content but does not restrict; omit Skill from tools to restrict. omitClaudeMd exists. A fresh haiku subagent per batch is stateless. Done when spec fixes the agent model and haiku lifecycle.
 
@@ -78,3 +80,7 @@
 **t26** · The launcher scans the user's skills and agents folders, writes a skillOverrides off entry per skill name and a permissions.deny Agent(name) entry per agent name into the workspace settings, keeps a manifest of names already nullified, and logs any name it has not seen. Also test --setting-sources project,local, which should drop the personal settings file and its hooks while leaving the login alone. Done when the launcher exists and a run shows nothing personal.
 
 **t27** · Test disableBundledSkills for the bundled skills such as code-review and loop; CLAUDE_AGENT_SDK_DISABLE_BUILTIN_AGENTS=1 for Explore, Plan and general-purpose in a -p session; and whether workspace settings can switch off a plugin enabled in the user's settings. Then define how a capability comes back: one at a time, on evidence it is needed, each re-enable recorded. Done when the stripped baseline is defined and tested.
+
+**t28** · A specialist needs code intelligence for its skill's language. Plugins can carry .lsp.json, and the official marketplace has TypeScript, Python, Go and Rust plugins. Plugins load at session start, so an install reaches the next session. Investigate: claude plugin CLI subcommands, writing enabledPlugins and marketplaces into the workspace settings, --plugin-dir at launch, and skills-directory plugins that auto-load. Done when a specialist can request one and the next launch has it.
+
+**t29** · The user is looking for a plugin or tool that builds a graph of a codebase, like a compiler AST, so an instance can see which parts affect which. Once found, decide how a specialist reaches it: a plugin loaded at launch, or a meta tool. Done when the tool is named and wired in, or the idea is dropped.

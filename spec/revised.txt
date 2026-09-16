@@ -61,6 +61,31 @@ Stripping the manager:
 	- Bundled skills, such as code-review and loop, always load. The docs name disableBundledSkills to drop them. Untested (t27).
 	- Built-in agents: CLAUDE_AGENT_SDK_DISABLE_BUILTIN_AGENTS=1 removes Explore, Plan and general-purpose in a -p session. Every Agent call must then name one of Adapt's own specialists.
 	- Plugins enabled in the user's settings still load their skills, commands and agents. Whether the workspace can switch one off is untested (t27).
+	- Auto memory: off in the workspace settings, so nothing the manager or a specialist learns is written outside Adapt's own records.
+	- MCP servers: none. The workspace ships no .mcp.json, and no MCP server is inherited, because MCP configuration is not read from parent folders.
+	The aim is one set of moving parts, Adapt's own. Every variable that comes from outside the workspace is one more thing that can change under the manager without anyone changing Adapt.
+
+
+Launching the manager:
+	The launcher is a script in the shim. It regenerates the exclusions, then starts one session in the workspace. The options, from the Claude Code docs:
+	- claude -p, one run per round. The plain headless session. It can spawn subagents, and while a background subagent is still working the run stays open until it finishes, with a ten-minute idle ceiling. Simplest, and it ends when the round ends.
+	- claude -p --input-format stream-json, a headless session fed more than one message. Use it when a round needs several exchanges with the manager rather than one prompt. --max-turns caps the agentic turns.
+	- claude --bg, a background agent session that returns at once and prints its session ID. It cannot be combined with -p. Useful if the manager should stay alive between rounds and be messaged.
+	- The Agent SDK in Python or TypeScript, for a full programmatic loop with the same tools and agent loop.
+	Chosen default: one claude -p run per round, no --resume and no carried conversation. The manager's context comes from files, its rules and vector-search, never from a long-lived transcript. A later round starts clean and reads what the last one wrote (open: t13).
+	Agent teams are never an option here: they need an interactive session and do not spawn in -p.
+	Keeping startup context small, for the manager and for every specialist:
+	- No CLAUDE.md, no unscoped rules, no bundled skills, no personal skills or agents, no MCP servers, no auto memory.
+	- Rules arrive only when a gate matches what the agent touches.
+	- A specialist is preloaded with the few skills it needs, and its definition sets omitClaudeMd, a short body, and a tools list that leaves out what it must not use. Every tool listed costs context.
+	- Everything else is looked up on demand: the agent's own folders, its rules folder, and vector-search over the corpus as it grows.
+
+
+Code intelligence for specialists:
+	A specialist works on someone else's code, so it needs to see what calls what instead of reading whole files.
+	- Claude Code's LSP plugins connect a language server, which gives definitions, references and type errors directly. The official marketplace has plugins for TypeScript, Python, Go, Rust and other common languages, and any plugin can carry its own .lsp.json for a language that has none. The language server binary must be on the machine.
+	- A specialist should be able to add the one for its skill's language on its own. Plugins load at session start, so an installed or enabled plugin reaches the next session, not the running one. How a subagent does this without the interactive plugin command is open (t28).
+	- A tool that builds a graph of the codebase, so an instance can see which parts affect which, is wanted on top of this. The user is looking for one (t29).
 
 
 Sessions and agents:
