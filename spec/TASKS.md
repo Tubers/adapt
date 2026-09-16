@@ -45,6 +45,7 @@
 - 🔜 notes folders: freeform space for the manager and every specialist `t49`
 - 🔜 retirement: the evidence, the path, and what archiving means `t50`
 - 🔜 trial: a low-model instance running the request interview from a decision tree `t51`
+- 🔜 draft the starting protocols: manager round, specialist work, chore worker `t52`
 
 ---
 
@@ -76,7 +77,7 @@
 
 **t17** · Minimal starting directives that breadcrumb each agent to what it needs: its skill, its rules folder, its records, the commands it uses. Done when three drafts exist and the user approves them.
 
-**t18** · Protocols are the workflow rules every specialist gets when spawned, tailorable per specialist; the manager has its own. Open: how a rule attaches at spawn (gate on the specialist folders, spawn prompt, SubagentStart hook injection). Includes the starting rule set Adapt ships. Done when the initial set is drafted and the attach mechanism chosen.
+**t18** · Protocols attach to an agent at spawn and can be tailored per specialist. The drafting of the starting three is t52; this task owns the attach mechanism: a gate on the agent's folders, the spawn prompt, or a hook that injects at subagent start, and how a tailored protocol overrides the common one. Done when the mechanism is chosen and one tailored protocol has been attached.
 
 **t19** · Needs a friction kind in rules-system history; a hook that notifies an instance after N new friction entries since its last notice, N configurable; grouping of similar entries by meaning with vector-search; manager commands to read specialist histories filtered for friction. Done when kind, hook, config and grouping are defined.
 
@@ -135,3 +136,5 @@
 **t50** · Adapt can retire a skill, a rule or a meta tool, through a request ratified by a fresh manager context. Needed: the evidence thresholds (unused tool, never-firing or superseded rule, skill nothing asks for), how the host's use of a skill is checked first, where an archived thing goes, and how a retirement is reversed if it was wrong. Relates to t16. Done when the path is written and one retirement has been run.
 
 **t51** · The dynamic request form routes on parsed answers. One candidate is a Haiku-class instance running the interview against a decision tree. It may be too much for that model. Needed: the decision tree, a trial on real requests, and a measure of whether the asking instance was routed down the right branch. The fallback is a scripted form with fixed branches. Done when the trial has a verdict.
+
+**t52** · Three protocol rules a fresh instance follows with no memory: the manager's round workflow from inbox to closing report; the specialist's workflow from briefing to evidence; the chore protocol for the low-model worker, stateless and batched. They carry the sequence of the work, not advice. Depends on the shapes of the work item, the inbox and the round id. Relates to t17, t18, t30, t31. Done when three drafts exist and the user has read them.

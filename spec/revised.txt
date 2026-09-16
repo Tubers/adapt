@@ -103,6 +103,7 @@ Rules and protocols:
 	- Adapt ships a starting set of rules. They can and probably will be modified, deleted and appended to.
 	- Some rules are constants: never removed or modified. A rules-system config names them. (open: t16)
 	- Protocols are rules assigned to every specialist when it is spawned. They give the specialist its workflow, and they can be tailored per specialist. (open: t18)
+	- Adapt ships three of them, drafted before anything runs: the manager's round protocol, the specialist's work protocol, and the chore protocol for the low-model worker. They are what a fresh instance follows when it has no memory of anything, so they carry the sequence of the work, not advice (open: t52).
 	- Every specialist has its own folder in rules/, named after the skill it is responsible for. All of that specialist's findings live there. The specialist curates its own findings and turns them into rules gated to particular code files or skill documents. (open: t24)
 	- vector-search finds niche rules for a specialist to inject while it works on code. It also runs the audit tools that keep the rule set healthy: information independence (no redundancy), concise descriptions and proper scope.
 	- vector-search also helps specialists navigate the code of the skill they work on, and the documentation they have collected on it that does not merit a finding.
