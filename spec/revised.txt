@@ -120,6 +120,14 @@ Records and communication:
 	- The manager's task file IS the status surface. The user watches it in the viewer; a host instance reads it through the shim. Adapt builds no second status channel, because the manager has to keep that file anyway and status comes free with it.
 
 
+Who Adapt answers to:
+	Adapt exists for the host agent, not for the user directly. The manager reports to the instance that asked, and nothing waits on a person by default.
+	The division is interface against implementation:
+	- The host agent's concern stops at three things: its own intent, the surface the skills present, and how well that surface serves the intent. Below that line it is simply a user of the skills. If they work, they work; how they work is not its business.
+	- The manager owns everything below that line: the internal design, and what each choice costs in effort, delay and tokens for the fixes and capabilities delivered back up.
+	The manager's task file stays the status surface. The host agent reads it; the user watches it when they want to.
+
+
 Requests from inside Adapt:
 	Adapt may work on its own tooling, and on its own rules, but never by a shortcut. Everything inside uses the same inbox as an instance outside.
 	- A specialist that wants a change to a skill or tool it uses drafts a request into the inbox in the course of its work and tells the manager it has done so. It does not make the change itself.
