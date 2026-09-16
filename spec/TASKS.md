@@ -35,7 +35,7 @@
 - 🔜 request archive: every request kept, automatically `t34`
 - 🔜 ratification: enforcing that no instance ratifies its own request `t35`
 - 🔜 permissions posture: what agents may run and touch `t36`
-- 🔜 ❓ budget for a round: caps, and what happens at the usage limit `t37`
+- 🔜 budget for a round: caps, and what happens at the usage limit `t37`
 - 🔜 recovery: what happens to a round that dies mid-way `t38`
 - 🔜 ❓ concurrent writers: manager and specialists writing records at once `t39`
 - 🔜 ❓ canonical copy of a skill, and how an improvement travels `t40`
@@ -115,7 +115,7 @@
 
 **t36** · Unwritten today: whether a specialist may run arbitrary shell, install packages, reach the network, push to git, or edit host files outside .claude/skills/; and which unattended mode the manager runs in (dontAsk, auto, bypassPermissions). Inbox requests are written by other agents, so this is also the prompt-injection surface. The user is writing an answer in chat. Done when the posture is written into the spec.
 
-**t37** · Nothing caps a round: no ceiling on specialists, agentic turns, tokens or wall-clock time, and no rule for the plan's usage running out mid-round. Needed: the caps, what a stopped round leaves behind, and who is told. Done when both are written.
+**t37** · Answered (q2): no caps for now, keep it simple. A round that stops because the plan's included usage ran out is treated exactly as a crash: the same automated rollback, then the round is redone from the known state. Left open: whether the launcher should notice the limit and stop cleanly rather than being cut off mid-tool, and whether caps are wanted once rounds have been run a few times. Done when the stop path shares the rollback of t38.
 
 **t38** · Answered (q3): a crashed round is redone from a known state, never salvaged. Automated rollback first, in code: discard the branch, remove the worktree, revert a merge already made. Agents log as they go and an active worktree is marked active, so the wreckage is discoverable. Where rollback cannot be automatic, the manager establishes what was done and decides what to roll back. Done when the rollback script, the active marker and the manager path exist.
 

@@ -155,6 +155,11 @@ Making sure a round delivered (open: t30):
 	7. The round closes by restating the original request and saying which criterion answered it. The submitter is told what changed, in the terms they asked in.
 	Rollback is always available because the work is done on a copy: an unmerged branch is discarded, and a merged one is reverted.
 
+Budget (open: t37):
+	No caps for now. A round is not limited by a number of specialists, turns or minutes until there is a reason to limit it.
+	A round that stops because the plan's included usage ran out is treated exactly as a crash: automated rollback, then the round is redone later from the known state. Running out of usage is a stop, never a half-finished merge.
+
+
 Recovery from a crashed round (open: t38):
 	A crashed round is redone from a known state, never salvaged. Rerunning from a state that is understood beats rescuing one that is not.
 	- Rollback comes first, and in code wherever it can: the work happened on a copy, so the branch is discarded and its worktree removed, and a merge already made is reverted. An automated rollback is always preferred to an agent reasoning its way through wreckage.
