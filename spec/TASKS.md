@@ -2,12 +2,11 @@
 
 **Goal:** revise the Adapt skill spec with the user: spec/original.txt is the untouched first draft, spec/revised.txt the working revision
 
-- ✅ define SPECIALISTS as per-skill context folders · *2026-09-15* `t8`
-- ✅ keep Adapt's inner skills away from host-project instances · *2026-09-15* `t14`
+- ✅ ❓ concurrent writers: manager and specialists writing records at once · *2026-09-16* `t39`
+- ✅ define how sub-agents route requests through THE MANAGER · *2026-09-16* `t7`
 - 🔄 **fold in the user's own changes to the spec** · *since 2026-09-15* `t1`
 - 🔜 reconcile Documentation Dogma with the existing writing rules `t4`
 - 🔜 define THE MANAGER without a persistent instance `t6`
-- 🔜 define how sub-agents route requests through THE MANAGER `t7`
 - 🔜 separate NEW, EXTEND and REPAIR, and define amalgamation `t9`
 - 🔜 specify the request form and its python generator `t10`
 - 🔜 fix When to Trigger and the duplicate check `t11`
@@ -37,7 +36,6 @@
 - 🔜 permissions posture: what agents may run and touch `t36`
 - 🔜 budget for a round: caps, and what happens at the usage limit `t37`
 - 🔜 recovery: what happens to a round that dies mid-way `t38`
-- 🔜 ❓ concurrent writers: manager and specialists writing records at once `t39`
 - 🔜 ❓ canonical copy of a skill, and how an improvement travels `t40`
 - 🔜 ❓ one workspace per host, or a shared layer across hosts `t41`
 - 🔜 ❓ where the user is required, and how a round reports in `t42`
@@ -49,17 +47,15 @@
 
 ## Details
 
-**t8** · The original calls SPECIALISTS sub-agent managed directories. Sub-agents do not persist, so each subfolder is the context a fresh agent reads to work on that one skill. Done when the spec lists what a specialist folder holds and who writes it.
+**t39** · The manager and several specialists write history, task and question records, and share rules/INDEX.md. rules-system assumes one writer. Options: a records folder per specialist, a lock, or one writer that the others hand lines to. Done when the layout and the concurrency rule are fixed and tested.
 
-**t14** · Docs: a nested <subdir>/.claude/skills/ loads the first time a session reads or edits a file there; issue 40640 reported that broken. A git boundary may block it too. Options: host settings from init (skillOverrides off, Skill(...) deny); Read and Edit deny on Adapt's inner tree, only if a denied read does not trigger discovery (untested); a hook blocking host reads inside Adapt; an Adapt command as the only interface. Done when chosen and tested.
+**t7** · Specialists talk to the manager through their questions file or built-in instance-to-instance messaging; user undecided. Docs: named subagents can message each other; agent teams are unavailable in -p. Done when the spec picks the channel and says where approval of a specialist request is recorded.
 
 **t1** · The user has many changes of their own: some needed, some functional alternatives judged better than the original. Take each in chat, write it into spec/revised.txt, and split out any that opens a new question as its own task. Done when the user says the list is exhausted.
 
 **t4** · User scoped the dogma to the rules for THE MANAGER and SPECIALISTS and the documents they keep; now in spec/revised.txt. Open: dogma 1 restates writing/fact-ownership, dogma 2 writing/compressed-register; point, not restate. Dogma 3 fits on-demand folders read once on resume, but 'never have too few details' likely means too many. Done when each dogma points to its rule or is reworded.
 
 **t6** · User defined the manager: a headless Opus 5 session launched in the Adapt folder, bare bones, only spawner of subagents and only creator of work items, with a home folder of continuity files plus its own history log and tasks file. Open: Notes and Memories overlap the history log and tasks file; decide which record owns each kind of fact.
-
-**t7** · Specialists talk to the manager through their questions file or built-in instance-to-instance messaging; user undecided. Docs: named subagents can message each other; agent teams are unavailable in -p. Done when the spec picks the channel and says where approval of a specialist request is recorded.
 
 **t9** · Proposal now in spec/revised.txt: requests naming the same skill and same need merge into one work item; vector-search suggests, manager confirms; source ids kept, details appended. Still open: NEW says new skills and improvements, which overlaps EXTEND. Done when the user accepts or changes the proposal and the categories no longer overlap.
 
@@ -119,8 +115,6 @@
 
 **t38** · Answered (q3): a crashed round is redone from a known state, never salvaged. Automated rollback first, in code: discard the branch, remove the worktree, revert a merge already made. Agents log as they go and an active worktree is marked active, so the wreckage is discoverable. Where rollback cannot be automatic, the manager establishes what was done and decides what to roll back. Done when the rollback script, the active marker and the manager path exist.
 
-**t39** · The manager and several specialists write history, task and question records, and share rules/INDEX.md. rules-system assumes one writer. Options: a records folder per specialist, a lock, or one writer that the others hand lines to. Done when the layout and the concurrency rule are fixed and tested.
-
 **t40** · Mirroring is defined between a host skill and Adapt's inner copy, but nothing says what happens upstream. The same skill may live in several projects and may have come from a GitHub repo. Needed: which copy is canonical, whether Adapt pushes improvements upstream, and how other projects receive them. Relates to Adapt t13. Done when the direction of travel is written.
 
 **t41** · The workspace is per host project, so meta tools, findings and specialist rules would be rebuilt from scratch in every project. Needed: whether a shared layer exists, what it may hold, and how a project-specific fact is kept out of it. Done when the boundary is written.
@@ -129,6 +123,6 @@
 
 **t43** · Everything runs on Windows, where settings.local.json is not kept at the repository root, cross-session messaging uses named pipes with a required auth line, and worktrees, symlinks and long paths behave differently. Needed: one pass over the launch, worktree and messaging paths before building. Done when each footnote is checked and the spec says what it means here.
 
-**t44** · The corpus grows every round: rules, findings, skill documentation and code. Needed: when the index is rebuilt and by whom, whether a specialist re-indexes its own skill after a merge, and what the embedding pass costs in time. Done when the trigger and the owner are written.
+**t44** · Answered in part: vector-search keeps a separate index per kind of agent, so a specialist never carries rules that do not apply to it. Still needed: when each index is rebuilt and by whom, whether a specialist re-indexes its own skill after a merge, and what the embedding pass costs in time. Done when the trigger and the owner are written.
 
 **t45** · Each specialist owns one skill, but a change can touch a shared file or a second skill. Needed: who arbitrates, whether the manager serialises that work, and what stops two worktrees merging conflicting edits. Done when the arbitration is written.

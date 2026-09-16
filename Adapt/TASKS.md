@@ -14,6 +14,7 @@
 - 🔜 history friction log line, built with a rule `t8`
 - 🔜 mirror Adapt changes into every project that uses its skills `t13`
 - 🔜 a custom lightweight executable for the task and history viewer `t10`
+- 🔜 viewer: let an answer be longer than 1000 characters `t15`
 
 ---
 
@@ -42,3 +43,5 @@
 **t13** · So a skill, hook or rule improved here reaches every other project that uses the Adapt skills without copying by hand; carries t5's second goal (q8): a project installs the skills from github.com/Tubers/adapt. Candidates: a Claude Code plugin marketplace served from the repo (/plugin update), a git submodule or subtree of .claude/ per project, or the t2 installer pulling a tagged release. Project records stay local. Done: a change pushed here reaches a second project with one command.
 
 **t10** · Asked for by the user 2026-09-14. A small native window instead of a browser tab, hosting the same page and local server: candidates are a WebView2 host in C++ or C#, pywebview, or Tauri, judged on size, start time and no install step. For the future: the user is still iterating on the viewer (q5, 2026-09-15), so it waits at the back of the queue until they call the look settled. Done means one small executable that replaces the browser tab.
+
+**t15** · The user hit the answer box limit replying to a spec question and had to answer in chat instead. The box should take a long answer, and the question cap of 400 characters should be reconsidered at the same time. Done when a long answer can be typed and submitted in the viewer.

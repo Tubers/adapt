@@ -112,7 +112,10 @@ Rules and protocols:
 
 Records and communication:
 	Everything is kept as files and text, so it is all recorded and easy to look into, even at runtime.
-	- Each specialist uses the rules-system commands. Its history log records its actions, its tasks file shows its status, and its questions file carries its communication with the manager. Built-in instance-to-instance messaging is the alternative for that last part. (open: t7)
+	- Each specialist keeps its own history log, task window and questions file. They hold its working state and they are how it talks to the manager, to the host instance and to the user. What it puts there: what it did, its findings, its friction entries, and the complexity it runs into that needs judgement above its own.
+	- A specialist writes a question into its questions file. A hook notifies the manager, which reads it and then answers it, passes it on to the host instance or the user, or turns it into work. Whatever channel carries the answer, including instance-to-instance messaging, the outcome and the answer land in the history log as text on disk, so the record outlives the session that produced it.
+	- Anything that persists past the round is written by the manager. A specialist supplies the seed or the trigger for a rule; the manager creates and finalises it. That also settles who may write rules/INDEX.md while a round runs: only the manager.
+	- vector-search keeps a separate index per kind of agent. A specialist has no reason to carry rules that do not apply to it.
 	- The manager has its own history log and tasks file, created at initialization. An instance in the host project reads them in filtered slices by running a command against the Adapt skill. (open: t22)
 	- The manager's task file IS the status surface. The user watches it in the viewer; a host instance reads it through the shim. Adapt builds no second status channel, because the manager has to keep that file anyway and status comes free with it.
 
