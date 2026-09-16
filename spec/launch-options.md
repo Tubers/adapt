@@ -78,6 +78,36 @@ C also inherits the Pro and Max resume behaviour: a session idle for over an hou
 tokens opens a dialog offering a summary instead of the full history, which a headless run cannot
 answer.
 
+### Cache warmth, and what actually keeps it
+
+A fresh session per round sounds like a cold cache every time. It mostly isn't, and where it is, a
+setting fixes it more cheaply than any polling scheme.
+
+- **Every cache hit resets the TTL.** The cache expires only after a gap with no request that reads
+  it.
+- **The main conversation already gets a one-hour TTL** on a Claude subscription within the plan's
+  included usage. Once usage passes the plan limit and draws on credits, Claude Code drops it to
+  five minutes, and `promptCacheTtl` or `CLAUDE_CODE_PROMPT_CACHE_TTL` set to `1h` puts it back.
+- **Subagents are in the other bucket and get five minutes by default**, even on a subscription.
+  `subagentPromptCacheTtl`, the `CLAUDE_CODE_SUBAGENT_PROMPT_CACHE_TTL` variable, or a per-agent
+  `experimental.cacheTtl` raises that to `1h`. A `1h` in the per-agent field is ignored while the
+  subscription is drawing on usage credits.
+- **Polling a subagent to keep its cache warm is the wrong tool.** The five-minute window is a
+  default, not a law, and every poll costs a real request; the setting costs nothing. Nothing in the
+  documentation says the timer needs input from a person: it is reset by any request that reads the
+  cache.
+- **A subagent never reads the parent's cache**, because its prefix is its own. A fork does, since
+  it inherits the parent's prompt, tools and history exactly.
+- **The cache is scoped to a machine and a working directory**, and each conversation also carries
+  the git status snapshot taken at startup. So two rounds launched in the same workspace can read
+  the same system-prompt and project-context prefix, as long as neither the configuration nor that
+  snapshot changed between them. Parallel sessions in one directory share a cache; a worktree has
+  its own working directory and therefore its own.
+
+The practical reading for Adapt: statelessness costs the conversation layer, which is small and
+which the spec wants discarded anyway, not the system prompt and project context, which are the
+expensive parts and which a per-round session can still hit.
+
 ### Subagents
 
 Every candidate can spawn subagents. The differences are small:
@@ -209,6 +239,32 @@ every path Adapt records.
 **Rule out C** while context is meant to come from files, and **rule out E** while the subscription
 login is a requirement.
 
+## Glossary
+
+**The supervisor** (candidate D). A background service Claude Code starts the first time you
+background a session or open agent view. It runs each background session as its own Claude Code
+process and manages that process for you: it keeps it running while the session is working, paused
+on a prompt or attached; it stops it to free resources once the session is finished or waiting for a
+message and has been unattached for about an hour; it restarts it if it exits unexpectedly; and it
+moves idle sessions onto a new version after an auto-update. The conversation stays on disk
+throughout, so a stopped session resumes where it left off when you attach or reply. It authenticates
+with the same stored credentials as an interactive session. Its state lives in `~/.claude/daemon.log`,
+`~/.claude/daemon/roster.json` and `~/.claude/jobs/<id>/`, and each session gets a scratch directory
+at `$CLAUDE_JOB_DIR/tmp`. Background shell commands and background subagents carry over when a
+session's process restarts; monitors and a subagent's own shell commands stop with it.
+
+**"Each background session uses the subscription quota independently."** They do not share a budget
+between them. Every background session draws on the same plan limits as any other session, and none
+of them is discounted for running in the background, so ten sessions burn the plan roughly ten times
+as fast as one. The warning is about dispatching many at once, not about background sessions costing
+more per token.
+
+**Session-id bookkeeping** (candidates C and D). Anything that outlives one command has an id that
+the launcher must store, look up and clean up: write the session id somewhere durable when the
+session starts, find it again on the next round, decide what to do when it is missing, stopped or
+belongs to a crashed run, and stop or delete it when it is no longer wanted. With A there is nothing
+to keep, because the id dies with the round and the records hold the state.
+
 ## What is still untested
 
 1. The `.claude/worktrees/` relocation in a background session: when it happens, and what the
@@ -222,3 +278,10 @@ login is a requirement.
 5. Whether a background session, which is not `-p`, is treated as interactive for agent teams. It
    should not matter, since Adapt uses subagents, but it would change what a resident manager could
    do.
+6. Whether a background session can be reset in place. Claude has no tool that clears its own
+   context: `/clear` and `/compact` are commands a person types, a message from another session
+   arrives as plain text and is never executed as a command, and compaction otherwise happens on its
+   own when the window fills. What is untested is whether a reply sent into a background session
+   through agent view counts as typing the command, which is what a "clear yourself and start again"
+   instruction would need. If it does not, resetting a resident manager means stopping it and
+   launching a new one, which is what A does every round anyway.

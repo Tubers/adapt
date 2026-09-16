@@ -28,6 +28,8 @@
 - 🔜 strip the manager down: bundled skills, built-in agents, user plugins `t27`
 - 🔜 let a specialist add its own LSP plugin without the interactive plugin command `t28`
 - 🔜 code graph tooling for specialists, on top of LSP `t29`
+- 🔜 quality assurance: how a round proves it delivered `t30`
+- 🔜 the briefing: what each agent is given, and in what order `t31`
 
 ---
 
@@ -84,3 +86,7 @@
 **t28** · A specialist needs code intelligence for its skill's language. Plugins can carry .lsp.json, and the official marketplace has TypeScript, Python, Go and Rust plugins. Plugins load at session start, so an install reaches the next session. Investigate: claude plugin CLI subcommands, writing enabledPlugins and marketplaces into the workspace settings, --plugin-dir at launch, and skills-directory plugins that auto-load. Done when a specialist can request one and the next launch has it.
 
 **t29** · The user is looking for a plugin or tool that builds a graph of a codebase, like a compiler AST, so an instance can see which parts affect which. Once found, decide how a specialist reaches it: a plugin loaded at launch, or a meta tool. Done when the tool is named and wired in, or the idea is dropped.
+
+**t30** · Layers sketched in spec/revised.txt: acceptance criteria in the work item before assignment; a failing test first for a REPAIR; evidence not claims from the specialist; a verifier subagent with fresh context that re-runs tests and never sees the specialist's narrative; the manager merging only on that pass; a host-side check after the merge that reverts on failure; the round closed against the original request. Done when each step has a concrete form, a command and a rule.
+
+**t31** · No agent carries context between sessions, so the briefing is the design. Order: own system prompt, protocol rules for its kind, work item with acceptance criteria, pointers to where it works and what it may touch, nothing else. Everything further is looked up, and what is worth keeping is written back before the agent ends. Relates to t17 and t18. Done when the order is fixed and each part has an owner.

@@ -33,7 +33,7 @@ How a session learns of Adapt:
 
 The workspace's .claude tree:
 	The workspace contains its own .claude tree, because Adapt is mainly run by a headless session started inside it. That session treats the workspace as its project.
-	- .claude/settings.json: ordinary Claude Code settings. Its claudeMdExcludes setting lists glob patterns, matched against absolute paths, that stop every CLAUDE.md and CLAUDE.local.md above the workspace from loading. A managed-policy CLAUDE.md cannot be excluded. Its permissions.additionalDirectories names the host folders the manager may edit. The same file holds the hooks and permissions that keep each agent in its silo.
+	- .claude/settings.json: ordinary Claude Code settings. Its claudeMdExcludes setting lists glob patterns, matched against absolute paths, that stop every CLAUDE.md and CLAUDE.local.md above the workspace from loading. A managed-policy CLAUDE.md cannot be excluded. Its permissions.additionalDirectories names the host folders the manager may edit. The same file holds the hooks and permissions that keep each agent in its silo. It also sets promptCacheTtl and subagentPromptCacheTtl to 1h, because a subagent's requests otherwise keep only a five-minute cache even on a subscription, and because the main conversation drops to five minutes once the plan's included usage runs out. Cache warmth is a setting, not something to poll for: see spec/launch-options.md.
 	- .claude/agents/: the two specialist definitions.
 	- .claude/skills/: rules-system, vector-search and meta-tools.
 	- .claude/hooks/: the scripts the settings call.
@@ -120,6 +120,21 @@ Working on skills:
 	A copy of a host skill is a git worktree made in the host repository by script. The isolation: worktree subagent field would copy the workspace repository instead, so Adapt does not use it for host skills.
 	Copies live outside the manager's start folder and are reached through additionalDirectories. A copy under the start folder would let the session lazily load that copy's .claude/skills/.
 	When a specialist changes a sibling skill that Adapt also carries a copy of, the change is mirrored to Adapt's copy. A change to Adapt's copy is mirrored back the same way. (open: t20)
+
+
+Making sure a round delivered (open: t30):
+	This is the hardest problem in the skill. Every agent starts with no memory of the last round, so nothing is caught by someone remembering. A specialist that believes it finished, a manager that believes the specialist, and a host instance told the work is done, is the failure this design has to make difficult. The answer is that a claim is never evidence, and that the checks are layered:
+	1. The work item carries its acceptance criteria before any specialist touches it. The manager writes them from the inbox request, in the request's own words: what must be true, and how anyone would know. A work item without them is not assignable.
+	2. A REPAIR starts with a failing test that reproduces the fault, written before the fix. An EXTEND or a NEW skill lands with tests for what it added. A skill that has a selftest runs it.
+	3. The specialist reports evidence, not a summary: the diff, the commands it ran and their output, and each acceptance criterion paired with the evidence that satisfies it. An unmet criterion is reported as unmet, which is a normal outcome and never a failure of the specialist.
+	4. A separate verifier subagent, with a fresh context, receives the work item, the acceptance criteria and the diff, and never the specialist's narrative. It re-runs the tests in a clean copy and tries to break the claim. Its job is to fail the work, not to agree with it.
+	5. The manager merges on the verifier's pass and on the criteria being covered, never on either agent saying it is done. It sends the work back otherwise.
+	6. After the merge, the host-side check runs the skill's own tests where it actually lives. A failure reverts the merge, and the round reopens rather than closing.
+	7. The round closes by restating the original request and saying which criterion answered it. The submitter is told what changed, in the terms they asked in.
+	Rollback is always available because the work is done on a copy: an unmerged branch is discarded, and a merged one is reverted.
+
+The briefing (open: t31):
+	Because no agent carries context between sessions, what each agent is given, and in what order, is the design rather than a detail. Each agent is started with, in this order: its own short system prompt; the protocol rules for its kind; the work item with its acceptance criteria; the pointers to where it works and what it may touch; and nothing else. Everything further is looked up: its rules folder, its history, its skill's documentation, and vector-search over the corpus. What is worth keeping is written back into those places before the agent ends, because the next agent will read them and not it.
 
 
 Friction:
