@@ -107,12 +107,34 @@ Rules and protocols:
 	- vector-search finds niche rules for a specialist to inject while it works on code. It also runs the audit tools that keep the rule set healthy: information independence (no redundancy), concise descriptions and proper scope.
 	- vector-search also helps specialists navigate the code of the skill they work on, and the documentation they have collected on it that does not merit a finding.
 	- Agent system prompts breadcrumb the knowledge each specialist needs, so it starts from a good point. (open: t17)
+	- No agent edits a rule on its own account. A rule change is requested through the inbox and reviewed, like any other work: see Requests from inside Adapt.
 
 
 Records and communication:
 	Everything is kept as files and text, so it is all recorded and easy to look into, even at runtime.
 	- Each specialist uses the rules-system commands. Its history log records its actions, its tasks file shows its status, and its questions file carries its communication with the manager. Built-in instance-to-instance messaging is the alternative for that last part. (open: t7)
 	- The manager has its own history log and tasks file, created at initialization. An instance in the host project reads them in filtered slices by running a command against the Adapt skill. (open: t22)
+	- The manager's task file IS the status surface. The user watches it in the viewer; a host instance reads it through the shim. Adapt builds no second status channel, because the manager has to keep that file anyway and status comes free with it.
+
+
+Requests from inside Adapt:
+	Adapt may work on its own tooling, and on its own rules, but never by a shortcut. Everything inside uses the same inbox as an instance outside.
+	- A specialist that wants a change to a skill or tool it uses drafts a request into the inbox in the course of its work and tells the manager it has done so. It does not make the change itself.
+	- The manager reviews it like any other request. If it judges the request valuable it ratifies it, and it may extend the round in progress to include it as an item for the specialists.
+	- The manager files its own requests the same way. It may never ratify a request in the round that wrote it. That takes a later round, whose manager started with fresh context.
+	- Every request is kept. Archiving is automatic, so what was asked survives the work item it became (open: t34).
+	- Priority is the manager's job, weighed against the launch prompt and what it asked for. When a tool would save enough usage and context to be worth building first, the manager may raise it above the external request; having done so, it runs another round for the external request.
+	- Rules follow the same scheme. A specialist that wants a rule changed files a request and the manager reviews it. A rule change the manager itself wants is ratified only by a later manager round, with fresh context (open: t35).
+	- Work on a tool happens in an isolated worktree or sandbox, so every agent, inside Adapt and outside it, keeps using the working version while maintenance is under way. The change merges only when the tests pass.
+
+
+Tests and skill initialization:
+	Testing is mostly automated, and it is set up before the work rather than after.
+	- At init, Adapt takes inventory of the sibling skills in the host's skill folder.
+	- The first time Adapt works on one of them, extending or repairing, that skill first goes through skill initialization: an automated test suite is built for it, before the change (open: t32).
+	- The suites are meant to be robust: their job is to catch the change that quietly breaks something no instance thought to check.
+	- They are maintained from then on. Work that adds behaviour adds its tests, and a repair adds the test that reproduces the fault.
+	- Small meta tools carry less scrutiny. A meta tool under a size and line limit is narrow, highly specialised and internal-facing, and its documentation is whatever the agents that built it decide they need (open: t33).
 
 
 Working on skills:
@@ -157,6 +179,8 @@ Round (proposed; open: t12):
 	3. The specialists work on a copy of the skill. They call on a lower-model specialist for batched, stateless chores.
 	4. The manager reviews the result, then merges it or sends it back.
 	5. The change is mirrored where needed and logged, and the inbox requests it covered are closed.
+	A round can grow: the manager may ratify a request raised inside the round and add it as an item.
+	A round can be reordered: when the manager promotes an internal tool above the external request, the external request waits for the next round.
 	For now the user starts a round. Later the manager might start one itself. How much work a single round takes on is still open.
 
 

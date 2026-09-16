@@ -30,6 +30,10 @@
 - 🔜 code graph tooling for specialists, on top of LSP `t29`
 - 🔜 quality assurance: how a round proves it delivered `t30`
 - 🔜 the briefing: what each agent is given, and in what order `t31`
+- 🔜 skill initialization: build a skill's automated test suite before the first change `t32`
+- 🔜 meta tool exemption: the size and line limit below which scrutiny is reduced `t33`
+- 🔜 request archive: every request kept, automatically `t34`
+- 🔜 ratification: enforcing that no instance ratifies its own request `t35`
 
 ---
 
@@ -53,7 +57,7 @@
 
 **t11** · When to Trigger now names INBOX (done under t3). Still open: before filing, an instance checks for a similar request; vector-search could do that check by meaning. Done when the trigger conditions and the duplicate check are defined.
 
-**t12** · User leans: a round is a start-to-finish cycle on one manager-created work item from the inbox. Proposal with five steps now in spec/revised.txt. Open: how much work one round takes on, and when the manager may start one itself. Done when the user accepts or changes it.
+**t12** · A round is a start-to-finish cycle on one work item, with the five steps in spec/revised.txt. It can grow when the manager ratifies a request raised inside it, and it can be reordered when the manager promotes an internal tool above the external request, which then waits for the next round. Open: how much work one round takes on, and when the manager may start one itself. Done when the user accepts both.
 
 **t13** · One claude -p run per round in the workspace, no --bare and no resume. The comparison and the untested list live in spec/launch-options.md. Exclusions regenerated per launch (t26); bundled skills, built-in agents, plugins, auto memory and MCP off (t27). Left here: write the launch command with its permission mode and output capture, test --setting-sources project,local, test crossSessionInbound accept. Done when a run shows nothing host or personal.
 
@@ -71,7 +75,7 @@
 
 **t21** · First init creates the workspace outside the host repo as its own git repo, writes the shim into the host's .claude/skills/adapt/, marks the workspace trusted by writing hasTrustDialogAccepted for that path, spawns the manager, and runs build scripts: inventory the user's skills, create data folders and configs, load Adapt's own skills, create the manager's records. Needed: where the workspace lives, idempotent re-init, later inits. Done when defined.
 
-**t22** · What a host-project instance can run against Adapt: init, submit a request (the form), read the manager's tasks and history in filtered slices, start a round. Done when the command list and each command's output are defined.
+**t22** · What a host instance can run against Adapt: init, submit a request, start a round, and read the manager's records in filtered slices. The manager's task file is the status surface, watched in the viewer or read through the shim; there is no second status channel. Needed: the command list, each command's output, and how a host instance is told a round finished or stalled. Done when the list is defined.
 
 **t23** · User allows chains of Adapts building tools to build tools. Needed: which Adapt owns which skills, how a nested manager is launched and reports up, and any depth limit. Done when the spec states them.
 
@@ -90,3 +94,11 @@
 **t30** · Layers sketched in spec/revised.txt: acceptance criteria in the work item before assignment; a failing test first for a REPAIR; evidence not claims from the specialist; a verifier subagent with fresh context that re-runs tests and never sees the specialist's narrative; the manager merging only on that pass; a host-side check after the merge that reverts on failure; the round closed against the original request. Done when each step has a concrete form, a command and a rule.
 
 **t31** · No agent carries context between sessions, so the briefing is the design. Order: own system prompt, protocol rules for its kind, work item with acceptance criteria, pointers to where it works and what it may touch, nothing else. Everything further is looked up, and what is worth keeping is written back before the agent ends. Relates to t17 and t18. Done when the order is fixed and each part has an owner.
+
+**t32** · At init Adapt inventories the sibling skills. The first time it extends or repairs one, that skill goes through initialization: an automated suite is built first, robust enough to catch a quiet regression, and maintained afterwards. Needed: what the suite must cover, who writes it, how long it may take, what happens when a skill resists testing, and how the suite is kept current. Done when the process is defined and one skill has been through it.
+
+**t33** · A small meta tool is narrow, internal-facing and built by the agents for themselves, so it carries less process: documentation is whatever its builders need. Needed: the actual limit in files, lines and blast radius, what scrutiny still applies (a smoke test, a name, an owner), and what happens when a tool grows past the limit. Done when the limit and the remaining checks are written.
+
+**t34** · Requests are archived automatically so what was asked survives the work item it became. Needed: where the archive lives, the id a request keeps from submission through amalgamation to the closing report, what a submitter can look up later, and retention. Relates to t9 and t10. Done when the lifecycle of one request is written end to end.
+
+**t35** · A manager may not ratify a request written in the round that wrote it; that takes a later round with fresh context. A specialist's request is reviewed by the manager. Needed: a round id and an author stamped on every request, the check that refuses same-round ratification, and where it lives: a rule, a hook, or the request tool itself. Done when the check exists and is tested.
