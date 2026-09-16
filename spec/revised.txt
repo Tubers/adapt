@@ -85,7 +85,18 @@ Code intelligence for specialists:
 	A specialist works on someone else's code, so it needs to see what calls what instead of reading whole files.
 	- Claude Code's LSP plugins connect a language server, which gives definitions, references and type errors directly. The official marketplace has plugins for TypeScript, Python, Go, Rust and other common languages, and any plugin can carry its own .lsp.json for a language that has none. The language server binary must be on the machine.
 	- A specialist should be able to add the one for its skill's language on its own. Plugins load at session start, so an installed or enabled plugin reaches the next session, not the running one. How a subagent does this without the interactive plugin command is open (t28).
-	- A tool that builds a graph of the codebase, so an instance can see which parts affect which, is wanted on top of this. The user is looking for one (t29).
+	- A tool that builds a graph of the codebase, so an instance can see which parts affect which, is wanted on top of this. The user found one: graphify (github.com/Graphify-Labs/graphify, PyPI package graphifyy, double y, dual Apache 2.0 and MIT). Trialled on 2026-09-16 in a throwaway environment, since deleted (open: t29).
+	What graphify is:
+	- It parses code locally with tree-sitter, 37 languages, with no model and no API key, into graph.json: nodes, edges tagged EXTRACTED or INFERRED, and communities. The trial built 500 nodes, 1,153 edges and 18 communities from the rules-system scripts in seconds with `graphify extract <path> --code-only`.
+	- Its CLI answers the questions a specialist asks: `query "<question>"` with a token budget, `path "A" "B"`, `explain "X"`, `affected "X"` for what a change reaches, `god-nodes` for the hubs, and `update <path>` to re-extract changed code without a model.
+	- Docs, papers and images, and naming the communities, need a model: an API key for a backend, or the Claude Code session itself when the skill runs inside one. `--code-only` and `--no-label` keep it model-free.
+	- It writes graphify-out/ next to whatever it scanned unless told otherwise with --out, and a global graph under ~/.graphify only when asked with --global. Its query log is off unless enabled.
+	How Adapt installs it, differently from the README:
+	- The package goes into a Python environment of the workspace's own, pinned to a version, rather than a user-wide tool. Python 3.12 is present; uv is not installed yet, and is the recommended installer.
+	- `graphify install --project --platform claude` must NOT be run in the workspace. The trial showed it writes CLAUDE.md twice, at the root and under .claude/, and registers two PreToolUse hooks in .claude/settings.json. Adapt copies only the skill folder it produces, .claude/skills/graphify/ with SKILL.md and its references/, and nothing else.
+	- If the nudge those hooks give is wanted, Adapt writes it as its own gated rule.
+	- graphify-out/ is always pointed with --out into the specialist's home, never left beside a host skill, because writing there would break the scope rule.
+	- Its SKILL.md is about 41KB and its description claims "any question about a codebase", so it is preloaded only into specialists that work on code, and kept away from the manager.
 
 
 Sessions and agents:
