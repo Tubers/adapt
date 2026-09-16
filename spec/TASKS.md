@@ -64,7 +64,7 @@
 
 **t11** · When to Trigger now names INBOX (done under t3). Still open: before filing, an instance checks for a similar request; vector-search could do that check by meaning. Done when the trigger conditions and the duplicate check are defined.
 
-**t12** · A round is a start-to-finish cycle on one work item, with the five steps in spec/revised.txt. It can grow when the manager ratifies a request raised inside it, and it can be reordered when the manager promotes an internal tool above the external request, which then waits for the next round. Open: how much work one round takes on, and when the manager may start one itself. Done when the user accepts both.
+**t12** · A round is one start-to-finish cycle on one work item, with the five steps in spec/revised.txt. Only an internal tool that improves delivery of that item may join it, judged on speed, usage and token efficiency, or ease of implementation. The round can grow by ratification and be reordered when a tool is promoted, in which case the external request waits for the next round. Open: when the manager may start a round itself. Done when the user accepts.
 
 **t13** · One claude -p run per round in the workspace, no --bare and no resume. The comparison and the untested list live in spec/launch-options.md. Exclusions regenerated per launch (t26); bundled skills, built-in agents, plugins, auto memory and MCP off (t27). Left here: write the launch command with its permission mode and output capture, test --setting-sources project,local, test crossSessionInbound accept. Done when a run shows nothing host or personal.
 

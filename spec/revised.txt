@@ -155,7 +155,7 @@ Requests from inside Adapt:
 	- The manager chooses the shape of the answer to a request. In order of how little it disturbs: repair what is broken; extend a skill that already does something close; wrap several skills behind one surface when composition delivers the capability best; or build a brand new skill when the functionality is entirely foreign, meaning nothing in the external-facing skills does it or anything like it. The last two are NEW requests.
 	- A wrapper skill or a brand new one the manager itself proposes is filed in the inbox like any other request, and ratified by a later manager with fresh context, because this manager wrote it.
 	- Every request is kept. Archiving is automatic, so what was asked survives the work item it became (open: t34).
-	- Priority is the manager's job, weighed against the launch prompt and what it asked for. When a tool would save enough usage and context to be worth building first, the manager may raise it above the external request; having done so, it runs another round for the external request.
+	- Priority is the manager's job, weighed against the launch prompt and what it asked for. A tool earns its place by improving the delivery of the work item in hand on one of three measures: speed, usage and token efficiency, or ease of implementation, which covers both the complexity of the build and the chance of future breakage. When a tool is worth building first on those grounds, the manager may raise it above the external request; having done so, it runs another round for the external request.
 	- Rules follow the same scheme. A specialist that wants a rule changed files a request and the manager reviews it. A rule change the manager itself wants is ratified only by a later manager round, with fresh context (open: t35).
 	- Work on a tool happens in an isolated worktree or sandbox, so every agent, inside Adapt and outside it, keeps using the working version while maintenance is under way. The change merges only when the tests pass.
 
@@ -235,6 +235,7 @@ Round (proposed; open: t12):
 	3. The specialists work on a copy of the skill. They call on a lower-model specialist for batched, stateless chores.
 	4. The manager reviews the result, then merges it or sends it back.
 	5. The change is mirrored where needed and logged, and the inbox requests it covered are closed.
+	One work item per round. The only work that may join it is an internal tool that directly improves the delivery of that item, judged on three things: speed, usage and token efficiency, and ease of implementation, meaning less complexity to build and less chance of future breakage and repair. A tool that improves none of them waits for its own round.
 	A round can grow: the manager may ratify a request raised inside the round and add it as an item.
 	A round can be reordered: when the manager promotes an internal tool above the external request, the external request waits for the next round.
 	For now the user starts a round. Later the manager might start one itself. How much work a single round takes on is still open.
