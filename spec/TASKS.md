@@ -43,6 +43,7 @@
 - 🔜 stall notice: tell the user when a round stalls or crashes `t47`
 - 🔜 the manager's questions file as a diagnostic, and turning its entries into rules `t48`
 - 🔜 notes folders: freeform space for the manager and every specialist `t49`
+- 🔜 retirement: the evidence, the path, and what archiving means `t50`
 
 ---
 
@@ -129,3 +130,5 @@
 **t48** · The manager writes a question whenever it does not know what to do, without waiting for an answer. Later review turns each into a structural fix: a rule, a protocol line, a better briefing, or a tool. Needed: the instruction that makes the manager write instead of guess, how the entries are reviewed and grouped, and how a recurring question becomes a rule candidate. Relates to t18 and t31. Done when the loop runs once.
 
 **t49** · Each agent gets a freeform notes folder it organises itself, never read whole at session start. Use is counted per note, and a high count surfaces it to the manager as a candidate finding; graduating one moves its information into a rule scoped to where it will be needed and removes the note. Each specialist gets vector-search files of its own over its notes. Needed: where the folders live, the counter, the graduation path, and the per-specialist index. Done when all four exist.
+
+**t50** · Adapt can retire a skill, a rule or a meta tool, through a request ratified by a fresh manager context. Needed: the evidence thresholds (unused tool, never-firing or superseded rule, skill nothing asks for), how the host's use of a skill is checked first, where an archived thing goes, and how a retirement is reversed if it was wrong. Relates to t16. Done when the path is written and one retirement has been run.

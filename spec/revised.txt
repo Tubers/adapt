@@ -160,6 +160,15 @@ Requests from inside Adapt:
 	- Work on a tool happens in an isolated worktree or sandbox, so every agent, inside Adapt and outside it, keeps using the working version while maintenance is under way. The change merges only when the tests pass.
 
 
+Retirement (open: t50):
+	Adapt can retire what it maintains: a skill, a rule, or a meta tool. A set that only grows eventually costs more than it earns.
+	- Retiring is a request like any other. It is reviewed and ratified by a manager with fresh context, and nothing goes on the authority of the agent that wants it gone.
+	- The case is made from evidence, not opinion: a meta tool whose use count has stayed at nothing, a rule that never fires or that a newer rule covers, a skill whose surface nothing asks for any more. Use counts and firing logs are what make it.
+	- A skill the host still uses is not retired, whatever Adapt thinks of it. The host's use is checked first.
+	- A constant rule cannot be retired at all (open: t16).
+	- Retirement archives rather than erases. The thing leaves the working set, and the record of what it was and why it went stays behind.
+
+
 Tests and skill initialization:
 	Testing is mostly automated, and it is set up before the work rather than after.
 	- At init, Adapt takes inventory of the sibling skills in the host's skill folder.
