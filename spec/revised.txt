@@ -155,6 +155,14 @@ Making sure a round delivered (open: t30):
 	7. The round closes by restating the original request and saying which criterion answered it. The submitter is told what changed, in the terms they asked in.
 	Rollback is always available because the work is done on a copy: an unmerged branch is discarded, and a merged one is reverted.
 
+Recovery from a crashed round (open: t38):
+	A crashed round is redone from a known state, never salvaged. Rerunning from a state that is understood beats rescuing one that is not.
+	- Rollback comes first, and in code wherever it can: the work happened on a copy, so the branch is discarded and its worktree removed, and a merge already made is reverted. An automated rollback is always preferred to an agent reasoning its way through wreckage.
+	- What makes that possible is discoverability. Every agent logs its work to its history as it goes, and an active worktree or environment is marked active while it is in use, so a later session can find where changes were being made without guessing.
+	- When the rollback cannot be automatic, the manager takes it. It establishes what was actually done in the folders that were active, decides what must be rolled back, and records both. This is manager work because it needs judgement rather than a script.
+	- Once the state is known again, the round runs from the start.
+
+
 The briefing (open: t31):
 	Because no agent carries context between sessions, what each agent is given, and in what order, is the design rather than a detail. Each agent is started with, in this order: its own short system prompt; the protocol rules for its kind; the work item with its acceptance criteria; the pointers to where it works and what it may touch; and nothing else. Everything further is looked up: its rules folder, its history, its skill's documentation, and vector-search over the corpus. What is worth keeping is written back into those places before the agent ends, because the next agent will read them and not it.
 

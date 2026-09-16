@@ -36,7 +36,7 @@
 - 🔜 ratification: enforcing that no instance ratifies its own request `t35`
 - 🔜 permissions posture: what agents may run and touch `t36`
 - 🔜 ❓ budget for a round: caps, and what happens at the usage limit `t37`
-- 🔜 ❓ recovery: what happens to a round that dies mid-way `t38`
+- 🔜 recovery: what happens to a round that dies mid-way `t38`
 - 🔜 ❓ concurrent writers: manager and specialists writing records at once `t39`
 - 🔜 ❓ canonical copy of a skill, and how an improvement travels `t40`
 - 🔜 ❓ one workspace per host, or a shared layer across hosts `t41`
@@ -117,7 +117,7 @@
 
 **t37** · Nothing caps a round: no ceiling on specialists, agentic turns, tokens or wall-clock time, and no rule for the plan's usage running out mid-round. Needed: the caps, what a stopped round leaves behind, and who is told. Done when both are written.
 
-**t38** · A crash or a stop leaves stale worktrees, a possibly half-merged branch and a work item stuck in progress. Needed: how the next round detects an abandoned one, what it cleans up by itself, how many retries before the item is parked for the user, and where the wreckage is recorded. Done when the recovery path is written.
+**t38** · Answered (q3): a crashed round is redone from a known state, never salvaged. Automated rollback first, in code: discard the branch, remove the worktree, revert a merge already made. Agents log as they go and an active worktree is marked active, so the wreckage is discoverable. Where rollback cannot be automatic, the manager establishes what was done and decides what to roll back. Done when the rollback script, the active marker and the manager path exist.
 
 **t39** · The manager and several specialists write history, task and question records, and share rules/INDEX.md. rules-system assumes one writer. Options: a records folder per specialist, a lock, or one writer that the others hand lines to. Done when the layout and the concurrency rule are fixed and tested.
 
