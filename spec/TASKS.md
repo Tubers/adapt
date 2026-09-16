@@ -24,6 +24,8 @@
 - 🔜 nested Adapt: an Adapt inside an Adapt `t23`
 - 🔜 per-specialist rules folders and finding curation `t24`
 - 🔜 place META TOOLS: root folder, inner skill, or both `t25`
+- 🔜 launcher: regenerate the personal exclusions at every manager launch `t26`
+- 🔜 strip the manager down: bundled skills, built-in agents, user plugins `t27`
 
 ---
 
@@ -49,7 +51,7 @@
 
 **t12** · User leans: a round is a start-to-finish cycle on one manager-created work item from the inbox. Proposal with five steps now in spec/revised.txt. Open: how much work one round takes on, and when the manager may start one itself. Done when the user accepts or changes it.
 
-**t13** · Configuration B, manager without --bare, started in a workspace outside the host. A probe proved the host fence works and that personal skills and agents still load. Choose the exclusion: launcher-regenerated skillOverrides off plus Agent(name) deny entries, or a CLAUDE_CONFIG_DIR of Adapt's own that costs one login. Bundled skills always load; disableBundledSkills is untested. Done when the launch command is fixed and a run shows no host or personal skills.
+**t13** · Configuration B, manager without --bare, started in a workspace outside the host. A probe proved the host fence works and that personal skills and agents still load. Chosen: regenerated exclusions (t26), not a config folder of Adapt's own. Left here: the launch command itself, and testing --setting-sources project,local for the personal settings file and its hooks. Done when the launch command is fixed and a run shows no host or personal skills.
 
 **t15** · Docs: agent teams need an interactive session, never -p. Subagents may spawn subagents by default, 3 layers deep; CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH=1 turns it off and so enforces manager-only spawning. The skills field preloads full content but does not restrict; omit Skill from tools to restrict. omitClaudeMd exists. A fresh haiku subagent per batch is stateless. Done when spec fixes the agent model and haiku lifecycle.
 
@@ -63,7 +65,7 @@
 
 **t20** · Specialists work on copies; the manager approves merges; two-way mirror with Adapt's inner copies. Under B a host skill copy is a git worktree made in the host repo by script, placed outside the workspace start folder and reached through additionalDirectories; isolation worktree would copy the workspace repo instead. Needed: branch naming, conflicts, which side wins. Done when the flow is defined.
 
-**t21** · First init creates the workspace outside the host repo as its own git repo, writes the shim into the host's .claude/skills/adapt/, spawns the manager, and runs build scripts: inventory the user's skills, create data folders and configs, load Adapt's own skills, create the manager's records. The workspace must be trusted once or additionalDirectories is ignored. Needed: where the workspace lives, idempotent re-init, later inits. Done when defined.
+**t21** · First init creates the workspace outside the host repo as its own git repo, writes the shim into the host's .claude/skills/adapt/, marks the workspace trusted by writing hasTrustDialogAccepted for that path, spawns the manager, and runs build scripts: inventory the user's skills, create data folders and configs, load Adapt's own skills, create the manager's records. Needed: where the workspace lives, idempotent re-init, later inits. Done when defined.
 
 **t22** · What a host-project instance can run against Adapt: init, submit a request (the form), read the manager's tasks and history in filtered slices, start a round. Done when the command list and each command's output are defined.
 
@@ -72,3 +74,7 @@
 **t24** · Each specialist gets rules/<skill name>/ holding its findings; it curates them into rules gated to code files or skill documents. Needed: how this fits rules-system candidates and approval, and who approves a specialist's new rule. Done when defined.
 
 **t25** · The spec keeps META TOOLS as a root folder, and specialists are preloaded with it as a skill, which lives in .claude/skills/. Decide the one real location and how the other refers to it. Done when the spec names it.
+
+**t26** · The launcher scans the user's skills and agents folders, writes a skillOverrides off entry per skill name and a permissions.deny Agent(name) entry per agent name into the workspace settings, keeps a manifest of names already nullified, and logs any name it has not seen. Also test --setting-sources project,local, which should drop the personal settings file and its hooks while leaving the login alone. Done when the launcher exists and a run shows nothing personal.
+
+**t27** · Test disableBundledSkills for the bundled skills such as code-review and loop; CLAUDE_AGENT_SDK_DISABLE_BUILTIN_AGENTS=1 for Explore, Plan and general-purpose in a -p session; and whether workspace settings can switch off a plugin enabled in the user's settings. Then define how a capability comes back: one at a time, on evidence it is needed, each re-enable recorded. Done when the stripped baseline is defined and tested.
