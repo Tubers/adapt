@@ -2,8 +2,8 @@
 
 **Goal:** revise the Adapt skill spec with the user: spec/original.txt is the untouched first draft, spec/revised.txt the working revision
 
-- ✅ where the user is required, and how a round reports in · *2026-09-16* `t42`
 - ✅ one workspace per host, or a shared layer across hosts · *2026-09-16* `t41`
+- ✅ rule gates that reach code outside the workspace · *2026-09-16* `t63`
 - 🔄 **fold in the user's own changes to the spec** · *since 2026-09-15* `t1`
 - 🔜 reconcile Documentation Dogma with the existing writing rules `t4`
 - 🔜 define THE MANAGER without a persistent instance `t6`
@@ -56,15 +56,15 @@
 - 🔜 ❓ a surface document per maintained skill `t60`
 - 🔜 ❓ counters: one metrics store or three `t61`
 - 🔜 ❓ a host project that is not a git repository `t62`
-- 🔜 rule gates that reach code outside the workspace `t63`
+- 🔜 router: rewrite paths under a mapped copy before matching gates `t64`
 
 ---
 
 ## Details
 
-**t42** · The user starts a round and nothing else requires them until it ends. Needed: which acts need approval, such as a new skill, a rule deleted or changed, or a merge into a skill the user relies on; and how the user learns a round finished or stalled, beyond watching the manager's task file. Done when the gates and the notice are written.
-
 **t41** · The workspace is per host project, so meta tools, findings and specialist rules would be rebuilt from scratch in every project. Needed: whether a shared layer exists, what it may hold, and how a project-specific fact is kept out of it. Done when the boundary is written.
+
+**t63** · A specialist's skill copy is a host worktree outside the workspace, but the rules router gates on paths relative to its own repository. The graphify rule, and every rule scoped to a skill's code, must fire when a specialist touches that copy. Options: absolute or mapped gates, a gate written per specialist when its copy is made, or copies placed where the router sees them without lazy skill loading. Done when a gated rule fires on a copy.
 
 **t1** · The user has many changes of their own: some needed, some functional alternatives judged better than the original. Take each in chat, write it into spec/revised.txt, and split out any that opens a new question as its own task. Done when the user says the list is exhausted.
 
@@ -148,7 +148,7 @@
 
 **t51** · The dynamic request form routes on parsed answers. One candidate is a Haiku-class instance running the interview against a decision tree. It may be too much for that model. Needed: the decision tree, a trial on real requests, and a measure of whether the asking instance was routed down the right branch. The fallback is a scripted form with fixed branches. Done when the trial has a verdict.
 
-**t52** · Answered (q18): work from both ends, iteratively. Each protocol is a collection of rules in a protocols folder with a manager branch and a specialist branch; the chore protocol sits with the specialists'. Each specialist gets its own copy on first assignment, changed only through the request scheme. Draft all three against the workflow already in the spec, alongside t53 to t55, and expect to rebuild them often. Done when three first drafts exist as rule collections.
+**t52** · Answered (q18): work from both ends, iteratively. Each protocol is a collection of rules in a protocols folder with a manager branch and a specialist branch; the chore protocol sits with the specialists'. Each specialist gets its own copy on first assignment, changed only by request. Both protocols must describe the copy map and the made-up path of the agent's copy. Draft all three against the settled workflow, alongside t53 to t55. Done when three first drafts exist.
 
 **t53** · Everything hangs off the work item: acceptance criteria, assignment, verification, the closing report. It has no shape yet. Needed: its fields, its id, its states (drafted, ratified, assigned, in verification, merged, closed, parked), its place on disk, and whether it is a task in the manager's task window or a separate file a task points at. Done when one can be created, moved through every state and closed.
 
@@ -170,4 +170,4 @@
 
 **t62** · Worktrees, mirroring and rollback all assume git. Needed: what init does when the host is not a repository: refuse, offer to initialise one, or fall back to copies without worktrees, and what that costs the rollback path. Relates to t20, t21, t38. Done when the fallback is written.
 
-**t63** · A specialist's skill copy is a host worktree outside the workspace, but the rules router gates on paths relative to its own repository. The graphify rule, and every rule scoped to a skill's code, must fire when a specialist touches that copy. Options: absolute or mapped gates, a gate written per specialist when its copy is made, or copies placed where the router sees them without lazy skill loading. Done when a gated rule fires on a copy.
+**t64** · Build option 1b of t63. The copy script writes .claude/copy-map.json entries pairing a copy's real folder with copies/<skill>/; merge, discard and rollback remove them. rule_router rewrites a real path under a mapped folder into its made-up path before matching, outside the never-gate-skills prefix. Tests: a gated rule fires on a copy, a removed entry stops it, a stale entry is cleared by rollback. Done when the tests pass in the workspace's rules-system copy.

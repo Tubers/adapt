@@ -3,8 +3,8 @@ name that no rules router in this repository reads, until the workspace exists. 
 the two instruction files `graphify install --project --platform claude` writes (0.9.63), and from
 its hooks reference. On install, the rule between the markers becomes
 `rules/tooling/graphify.rule.md` in the workspace, gated on the code files of each code
-specialist's own skill copy (spec task t63 owns how that gate reaches a path outside the
-workspace).
+specialist's own skill copy (through the copy map: the gate is written against copies/<skill>/, the made-up path the router maps a copy onto; see the
+Working on skills section of the spec).
 
 --- rule text ---
 RULE tooling/graphify - query the code graph before reading or grepping your skill's code; refresh it after changing code.
