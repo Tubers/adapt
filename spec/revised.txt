@@ -147,6 +147,15 @@ Working on skills:
 	When a specialist changes a sibling skill that Adapt also carries a copy of, the change is mirrored to Adapt's copy. A change to Adapt's copy is mirrored back the same way. (open: t20)
 
 
+Where an improvement goes (open: t46):
+	Adapt keeps a configuration, written when it is initialised in a project, with options per skill. Scripts maintain it: a skill discovered later is keyed into the configuration at the moment it is found, so the file never falls behind the folder.
+	The options for a skill are:
+	- Local, the default. The improvement changes the host project's copy and stops there. It favours the local approach: what one project needed does not become everyone's.
+	- Global. The improvement is also merged into the skill's own repository, so other projects get it.
+	- Later, a third: a retroactive reconciliation that takes what every Adapt instance has done to a skill and works it into a branch of that skill in its repository.
+	Defaults exist for every option, and a skill may be set either way.
+
+
 Making sure a round delivered (open: t30):
 	This is the hardest problem in the skill. Every agent starts with no memory of the last round, so nothing is caught by someone remembering. A specialist that believes it finished, a manager that believes the specialist, and a host instance told the work is done, is the failure this design has to make difficult. The answer is that a claim is never evidence, and that the checks are layered:
 	1. The work item carries its acceptance criteria before any specialist touches it. The manager writes them from the inbox request, in the request's own words: what must be true, and how anyone would know. A work item without them is not assignable.

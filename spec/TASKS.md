@@ -2,8 +2,8 @@
 
 **Goal:** revise the Adapt skill spec with the user: spec/original.txt is the untouched first draft, spec/revised.txt the working revision
 
-- ✅ ❓ concurrent writers: manager and specialists writing records at once · *2026-09-16* `t39`
 - ✅ define how sub-agents route requests through THE MANAGER · *2026-09-16* `t7`
+- ✅ canonical copy of a skill, and how an improvement travels · *2026-09-16* `t40`
 - 🔄 **fold in the user's own changes to the spec** · *since 2026-09-15* `t1`
 - 🔜 reconcile Documentation Dogma with the existing writing rules `t4`
 - 🔜 define THE MANAGER without a persistent instance `t6`
@@ -36,20 +36,20 @@
 - 🔜 permissions posture: what agents may run and touch `t36`
 - 🔜 budget for a round: caps, and what happens at the usage limit `t37`
 - 🔜 recovery: what happens to a round that dies mid-way `t38`
-- 🔜 ❓ canonical copy of a skill, and how an improvement travels `t40`
 - 🔜 ❓ one workspace per host, or a shared layer across hosts `t41`
 - 🔜 ❓ where the user is required, and how a round reports in `t42`
 - 🔜 Windows specifics: the mechanisms that carry a Windows footnote `t43`
 - 🔜 who re-indexes vector-search, and what it costs `t44`
 - 🔜 two specialists needing the same file `t45`
+- 🔜 skill configuration: per-skill options, defaults, and the script that keeps it current `t46`
 
 ---
 
 ## Details
 
-**t39** · The manager and several specialists write history, task and question records, and share rules/INDEX.md. rules-system assumes one writer. Options: a records folder per specialist, a lock, or one writer that the others hand lines to. Done when the layout and the concurrency rule are fixed and tested.
-
 **t7** · Specialists talk to the manager through their questions file or built-in instance-to-instance messaging; user undecided. Docs: named subagents can message each other; agent teams are unavailable in -p. Done when the spec picks the channel and says where approval of a specialist request is recorded.
+
+**t40** · Mirroring is defined between a host skill and Adapt's inner copy, but nothing says what happens upstream. The same skill may live in several projects and may have come from a GitHub repo. Needed: which copy is canonical, whether Adapt pushes improvements upstream, and how other projects receive them. Relates to Adapt t13. Done when the direction of travel is written.
 
 **t1** · The user has many changes of their own: some needed, some functional alternatives judged better than the original. Take each in chat, write it into spec/revised.txt, and split out any that opens a new question as its own task. Done when the user says the list is exhausted.
 
@@ -115,8 +115,6 @@
 
 **t38** · Answered (q3): a crashed round is redone from a known state, never salvaged. Automated rollback first, in code: discard the branch, remove the worktree, revert a merge already made. Agents log as they go and an active worktree is marked active, so the wreckage is discoverable. Where rollback cannot be automatic, the manager establishes what was done and decides what to roll back. Done when the rollback script, the active marker and the manager path exist.
 
-**t40** · Mirroring is defined between a host skill and Adapt's inner copy, but nothing says what happens upstream. The same skill may live in several projects and may have come from a GitHub repo. Needed: which copy is canonical, whether Adapt pushes improvements upstream, and how other projects receive them. Relates to Adapt t13. Done when the direction of travel is written.
-
 **t41** · The workspace is per host project, so meta tools, findings and specialist rules would be rebuilt from scratch in every project. Needed: whether a shared layer exists, what it may hold, and how a project-specific fact is kept out of it. Done when the boundary is written.
 
 **t42** · The user starts a round and nothing else requires them until it ends. Needed: which acts need approval, such as a new skill, a rule deleted or changed, or a merge into a skill the user relies on; and how the user learns a round finished or stalled, beyond watching the manager's task file. Done when the gates and the notice are written.
@@ -126,3 +124,5 @@
 **t44** · Answered in part: vector-search keeps a separate index per kind of agent, so a specialist never carries rules that do not apply to it. Still needed: when each index is rebuilt and by whom, whether a specialist re-indexes its own skill after a merge, and what the embedding pass costs in time. Done when the trigger and the owner are written.
 
 **t45** · Each specialist owns one skill, but a change can touch a shared file or a second skill. Needed: who arbitrates, whether the manager serialises that work, and what stops two worktrees merging conflicting edits. Done when the arbitration is written.
+
+**t46** · Adapt writes a configuration at init with options per skill, and scripts key a newly discovered skill into it when it is found. The first option is where an improvement goes: local (default), global (merged into the skill's own repo), and later a retroactive reconciliation onto a branch of that repo. Needed: the file, its format and place, the defaults, the discovery script, and what else belongs per skill. Relates to Adapt t6. Done when the configuration exists.
