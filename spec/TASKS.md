@@ -34,6 +34,16 @@
 - 🔜 meta tool exemption: the size and line limit below which scrutiny is reduced `t33`
 - 🔜 request archive: every request kept, automatically `t34`
 - 🔜 ratification: enforcing that no instance ratifies its own request `t35`
+- 🔜 permissions posture: what agents may run and touch `t36`
+- 🔜 ❓ budget for a round: caps, and what happens at the usage limit `t37`
+- 🔜 ❓ recovery: what happens to a round that dies mid-way `t38`
+- 🔜 ❓ concurrent writers: manager and specialists writing records at once `t39`
+- 🔜 ❓ canonical copy of a skill, and how an improvement travels `t40`
+- 🔜 ❓ one workspace per host, or a shared layer across hosts `t41`
+- 🔜 ❓ where the user is required, and how a round reports in `t42`
+- 🔜 Windows specifics: the mechanisms that carry a Windows footnote `t43`
+- 🔜 who re-indexes vector-search, and what it costs `t44`
+- 🔜 two specialists needing the same file `t45`
 
 ---
 
@@ -102,3 +112,23 @@
 **t34** · Requests are archived automatically so what was asked survives the work item it became. Needed: where the archive lives, the id a request keeps from submission through amalgamation to the closing report, what a submitter can look up later, and retention. Relates to t9 and t10. Done when the lifecycle of one request is written end to end.
 
 **t35** · A manager may not ratify a request written in the round that wrote it; that takes a later round with fresh context. A specialist's request is reviewed by the manager. Needed: a round id and an author stamped on every request, the check that refuses same-round ratification, and where it lives: a rule, a hook, or the request tool itself. Done when the check exists and is tested.
+
+**t36** · Unwritten today: whether a specialist may run arbitrary shell, install packages, reach the network, push to git, or edit host files outside .claude/skills/; and which unattended mode the manager runs in (dontAsk, auto, bypassPermissions). Inbox requests are written by other agents, so this is also the prompt-injection surface. The user is writing an answer in chat. Done when the posture is written into the spec.
+
+**t37** · Nothing caps a round: no ceiling on specialists, agentic turns, tokens or wall-clock time, and no rule for the plan's usage running out mid-round. Needed: the caps, what a stopped round leaves behind, and who is told. Done when both are written.
+
+**t38** · A crash or a stop leaves stale worktrees, a possibly half-merged branch and a work item stuck in progress. Needed: how the next round detects an abandoned one, what it cleans up by itself, how many retries before the item is parked for the user, and where the wreckage is recorded. Done when the recovery path is written.
+
+**t39** · The manager and several specialists write history, task and question records, and share rules/INDEX.md. rules-system assumes one writer. Options: a records folder per specialist, a lock, or one writer that the others hand lines to. Done when the layout and the concurrency rule are fixed and tested.
+
+**t40** · Mirroring is defined between a host skill and Adapt's inner copy, but nothing says what happens upstream. The same skill may live in several projects and may have come from a GitHub repo. Needed: which copy is canonical, whether Adapt pushes improvements upstream, and how other projects receive them. Relates to Adapt t13. Done when the direction of travel is written.
+
+**t41** · The workspace is per host project, so meta tools, findings and specialist rules would be rebuilt from scratch in every project. Needed: whether a shared layer exists, what it may hold, and how a project-specific fact is kept out of it. Done when the boundary is written.
+
+**t42** · The user starts a round and nothing else requires them until it ends. Needed: which acts need approval, such as a new skill, a rule deleted or changed, or a merge into a skill the user relies on; and how the user learns a round finished or stalled, beyond watching the manager's task file. Done when the gates and the notice are written.
+
+**t43** · Everything runs on Windows, where settings.local.json is not kept at the repository root, cross-session messaging uses named pipes with a required auth line, and worktrees, symlinks and long paths behave differently. Needed: one pass over the launch, worktree and messaging paths before building. Done when each footnote is checked and the spec says what it means here.
+
+**t44** · The corpus grows every round: rules, findings, skill documentation and code. Needed: when the index is rebuilt and by whom, whether a specialist re-indexes its own skill after a merge, and what the embedding pass costs in time. Done when the trigger and the owner are written.
+
+**t45** · Each specialist owns one skill, but a change can touch a shared file or a second skill. Needed: who arbitrates, whether the manager serialises that work, and what stops two worktrees merging conflicting edits. Done when the arbitration is written.
