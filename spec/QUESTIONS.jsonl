@@ -1,1 +1,0 @@
-{"id": "q6", "ts": "2026-09-16", "time": "2026-09-16T00:28:11", "session": "e7a88b06-04b7-464e-b4d9-e158c76d5d9a", "task": "t41", "question": "Adapt gets a workspace per host project. Should meta tools, findings and specialist rules be rebuilt separately in each, or should one shared layer across your projects hold them, with each workspace drawing on it?"}
