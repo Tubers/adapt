@@ -45,7 +45,7 @@
 - 🔜 notes folders: freeform space for the manager and every specialist `t49`
 - 🔜 retirement: the evidence, the path, and what archiving means `t50`
 - 🔜 trial: a low-model instance running the request interview from a decision tree `t51`
-- 🔜 ❓ draft the starting protocols: manager round, specialist work, chore worker `t52`
+- 🔜 draft the starting protocols: manager round, specialist work, chore worker `t52`
 - 🔜 ❓ define the work item: fields, id, states and where it lives `t53`
 - 🔜 ❓ define the inbox: file shape, ids, states, and who moves a request `t54`
 - 🔜 ❓ define the round record: its id and what it leaves behind `t55`
@@ -88,7 +88,7 @@
 
 **t17** · Minimal starting directives that breadcrumb each agent to what it needs: its skill, its rules folder, its records, the commands it uses. Done when three drafts exist and the user approves them.
 
-**t18** · Protocols attach to an agent at spawn and can be tailored per specialist. The drafting of the starting three is t52; this task owns the attach mechanism: a gate on the agent's folders, the spawn prompt, or a hook that injects at subagent start, and how a tailored protocol overrides the common one. Done when the mechanism is chosen and one tailored protocol has been attached.
+**t18** · Protocols arrive nearly at session start, before any path is touched, so a path gate cannot deliver them. This task owns that startup mechanism: a hook at session or subagent start that injects the agent's whole protocol collection, and how a specialist's own copy is found in place of the common branch. Done when a fresh specialist starts with its own collection in context and nothing else.
 
 **t19** · Needs a friction kind in rules-system history; a hook that notifies an instance after N new friction entries since its last notice, N configurable; grouping of similar entries by meaning with vector-search; manager commands to read specialist histories filtered for friction. Done when kind, hook, config and grouping are defined.
 
@@ -148,7 +148,7 @@
 
 **t51** · The dynamic request form routes on parsed answers. One candidate is a Haiku-class instance running the interview against a decision tree. It may be too much for that model. Needed: the decision tree, a trial on real requests, and a measure of whether the asking instance was routed down the right branch. The fallback is a scripted form with fixed branches. Done when the trial has a verdict.
 
-**t52** · Three protocol rules a fresh instance follows with no memory: the manager's round workflow from inbox to closing report; the specialist's workflow from briefing to evidence; the chore protocol for the low-model worker, stateless and batched. They carry the sequence of the work, not advice. Depends on the shapes of the work item, the inbox and the round id. Relates to t17, t18, t30, t31. Done when three drafts exist and the user has read them.
+**t52** · Answered (q18): work from both ends, iteratively. Each protocol is a collection of rules in a protocols folder with a manager branch and a specialist branch; the chore protocol sits with the specialists'. Each specialist gets its own copy on first assignment, changed only through the request scheme. Draft all three against the workflow already in the spec, alongside t53 to t55, and expect to rebuild them often. Done when three first drafts exist as rule collections.
 
 **t53** · Everything hangs off the work item: acceptance criteria, assignment, verification, the closing report. It has no shape yet. Needed: its fields, its id, its states (drafted, ratified, assigned, in verification, merged, closed, parked), its place on disk, and whether it is a task in the manager's task window or a separate file a task points at. Done when one can be created, moved through every state and closed.
 
