@@ -126,6 +126,7 @@ Who Adapt answers to:
 	- The host agent's concern stops at three things: its own intent, the surface the skills present, and how well that surface serves the intent. Below that line it is simply a user of the skills. If they work, they work; how they work is not its business.
 	- The manager owns everything below that line: the internal design, and what each choice costs in effort, delay and tokens for the fixes and capabilities delivered back up.
 	The manager's task file stays the status surface. The host agent reads it; the user watches it when they want to.
+	One exception, while the skill is young: if a round stalls or crashes, the user is told directly. These are the days when that information is worth interrupting for, because the skill is still being built. The notice is a safeguard for this period, not part of the design's shape, and it can be retired once Adapt has proved itself (open: t47).
 
 
 Requests from inside Adapt:
