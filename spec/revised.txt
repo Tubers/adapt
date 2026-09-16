@@ -67,12 +67,12 @@ Stripping the manager:
 
 
 Launching the manager:
-	The launcher is a script in the shim. It regenerates the exclusions, then starts one session in the workspace. The options, from the Claude Code docs:
-	- claude -p, one run per round. The plain headless session. It can spawn subagents, and while a background subagent is still working the run stays open until it finishes, with a ten-minute idle ceiling. Simplest, and it ends when the round ends.
-	- claude -p --input-format stream-json, a headless session fed more than one message. Use it when a round needs several exchanges with the manager rather than one prompt. --max-turns caps the agentic turns.
-	- claude --bg, a background agent session that returns at once and prints its session ID. It cannot be combined with -p. Useful if the manager should stay alive between rounds and be messaged.
-	- The Agent SDK in Python or TypeScript, for a full programmatic loop with the same tools and agent loop.
+	The launcher is a script in the shim. It regenerates the exclusions, then starts one session in the workspace.
+	Five candidates were compared across authentication, lifetime, startup context, subagents, messaging, permissions, working directory, observability, failure, concurrency, effort and swappability: claude -p per round, -p with stream-json input, -p with --resume, claude --bg, and the Agent SDK. The comparison, the evidence and what is still untested are in spec/launch-options.md. It is the owner of that analysis; this section keeps only the decision.
 	Chosen default: one claude -p run per round, no --resume and no carried conversation. The manager's context comes from files, its rules and vector-search, never from a long-lived transcript. A later round starts clean and reads what the last one wrote (open: t13).
+	Ruled out for now: --resume, because a resumed run does not restore the --settings that carry the exclusions, and because the conversation would grow into the context store the spec rejects; the Agent SDK, because its documentation directs agents built on it to API-key authentication rather than the subscription login.
+	Kept in view: claude --bg, the only candidate that survives between rounds, can be attached to and messaged, and restarts itself after a crash. Before adopting it, test that a background session moves itself into a worktree under .claude/worktrees/ before editing files, which would move the manager out of the workspace it was started in.
+	A -p session binds a messaging inbox, so the host can message a running manager; it cannot show an approval dialog, so the launcher passes crossSessionInbound accept for held messages to be delivered (untested).
 	Agent teams are never an option here: they need an interactive session and do not spawn in -p.
 	Keeping startup context small, for the manager and for every specialist:
 	- No CLAUDE.md, no unscoped rules, no bundled skills, no personal skills or agents, no MCP servers, no auto memory.

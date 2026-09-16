@@ -53,7 +53,7 @@
 
 **t12** · User leans: a round is a start-to-finish cycle on one manager-created work item from the inbox. Proposal with five steps now in spec/revised.txt. Open: how much work one round takes on, and when the manager may start one itself. Done when the user accepts or changes it.
 
-**t13** · Configuration B, no --bare, one claude -p run per round started in the workspace, no resume. Exclusions regenerated per launch (t26); bundled skills, built-in agents, user plugins, auto memory and MCP off (t27). Left here: write the launch command, test --setting-sources project,local for the personal settings file and its hooks, and decide whether plugin packaging (C) is added. Done when the command is fixed and a run shows no host or personal skills.
+**t13** · One claude -p run per round in the workspace, no --bare and no resume. The comparison and the untested list live in spec/launch-options.md. Exclusions regenerated per launch (t26); bundled skills, built-in agents, plugins, auto memory and MCP off (t27). Left here: write the launch command with its permission mode and output capture, test --setting-sources project,local, test crossSessionInbound accept. Done when a run shows nothing host or personal.
 
 **t15** · Docs: agent teams need an interactive session, never -p. Subagents may spawn subagents by default, 3 layers deep; CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH=1 turns it off and so enforces manager-only spawning. The skills field preloads full content but does not restrict; omit Skill from tools to restrict. omitClaudeMd exists. A fresh haiku subagent per batch is stateless. Done when spec fixes the agent model and haiku lifecycle.
 
