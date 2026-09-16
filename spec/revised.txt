@@ -19,7 +19,7 @@ Where Adapt lives (configuration B, the current best contender):
 	Adapt comes bundled with its own copies of two skills from this repo: rules-system and vector-search. It also carries a third skill of its own, META TOOLS. The handoff skill may join later; for now Adapt ships with these three. All three live in the workspace.
 	Why B: every fence rests on documented Claude Code behavior.
 	- The manager starts in the workspace. The host is not above it, so the skill and agent search, which walks up from the start folder, never reaches the host's skills or agents.
-	- The manager reaches host files through the permissions.additionalDirectories setting. That setting grants file access and never loads the folder's skills, CLAUDE.md or rules. The --add-dir flag does load skills, so Adapt does not use it.
+	- The manager reaches host files through the permissions.additionalDirectories setting. That setting grants file access and never loads the folder's skills, CLAUDE.md or rules. The --add-dir flag does load skills, so Adapt does not use it. The setting takes effect only once the workspace is trusted.
 	- Adapt's inner skills are not under the host tree, so a host session can never discover them. They serve only the instances that inhabit Adapt.
 	Set aside:
 	- A: everything inside the skill folder, made its own git repository. It rests on untested behavior: discovery stopping at a git root, and lazy nested skill discovery.
@@ -45,8 +45,13 @@ The workspace's .claude tree:
 	- claudeMdExcludes stops CLAUDE.md and rules files. --setting-sources affects settings files only, not skills, agents, CLAUDE.md, rules or hooks.
 	- Permission deny rules gate Claude's own tool calls, not Claude Code's startup discovery, so a Read deny cannot stop a skill from loading.
 	- The --bare flag skips hooks, skills, subagents, plugins, MCP servers, auto memory and CLAUDE.md, and never reads the subscription login, so it needs ANTHROPIC_API_KEY or an apiKeyHelper.
-	Still open for the manager (t13):
-	- The user's personal ~/.claude skills, agents and CLAUDE.md load in any session started without --bare. claudeMdExcludes can drop the personal CLAUDE.md. For personal skills and agents: hide each by name (skillOverrides "off", or a deny rule on Skill(name)), or give the manager its own CLAUDE_CONFIG_DIR, which then needs its own subscription login. Untested.
+	What a probe proved (2026-09-15, a throwaway workspace outside this repo, since deleted):
+	- A session started in a workspace outside the host loads none of the host's skills or agents. It listed only its own workspace skill and agent, plus Claude Code's bundled skills and built-in agents. This is B's main fence, confirmed.
+	- The user's personal ~/.claude skills and agents DO load. They must be excluded.
+	- skillOverrides "off" in the workspace settings removes a personal skill from the session. A permissions.deny entry of Agent(<name>) removes a personal agent. Both work by name, so the launcher regenerates them from what ~/.claude/skills and ~/.claude/agents hold at that moment.
+	- CLAUDE_CONFIG_DIR gives the manager a config folder with no personal skills or agents at all, but that folder carries no credentials: the run ends with "Not logged in - Please run /login". It costs one login for that folder.
+	- permissions.additionalDirectories is IGNORED until the workspace is trusted: "this workspace has not been trusted". The user accepts the trust dialog once in the workspace, or init writes hasTrustDialogAccepted for that path. This belongs in the install steps (t21).
+	Still open for the manager (t13): which exclusion to use, the regenerated overrides or a config folder of Adapt's own. Bundled skills always load; the docs name disableBundledSkills to drop them, untested.
 
 
 Sessions and agents:
