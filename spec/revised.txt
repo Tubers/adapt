@@ -147,6 +147,16 @@ Scope, and the home folders:
 	- An agent that believes one of those is wrong may say so, and should: it files a request. The request is adjudicated by a manager whose context is fresh, which means a new round or a newly spun-up manager instance, and it is implemented only on that manager's approval.
 
 
+Submitting a request:
+	The shim's SKILL.md carries an invocable command that walks the asking instance through the questions. It is an interview, not a blank form.
+	- The questions differ by the nature of the request. A new capability or an extension is asked about one way, a repair another.
+	- What the manager wants captured is the surface: the inputs, and what they deliver. A repair has the same shape: input x went in, z came out, y should have.
+	- The middle is not asked for. How the thing is built is the manager's to decide, from research online or from what the specialist home folders already hold.
+	- The form is dynamic. An answer is parsed as it is given and decides the follow-up question, so the asking instance is routed down the branch its own answers open.
+	- One candidate for running that interview is a low-model instance working a decision tree. It may prove too much for that model; it is worth trying and measuring whether it routes the asking instance correctly (open: t51).
+	- The aim is one pass: everything captured at submission, with no follow-up to the host instance, or as little as can be managed.
+
+
 Requests from inside Adapt:
 	Adapt may work on its own tooling, and on its own rules, but never by a shortcut. Everything inside uses the same inbox as an instance outside.
 	- A specialist that wants a change to a skill or tool it uses drafts a request into the inbox in the course of its work and tells the manager it has done so. It does not make the change itself.

@@ -44,6 +44,7 @@
 - 🔜 the manager's questions file as a diagnostic, and turning its entries into rules `t48`
 - 🔜 notes folders: freeform space for the manager and every specialist `t49`
 - 🔜 retirement: the evidence, the path, and what archiving means `t50`
+- 🔜 trial: a low-model instance running the request interview from a decision tree `t51`
 
 ---
 
@@ -61,7 +62,7 @@
 
 **t9** · The manager's choice of shape is now written: repair, extend, wrap several skills behind one surface, or build a brand new skill when the functionality is entirely foreign; the last two are NEW. Still open: NEW says new skills and improvements, which overlaps EXTEND, and the amalgamation proposal in spec/revised.txt awaits the user. Done when the categories no longer overlap and the merge rule is accepted.
 
-**t10** · 'Mechanics of Request Submission' is empty, and the form is described twice: there and under 'When to Trigger'. Needed: headers, seed prompts that draw out friction (comprehension, time cost, intent cost, other vectors), use for both new requests and piggybacks on existing ones, and the command that generates it. Done when one section owns the form and the other points to it.
+**t10** · The form is an interview invoked from the shim's SKILL.md, with different questions for a new capability, an extension and a repair. It captures the surface: inputs and what they deliver, or for a repair input x, actual z, expected y. It never asks about implementation. It is dynamic, routing on parsed answers (t51), and aims to capture everything in one pass. Needed: the question sets, the generator, where the filled form lands. Done when a request can be filed end to end.
 
 **t11** · When to Trigger now names INBOX (done under t3). Still open: before filing, an instance checks for a similar request; vector-search could do that check by meaning. Done when the trigger conditions and the duplicate check are defined.
 
@@ -132,3 +133,5 @@
 **t49** · Each agent gets a freeform notes folder it organises itself, never read whole at session start. Use is counted per note, and a high count surfaces it to the manager as a candidate finding; graduating one moves its information into a rule scoped to where it will be needed and removes the note. Each specialist gets vector-search files of its own over its notes. Needed: where the folders live, the counter, the graduation path, and the per-specialist index. Done when all four exist.
 
 **t50** · Adapt can retire a skill, a rule or a meta tool, through a request ratified by a fresh manager context. Needed: the evidence thresholds (unused tool, never-firing or superseded rule, skill nothing asks for), how the host's use of a skill is checked first, where an archived thing goes, and how a retirement is reversed if it was wrong. Relates to t16. Done when the path is written and one retirement has been run.
+
+**t51** · The dynamic request form routes on parsed answers. One candidate is a Haiku-class instance running the interview against a decision tree. It may be too much for that model. Needed: the decision tree, a trial on real requests, and a measure of whether the asking instance was routed down the right branch. The fallback is a scripted form with fixed branches. Done when the trial has a verdict.
