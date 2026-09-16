@@ -42,6 +42,7 @@
 - 🔜 two specialists needing the same file `t45`
 - 🔜 skill configuration: per-skill options, defaults, and the script that keeps it current `t46`
 - 🔜 stall notice: tell the user when a round stalls or crashes `t47`
+- 🔜 the manager's questions file as a diagnostic, and turning its entries into rules `t48`
 
 ---
 
@@ -126,3 +127,5 @@
 **t46** · Adapt writes a configuration at init with options per skill, and scripts key a newly discovered skill into it when it is found. The first option is where an improvement goes: local (default), global (merged into the skill's own repo), and later a retroactive reconciliation onto a branch of that repo. Needed: the file, its format and place, the defaults, the discovery script, and what else belongs per skill. Relates to Adapt t6. Done when the configuration exists.
 
 **t47** · While Adapt is young the user wants to hear about a stalled or crashed round directly, not by watching a file. Needed: what counts as a stall (no record written for N minutes, a launcher that exited non-zero, a round that ended without closing its work item), how the notice reaches the user, and when the safeguard can be retired. Done when the detector and the notice exist.
+
+**t48** · The manager writes a question whenever it does not know what to do, without waiting for an answer. Later review turns each into a structural fix: a rule, a protocol line, a better briefing, or a tool. Needed: the instruction that makes the manager write instead of guess, how the entries are reviewed and grouped, and how a recurring question becomes a rule candidate. Relates to t18 and t31. Done when the loop runs once.
