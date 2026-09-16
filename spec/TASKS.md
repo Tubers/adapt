@@ -2,8 +2,8 @@
 
 **Goal:** revise the Adapt skill spec with the user: spec/original.txt is the untouched first draft, spec/revised.txt the working revision
 
-- ✅ one workspace per host, or a shared layer across hosts · *2026-09-16* `t41`
 - ✅ rule gates that reach code outside the workspace · *2026-09-16* `t63`
+- ✅ define the work item: fields, id, states and where it lives · *2026-09-16* `t53`
 - 🔄 **fold in the user's own changes to the spec** · *since 2026-09-15* `t1`
 - 🔜 reconcile Documentation Dogma with the existing writing rules `t4`
 - 🔜 define THE MANAGER without a persistent instance `t6`
@@ -46,7 +46,6 @@
 - 🔜 retirement: the evidence, the path, and what archiving means `t50`
 - 🔜 trial: a low-model instance running the request interview from a decision tree `t51`
 - 🔜 draft the starting protocols: manager round, specialist work, chore worker `t52`
-- 🔜 ❓ define the work item: fields, id, states and where it lives `t53`
 - 🔜 ❓ define the inbox: file shape, ids, states, and who moves a request `t54`
 - 🔜 ❓ define the round record: its id and what it leaves behind `t55`
 - 🔜 ❓ the verifier: a third agent kind, or a mode of the specialist `t56`
@@ -57,14 +56,18 @@
 - 🔜 ❓ counters: one metrics store or three `t61`
 - 🔜 ❓ a host project that is not a git repository `t62`
 - 🔜 router: rewrite paths under a mapped copy before matching gates `t64`
+- 🔜 group channel: an append-only message file per work item `t65`
+- 🔜 aggregated history: fixtures that pull specialist history into the work item `t66`
+- 🔜 manager-built graphs for skills with no specialist yet `t67`
+- 🔜 task links: manager task to work folder to specialist sub-tasks `t68`
 
 ---
 
 ## Details
 
-**t41** · The workspace is per host project, so meta tools, findings and specialist rules would be rebuilt from scratch in every project. Needed: whether a shared layer exists, what it may hold, and how a project-specific fact is kept out of it. Done when the boundary is written.
-
 **t63** · A specialist's skill copy is a host worktree outside the workspace, but the rules router gates on paths relative to its own repository. The graphify rule, and every rule scoped to a skill's code, must fire when a specialist touches that copy. Options: absolute or mapped gates, a gate written per specialist when its copy is made, or copies placed where the router sees them without lazy skill loading. Done when a gated rule fires on a copy.
+
+**t53** · Everything hangs off the work item: acceptance criteria, assignment, verification, the closing report. It has no shape yet. Needed: its fields, its id, its states (drafted, ratified, assigned, in verification, merged, closed, parked), its place on disk, and whether it is a task in the manager's task window or a separate file a task points at. Done when one can be created, moved through every state and closed.
 
 **t1** · The user has many changes of their own: some needed, some functional alternatives judged better than the original. Take each in chat, write it into spec/revised.txt, and split out any that opens a new question as its own task. Done when the user says the list is exhausted.
 
@@ -150,13 +153,11 @@
 
 **t52** · Answered (q18): work from both ends, iteratively. Each protocol is a collection of rules in a protocols folder with a manager branch and a specialist branch; the chore protocol sits with the specialists'. Each specialist gets its own copy on first assignment, changed only by request. Both protocols must describe the copy map and the made-up path of the agent's copy. Draft all three against the settled workflow, alongside t53 to t55. Done when three first drafts exist.
 
-**t53** · Everything hangs off the work item: acceptance criteria, assignment, verification, the closing report. It has no shape yet. Needed: its fields, its id, its states (drafted, ratified, assigned, in verification, merged, closed, parked), its place on disk, and whether it is a task in the manager's task window or a separate file a task points at. Done when one can be created, moved through every state and closed.
-
 **t54** · The inbox is described as a place, not a structure. Needed: one file per request or one appended log, the id scheme, the states a request passes through (new, triaged, amalgamated, ratified, rejected, archived), who moves it, and whether NEW, EXTEND and REPAIR hold requests or the work items they became. Relates to t9, t34. Done when a request can be filed, triaged and archived.
 
 **t55** · A round id makes several rules enforceable: fresh-context ratification, the crash markers, the archive, the closing report. Needed: whether a round has its own folder or lives only in the manager's history, what is stamped with its id, and how the next round finds the last one. Relates to t12, t35, t38. Done when a round can be identified after the fact.
 
-**t56** · The quality-assurance layer introduces a verifier with fresh context that never sees the specialist's narrative, but Sessions and agents lists only two kinds. Needed: whether it is its own definition with a model, a home and rules, or a medium specialist spawned under a verifier protocol; and how it is kept from seeing the implementer's account. Relates to t30. Done when it is defined.
+**t56** · Two roles may be one agent or two: the verifier, with fresh context, that never sees the specialist's account; and a testing specialist, suggested by the user, that writes acceptance tests which cannot be trivially satisfied or gamed, starting from the final test the manager designs. Needed: whether these are one kind or two, their definitions, models and homes. Relates to t30. Done when defined.
 
 **t57** · Needed: whether a specialist is spawned per work item, per skill or per step; whether two may run at once inside one round; and what the manager does while they work: block, poll their records, or wait on messages. Relates to t15, t45. Done when the assignment rule and the manager's waiting behaviour are written.
 
@@ -164,10 +165,18 @@
 
 **t59** · The round closes by restating the request and naming the criterion that answered it, but the report has no form. Needed: whether it is a file, a line in the manager's task window or a message; what it contains; and what the host agent does when the delivered surface still does not serve its intent: reopen, new request, or appeal. Relates to t22, t30. Done when the form and the appeal path are written.
 
-**t60** · The interview captures inputs and outputs and the acceptance criteria come from them, but no document records a skill's surface. Wrapping, regression testing and amalgamation all need it. Needed: whether each maintained skill carries a surface document Adapt keeps current, what it holds, and who updates it after a merge. Relates to t32. Done when the document has a shape and an owner.
+**t60** · The manager needs a high-level understanding of every sibling skill's surface, first to answer a request with an existing skill and only then to weigh engineering. A surface document per skill, kept current after each merge, is the likely carrier. Needed: its shape, what it holds, who updates it, and how it relates to the skill's graph. Relates to t67. Done when the document has a shape and an owner.
 
 **t61** · Note lookups, friction entries and rule firings are all counted by different parts of the spec. Needed: whether they share one small store, where it lives, who increments it, and whether it is per agent or per workspace. Relates to t19, t49. Done when the store and its writers are defined.
 
 **t62** · Worktrees, mirroring and rollback all assume git. Needed: what init does when the host is not a repository: refuse, offer to initialise one, or fall back to copies without worktrees, and what that costs the rollback path. Relates to t20, t21, t38. Done when the fallback is written.
 
 **t64** · Build option 1b of t63. The copy script writes .claude/copy-map.json entries pairing a copy's real folder with copies/<skill>/; merge, discard and rollback remove them. rule_router rewrites a real path under a mapped folder into its made-up path before matching, outside the never-gate-skills prefix. Tests: a gated rule fires on a copy, a removed entry stops it, a stale entry is cleared by rollback. Done when the tests pass in the workspace's rules-system copy.
+
+**t65** · Every instance on a work item posts to one sequence of messages and reads only what it has not yet seen, in order. Needed: the file shape, per-reader position tracking, the post and read commands, and how it relates to the questions file and to instance-to-instance messaging. Likely a small rules-system extension. Done when two agents can talk through it.
+
+**t66** · A work item's history log gathers the entries of every specialist working on it. Needed: whether entries are copied or referenced, when the pull runs (on each write, at round end, or on read), how duplicates and ordering are handled, and whether rules-system gains an aggregate command. Done when a work item shows one ordered log of its specialists' events.
+
+**t67** · The manager must see a skill's internals before any specialist exists, to decide whether an existing surface answers a request. Needed: where such a graph lives (manager home or a shared graphs folder), when it is built and refreshed, and whether a specialist inherits it on first assignment. Relates to t29. Done when the manager can query a graph of an unassigned skill.
+
+**t68** · The manager's task points at a work folder; each specialist processifies the item into its own tasks linked back to that folder. rules-system links a sub-project to a parent task today (init --task, Parent line, viewer drill-down). Needed: check whether that covers a work folder as the link target and several specialists under one item, and extend it if not. Done when the viewer walks from the manager's task to every specialist's sub-tasks.

@@ -229,6 +229,30 @@ Where an improvement goes (open: t46):
 	When a change to Adapt's own workings looks like a net benefit in the general case, and not only here, it becomes a candidate to push and merge into the main branch of Adapt's repository, so other instances gain it too. It is a promotion on evidence, never an automatic sync.
 
 
+Reading the inbox, and the answer that needs no engineering:
+	- The manager reads every request in the inbox before it acts on any of them, and writes notes as it reads.
+	- For a NEW or EXTEND request, its first question is whether an existing skill already does the thing and the host simply does not know. If one does, the manager answers the host with that skill's surface and a short piece of documentation that addresses the request, and closes the request. No work item is made.
+	- Only when no existing surface answers the request does the manager weigh engineering.
+	- To answer that first question, the manager keeps a high-level understanding of the surface of every sibling skill, and can look into a skill's internals through its graph. A skill with no specialist yet has no graph in a specialist home, so the manager can build and read one itself (open: t67).
+
+
+The work item (user, 2026-09-16):
+	A work item is a folder, and it is machine-facing: something a specialist can pick up and understand at once. Its contents are structured data where structure helps; JSON is the working suggestion, open to better.
+	The folder exists to keep the information of one piece of work apart from the home folders. What belongs to this request, this repair, this extension stays in the work folder. What turns out to be useful beyond it is deposited into the manager's or a specialist's home, or promoted to a rule through the candidate process.
+	What the folder holds:
+	- The original copy of the request, or of each request amalgamated into it.
+	- A coarse process spec written by the manager. For NEW or EXTEND work it says what the specialists must build, in outline. For a REPAIR it gives high-level guidance on how to probe for the fault and narrow down where in the code it lives, drawing on the skill's graph.
+	- The acceptance tests, which are the main gate for completion. The manager designs the final test that must pass, and it is appended to the suite the specialist runs once it believes its work is done. Writing tests that cannot be trivially satisfied or gamed may be better done by a testing specialist with that knowledge (open: t56).
+	- A history log that aggregates the history files of every specialist working on the item, pulled in by automated fixtures, so the item has one running log of events (open: t66).
+	- A group channel: an append-only sequence of messages, like a history file, that every instance on the item can post to with a command, and read from in order, asking only for the entries it has not yet seen (open: t65).
+	- Anything else that turns out to belong there.
+	Tasks and links:
+	- The manager tracks each work item as one task in its own task window, and that task points at the work folder.
+	- A specialist that picks the item up processifies it as part of its protocol: it breaks the implementation into tasks of its own, in its own task window, linked back to the work folder. rules-system already links a sub-project to the task it serves (init --task, and the viewer opens a sub-project from its parent task); whether that link covers this shape is open (t68).
+	End states:
+	- A finished work folder is moved into a folder named for how it ended, such as Fulfilled, Aborted or Postponed. The states in between matter less than where the folder comes to rest.
+
+
 Making sure a round delivered (open: t30):
 	This is the hardest problem in the skill. Every agent starts with no memory of the last round, so nothing is caught by someone remembering. A specialist that believes it finished, a manager that believes the specialist, and a host instance told the work is done, is the failure this design has to make difficult. The answer is that a claim is never evidence, and that the checks are layered:
 	1. The work item carries its acceptance criteria before any specialist touches it. The manager writes them from the inbox request, in the request's own words: what must be true, and how anyone would know. A work item without them is not assignable.
