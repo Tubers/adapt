@@ -1,7 +1,7 @@
 Draft of a rule for the Adapt workspace, not a rule of this repository. It is kept here, under a
 name that no rules router in this repository reads, until the workspace exists. It is mined from
 the two instruction files `graphify install --project --platform claude` writes (0.9.63), and from
-its hooks reference. Once placed, the four lines between the markers become
+its hooks reference. On install, the rule between the markers becomes
 `rules/tooling/graphify.rule.md` in the workspace, gated on the code files of each code
 specialist's own skill copy (spec task t63 owns how that gate reaches a path outside the
 workspace).

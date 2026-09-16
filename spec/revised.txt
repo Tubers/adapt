@@ -37,7 +37,7 @@ The workspace's .claude tree:
 	- .claude/agents/: the two specialist definitions.
 	- .claude/skills/: rules-system, vector-search and meta-tools.
 	- .claude/hooks/: the scripts the settings call.
-	There is no unscoped rule anywhere in this tree, and no CLAUDE.md is ever loaded. The one exception on disk is graphify's pair, kept for its installer and excluded from loading (see Code intelligence for specialists). Adapt's rules live in the workspace's rules/ folder, gated by its own rules/INDEX.md.
+	There is no unscoped rule and no CLAUDE.md anywhere in this tree. graphify's installer writes two; Adapt's install script mines and deletes them at once (see Code intelligence for specialists). Adapt's rules live in the workspace's rules/ folder, gated by its own rules/INDEX.md.
 	The workspace is the root of its own git repository and never sits inside another one, so the documented walk up to the repository root ends at the workspace itself.
 	What the Claude Code docs and issue reports say (checked 2026-09-15):
 	- Skills and agent definitions are found by walking up from the start folder to the repository root. No setting stops that walk.
@@ -94,7 +94,7 @@ Code intelligence for specialists:
 	How Adapt installs it, differently from the README:
 	- The package goes into a Python environment of the workspace's own, pinned to a version, rather than a user-wide tool. Python 3.12 is present; uv is not installed yet, and is the recommended installer.
 	- graphify is an exception to the no-CLAUDE.md rule, and the only one (user, 2026-09-16). `graphify install --project --platform claude` is run as the tool intends. It writes two CLAUDE.md files, at the workspace root and under .claude/, registers two PreToolUse hooks, and installs the skill folder, .claude/skills/graphify/ with SKILL.md and its references/.
-	- The CLAUDE.md files stay on disk, so graphify's own upgrade and uninstall find them, but they are never loaded: claudeMdExcludes names both, so the manager never pays for them.
+	- The CLAUDE.md files are deleted as soon as the install finishes (user, 2026-09-16). Their content already lives in the rule below, so keeping them buys nothing. Adapt's install and upgrade script runs graphify install, compares the fresh files against the source text kept with the draft rule, updates the rule if graphify changed its wording, and then deletes both files. An upgrade therefore recreates them only for the moment it takes to mine them.
 	- Their content is mined into a gated rule that reaches a code specialist the moment it reads or modifies code in its own skill. The draft, with graphify's source text beside it for comparison at each upgrade, is spec/drafts/workspace-rule-tooling-graphify.md. The routing that makes that gate reach code outside the workspace is open (t63).
 	- The two PreToolUse hooks are confined to the agents that use graphify. They move out of the workspace settings into the code specialist's agent definition, whose hooks field runs only while that agent is active, and they call the pinned environment's graphify by its absolute path. The manager never runs them.
 	- A caveat from graphify's source: its hook-guard only nudges when an in-project graph exists, and it ignores reads of files outside the project. A specialist's skill copy sits outside the workspace, so the nudge may never fire there. The gated rule is what reliably carries the instruction; the hooks are kept as a second channel, not relied on.
