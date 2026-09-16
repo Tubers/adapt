@@ -58,7 +58,7 @@
 
 **t6** · User defined the manager: a headless Opus 5 session launched in the Adapt folder, bare bones, only spawner of subagents and only creator of work items, with a home folder of continuity files plus its own history log and tasks file. Open: Notes and Memories overlap the history log and tasks file; decide which record owns each kind of fact.
 
-**t9** · Proposal now in spec/revised.txt: requests naming the same skill and same need merge into one work item; vector-search suggests, manager confirms; source ids kept, details appended. Still open: NEW says new skills and improvements, which overlaps EXTEND. Done when the user accepts or changes the proposal and the categories no longer overlap.
+**t9** · The manager's choice of shape is now written: repair, extend, wrap several skills behind one surface, or build a brand new skill when the functionality is entirely foreign; the last two are NEW. Still open: NEW says new skills and improvements, which overlaps EXTEND, and the amalgamation proposal in spec/revised.txt awaits the user. Done when the categories no longer overlap and the merge rule is accepted.
 
 **t10** · 'Mechanics of Request Submission' is empty, and the form is described twice: there and under 'When to Trigger'. Needed: headers, seed prompts that draw out friction (comprehension, time cost, intent cost, other vectors), use for both new requests and piggybacks on existing ones, and the command that generates it. Done when one section owns the form and the other points to it.
 
