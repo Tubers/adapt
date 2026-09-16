@@ -45,7 +45,17 @@
 - 🔜 notes folders: freeform space for the manager and every specialist `t49`
 - 🔜 retirement: the evidence, the path, and what archiving means `t50`
 - 🔜 trial: a low-model instance running the request interview from a decision tree `t51`
-- 🔜 draft the starting protocols: manager round, specialist work, chore worker `t52`
+- 🔜 ❓ draft the starting protocols: manager round, specialist work, chore worker `t52`
+- 🔜 ❓ define the work item: fields, id, states and where it lives `t53`
+- 🔜 ❓ define the inbox: file shape, ids, states, and who moves a request `t54`
+- 🔜 ❓ define the round record: its id and what it leaves behind `t55`
+- 🔜 ❓ the verifier: a third agent kind, or a mode of the specialist `t56`
+- 🔜 ❓ assignment and parallelism inside a round `t57`
+- 🔜 ❓ who runs the post-merge check, given the scope rule `t58`
+- 🔜 ❓ the closing report: what the host agent receives `t59`
+- 🔜 ❓ a surface document per maintained skill `t60`
+- 🔜 ❓ counters: one metrics store or three `t61`
+- 🔜 ❓ a host project that is not a git repository `t62`
 
 ---
 
@@ -138,3 +148,23 @@
 **t51** · The dynamic request form routes on parsed answers. One candidate is a Haiku-class instance running the interview against a decision tree. It may be too much for that model. Needed: the decision tree, a trial on real requests, and a measure of whether the asking instance was routed down the right branch. The fallback is a scripted form with fixed branches. Done when the trial has a verdict.
 
 **t52** · Three protocol rules a fresh instance follows with no memory: the manager's round workflow from inbox to closing report; the specialist's workflow from briefing to evidence; the chore protocol for the low-model worker, stateless and batched. They carry the sequence of the work, not advice. Depends on the shapes of the work item, the inbox and the round id. Relates to t17, t18, t30, t31. Done when three drafts exist and the user has read them.
+
+**t53** · Everything hangs off the work item: acceptance criteria, assignment, verification, the closing report. It has no shape yet. Needed: its fields, its id, its states (drafted, ratified, assigned, in verification, merged, closed, parked), its place on disk, and whether it is a task in the manager's task window or a separate file a task points at. Done when one can be created, moved through every state and closed.
+
+**t54** · The inbox is described as a place, not a structure. Needed: one file per request or one appended log, the id scheme, the states a request passes through (new, triaged, amalgamated, ratified, rejected, archived), who moves it, and whether NEW, EXTEND and REPAIR hold requests or the work items they became. Relates to t9, t34. Done when a request can be filed, triaged and archived.
+
+**t55** · A round id makes several rules enforceable: fresh-context ratification, the crash markers, the archive, the closing report. Needed: whether a round has its own folder or lives only in the manager's history, what is stamped with its id, and how the next round finds the last one. Relates to t12, t35, t38. Done when a round can be identified after the fact.
+
+**t56** · The quality-assurance layer introduces a verifier with fresh context that never sees the specialist's narrative, but Sessions and agents lists only two kinds. Needed: whether it is its own definition with a model, a home and rules, or a medium specialist spawned under a verifier protocol; and how it is kept from seeing the implementer's account. Relates to t30. Done when it is defined.
+
+**t57** · Needed: whether a specialist is spawned per work item, per skill or per step; whether two may run at once inside one round; and what the manager does while they work: block, poll their records, or wait on messages. Relates to t15, t45. Done when the assignment rule and the manager's waiting behaviour are written.
+
+**t58** · Quality assurance says the skill's own tests run where it actually lives, which means executing code inside the host project; the scope rule says Adapt changes nothing outside its home folders. Needed: who runs that check, the shim, the manager or the host agent, and how the result comes back. Relates to t30, t36. Done when the runner and the path back are written.
+
+**t59** · The round closes by restating the request and naming the criterion that answered it, but the report has no form. Needed: whether it is a file, a line in the manager's task window or a message; what it contains; and what the host agent does when the delivered surface still does not serve its intent: reopen, new request, or appeal. Relates to t22, t30. Done when the form and the appeal path are written.
+
+**t60** · The interview captures inputs and outputs and the acceptance criteria come from them, but no document records a skill's surface. Wrapping, regression testing and amalgamation all need it. Needed: whether each maintained skill carries a surface document Adapt keeps current, what it holds, and who updates it after a merge. Relates to t32. Done when the document has a shape and an owner.
+
+**t61** · Note lookups, friction entries and rule firings are all counted by different parts of the spec. Needed: whether they share one small store, where it lives, who increments it, and whether it is per agent or per workspace. Relates to t19, t49. Done when the store and its writers are defined.
+
+**t62** · Worktrees, mirroring and rollback all assume git. Needed: what init does when the host is not a repository: refuse, offer to initialise one, or fall back to copies without worktrees, and what that costs the rollback path. Relates to t20, t21, t38. Done when the fallback is written.
