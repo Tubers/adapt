@@ -152,7 +152,7 @@
 
 **t61** · Note lookups, friction entries and rule firings are all counted by different parts of the spec. Needed: whether they share one small store, where it lives, who increments it, and whether it is per agent or per workspace. Relates to t19, t49. Done when the store and its writers are defined.
 
-**t62** · Worktrees, mirroring and rollback all assume git. Needed: what init does when the host is not a repository: refuse, offer to initialise one, or fall back to copies without worktrees, and what that costs the rollback path. Relates to t20, t21, t38. Done when the fallback is written.
+**t62** · Answered (q17): when the host is not a git repository, init offers to run git init and create private repositories for the skills, so worktrees work. Open: one repository for the host's skill folder, or one per skill; and whether private means a local repository only or a private remote on GitHub. Done when both are settled.
 
 **t64** · Build option 1b of t63. The copy script writes .claude/copy-map.json entries pairing a copy's real folder with copies/<skill>/; merge, discard and rollback remove them. rule_router rewrites a real path under a mapped folder into its made-up path before matching, outside the never-gate-skills prefix. Tests: a gated rule fires on a copy, a removed entry stops it, a stale entry is cleared by rollback. Done when the tests pass in the workspace's rules-system copy.
 
