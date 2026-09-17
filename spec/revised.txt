@@ -240,6 +240,7 @@ Reading the inbox, and the answer that needs no engineering:
 	- The manager reads every request in the inbox before it acts on any of them, and writes notes as it reads.
 	- For a NEW or EXTEND request, its first question is whether an existing skill already does the thing and the host simply does not know. If one does, the manager answers the host with that skill's surface and a short piece of documentation that addresses the request, and closes the request. No work item is made.
 	- Only when no existing surface answers the request does the manager weigh engineering.
+	- Every maintained skill carries a surface document (user, 2026-09-16): machine-facing, terse and dense, listing what goes in and what comes out. Adapt keeps it current after every merge. It is never loaded wholesale: it arrives lazily, either through a rule scoped to the skill, or through a vector-search index that spans every skill's surface document, so a capability can be searched for across all of them at once.
 	- To answer that first question, the manager keeps a high-level understanding of the surface of every sibling skill, and can look into a skill's internals through its graph. A skill with no specialist yet has no graph in a specialist home, so the manager can build and read one itself (open: t67).
 
 

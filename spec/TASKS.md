@@ -2,8 +2,8 @@
 
 **Goal:** revise the Adapt skill spec with the user: spec/original.txt is the untouched first draft, spec/revised.txt the working revision
 
-- ✅ assignment and parallelism inside a round · *2026-09-16* `t57`
 - ✅ who runs the post-merge check, given the scope rule · *2026-09-16* `t58`
+- ✅ a surface document per maintained skill · *2026-09-16* `t60`
 - 🔄 **fold in the user's own changes to the spec** · *since 2026-09-15* `t1`
 - 🔜 reconcile Documentation Dogma with the existing writing rules `t4`
 - 🔜 define THE MANAGER without a persistent instance `t6`
@@ -47,7 +47,6 @@
 - 🔜 trial: a low-model instance running the request interview from a decision tree `t51`
 - 🔜 draft the starting protocols: manager round, specialist work, chore worker `t52`
 - 🔜 the verifier: a third agent kind, or a mode of the specialist `t56`
-- 🔜 ❓ a surface document per maintained skill `t60`
 - 🔜 ❓ counters: one metrics store or three `t61`
 - 🔜 ❓ a host project that is not a git repository `t62`
 - 🔜 router: rewrite paths under a mapped copy before matching gates `t64`
@@ -55,14 +54,15 @@
 - 🔜 aggregated history: fixtures that pull specialist history into the work item `t66`
 - 🔜 manager-built graphs for skills with no specialist yet `t67`
 - 🔜 task links: manager task to work folder to specialist sub-tasks `t68`
+- 🔜 surface documents: format, the updater after merge, and the cross-skill index `t69`
 
 ---
 
 ## Details
 
-**t57** · Needed: whether a specialist is spawned per work item, per skill or per step; whether two may run at once inside one round; and what the manager does while they work: block, poll their records, or wait on messages. Relates to t15, t45. Done when the assignment rule and the manager's waiting behaviour are written.
-
 **t58** · Quality assurance says the skill's own tests run where it actually lives, which means executing code inside the host project; the scope rule says Adapt changes nothing outside its home folders. Needed: who runs that check, the shim, the manager or the host agent, and how the result comes back. Relates to t30, t36. Done when the runner and the path back are written.
+
+**t60** · The manager needs a high-level understanding of every sibling skill's surface, first to answer a request with an existing skill and only then to weigh engineering. A surface document per skill, kept current after each merge, is the likely carrier. Needed: its shape, what it holds, who updates it, and how it relates to the skill's graph. Relates to t67. Done when the document has a shape and an owner.
 
 **t1** · The user has many changes of their own: some needed, some functional alternatives judged better than the original. Take each in chat, write it into spec/revised.txt, and split out any that opens a new question as its own task. Done when the user says the list is exhausted.
 
@@ -150,8 +150,6 @@
 
 **t56** · Answered in part: the verifier is a medium specialist under a verifier protocol, for now. It drafts the hidden acceptance test in the sibling test skill, runs it before merge, reads the skill code the test touches to confirm fairness, and posts results to the group channel. Implementers are denied read access to the test skill. Open: whether the manager should author the test instead, which model is adequate, and the test skill's name and layout. Done when those are settled.
 
-**t60** · The manager needs a high-level understanding of every sibling skill's surface, first to answer a request with an existing skill and only then to weigh engineering. A surface document per skill, kept current after each merge, is the likely carrier. Needed: its shape, what it holds, who updates it, and how it relates to the skill's graph. Relates to t67. Done when the document has a shape and an owner.
-
 **t61** · Note lookups, friction entries and rule firings are all counted by different parts of the spec. Needed: whether they share one small store, where it lives, who increments it, and whether it is per agent or per workspace. Relates to t19, t49. Done when the store and its writers are defined.
 
 **t62** · Worktrees, mirroring and rollback all assume git. Needed: what init does when the host is not a repository: refuse, offer to initialise one, or fall back to copies without worktrees, and what that costs the rollback path. Relates to t20, t21, t38. Done when the fallback is written.
@@ -165,3 +163,5 @@
 **t67** · The manager must see a skill's internals before any specialist exists, to decide whether an existing surface answers a request. Needed: where such a graph lives (manager home or a shared graphs folder), when it is built and refreshed, and whether a specialist inherits it on first assignment. Relates to t29. Done when the manager can query a graph of an unassigned skill.
 
 **t68** · The manager's task points at a work folder; each specialist processifies the item into its own tasks linked back to that folder. rules-system links a sub-project to a parent task today (init --task, Parent line, viewer drill-down). Needed: check whether that covers a work folder as the link target and several specialists under one item, and extend it if not. Done when the viewer walks from the manager's task to every specialist's sub-tasks.
+
+**t69** · Every maintained skill gets a terse, machine-facing surface document. Needed: its format and place, the step in the merge path that refreshes it, how it is generated at skill initialization, the scoped rule that delivers it, and a vector-search namespace spanning all surface documents for capability search. Relates to t32, t44, t67. Done when one skill has a current surface document the manager can search.
