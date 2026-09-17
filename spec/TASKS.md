@@ -2,8 +2,8 @@
 
 **Goal:** revise the Adapt skill spec with the user: spec/original.txt is the untouched first draft, spec/revised.txt the working revision
 
-- ✅ the closing report: what the host agent receives · *2026-09-16* `t59`
 - ✅ assignment and parallelism inside a round · *2026-09-16* `t57`
+- ✅ who runs the post-merge check, given the scope rule · *2026-09-16* `t58`
 - 🔄 **fold in the user's own changes to the spec** · *since 2026-09-15* `t1`
 - 🔜 reconcile Documentation Dogma with the existing writing rules `t4`
 - 🔜 define THE MANAGER without a persistent instance `t6`
@@ -47,7 +47,6 @@
 - 🔜 trial: a low-model instance running the request interview from a decision tree `t51`
 - 🔜 draft the starting protocols: manager round, specialist work, chore worker `t52`
 - 🔜 the verifier: a third agent kind, or a mode of the specialist `t56`
-- 🔜 ❓ who runs the post-merge check, given the scope rule `t58`
 - 🔜 ❓ a surface document per maintained skill `t60`
 - 🔜 ❓ counters: one metrics store or three `t61`
 - 🔜 ❓ a host project that is not a git repository `t62`
@@ -61,9 +60,9 @@
 
 ## Details
 
-**t59** · The round closes by restating the request and naming the criterion that answered it, but the report has no form. Needed: whether it is a file, a line in the manager's task window or a message; what it contains; and what the host agent does when the delivered surface still does not serve its intent: reopen, new request, or appeal. Relates to t22, t30. Done when the form and the appeal path are written.
-
 **t57** · Needed: whether a specialist is spawned per work item, per skill or per step; whether two may run at once inside one round; and what the manager does while they work: block, poll their records, or wait on messages. Relates to t15, t45. Done when the assignment rule and the manager's waiting behaviour are written.
+
+**t58** · Quality assurance says the skill's own tests run where it actually lives, which means executing code inside the host project; the scope rule says Adapt changes nothing outside its home folders. Needed: who runs that check, the shim, the manager or the host agent, and how the result comes back. Relates to t30, t36. Done when the runner and the path back are written.
 
 **t1** · The user has many changes of their own: some needed, some functional alternatives judged better than the original. Take each in chat, write it into spec/revised.txt, and split out any that opens a new question as its own task. Done when the user says the list is exhausted.
 
@@ -149,9 +148,7 @@
 
 **t52** · Answered (q18): work from both ends, iteratively. Each protocol is a collection of rules in a protocols folder with a manager branch and a specialist branch; the chore protocol sits with the specialists'. Each specialist gets its own copy on first assignment, changed only by request. Both protocols must describe the copy map and the made-up path of the agent's copy. Draft all three against the settled workflow, alongside t53 to t55. Done when three first drafts exist.
 
-**t56** · Answered in part (q11): the verifier is a medium specialist under a verifier protocol, for now. It drafts the hidden acceptance test, runs it in a clean copy, and reads the skill code the test touches to confirm the result was fairly reached. The implementing specialist never sees the test. Open: whether the manager should author the test instead, the model that is adequate, and where hidden tests live so the implementer cannot read them. Done when those are settled.
-
-**t58** · Quality assurance says the skill's own tests run where it actually lives, which means executing code inside the host project; the scope rule says Adapt changes nothing outside its home folders. Needed: who runs that check, the shim, the manager or the host agent, and how the result comes back. Relates to t30, t36. Done when the runner and the path back are written.
+**t56** · Answered in part: the verifier is a medium specialist under a verifier protocol, for now. It drafts the hidden acceptance test in the sibling test skill, runs it before merge, reads the skill code the test touches to confirm fairness, and posts results to the group channel. Implementers are denied read access to the test skill. Open: whether the manager should author the test instead, which model is adequate, and the test skill's name and layout. Done when those are settled.
 
 **t60** · The manager needs a high-level understanding of every sibling skill's surface, first to answer a request with an existing skill and only then to weigh engineering. A surface document per skill, kept current after each merge, is the likely carrier. Needed: its shape, what it holds, who updates it, and how it relates to the skill's graph. Relates to t67. Done when the document has a shape and an owner.
 
