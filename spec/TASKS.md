@@ -2,10 +2,9 @@
 
 **Goal:** revise the Adapt skill spec with the user: spec/original.txt is the untouched first draft, spec/revised.txt the working revision
 
-- ✅ a host project that is not a git repository · *2026-09-16* `t62`
 - ✅ meta tool exemption: the size and line limit below which scrutiny is reduced · *2026-09-16* `t33`
+- ✅ reconcile Documentation Dogma with the existing writing rules · *2026-09-16* `t4`
 - 🔄 **fold in the user's own changes to the spec** · *since 2026-09-15* `t1`
-- 🔜 ❓ reconcile Documentation Dogma with the existing writing rules `t4`
 - 🔜 ❓ define THE MANAGER without a persistent instance `t6`
 - 🔜 ❓ separate NEW, EXTEND and REPAIR, and define amalgamation `t9`
 - 🔜 specify the request form and its python generator `t10`
@@ -58,13 +57,11 @@
 
 ## Details
 
-**t62** · Answered (q17): when the host is not a git repository, init offers to run git init and create private repositories for the skills, so worktrees work. Open: one repository for the host's skill folder, or one per skill; and whether private means a local repository only or a private remote on GitHub. Done when both are settled.
-
 **t33** · A small meta tool is narrow, internal-facing and built by the agents for themselves, so it carries less process: documentation is whatever its builders need. Needed: the actual limit in files, lines and blast radius, what scrutiny still applies (a smoke test, a name, an owner), and what happens when a tool grows past the limit. Done when the limit and the remaining checks are written.
 
-**t1** · The user has many changes of their own: some needed, some functional alternatives judged better than the original. Take each in chat, write it into spec/revised.txt, and split out any that opens a new question as its own task. Done when the user says the list is exhausted.
-
 **t4** · User scoped the dogma to the rules for THE MANAGER and SPECIALISTS and the documents they keep; now in spec/revised.txt. Open: dogma 1 restates writing/fact-ownership, dogma 2 writing/compressed-register; point, not restate. Dogma 3 fits on-demand folders read once on resume, but 'never have too few details' likely means too many. Done when each dogma points to its rule or is reworded.
+
+**t1** · The user has many changes of their own: some needed, some functional alternatives judged better than the original. Take each in chat, write it into spec/revised.txt, and split out any that opens a new question as its own task. Done when the user says the list is exhausted.
 
 **t6** · The manager's history, task and questions files now rotate per round into the rounds folder; its notes folder persists. Still open: whether the original draft's Notes and Memories survive as separate things, or are replaced by the notes folder (niche information) and the round archive (the running log). Done when the manager's home layout is fixed.
 

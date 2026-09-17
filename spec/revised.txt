@@ -391,14 +391,13 @@ The SPECIALISTS folder has sub folders within it that are organized by the name 
 
  Documentation Dogma:
 	1) Information Independence
-		There should be very little crossover of information between files.
-	 Information files should strive for information independence similar to the idea of linear independence in linear algebra where vectors are independent of one another and cannot inform or construct the others due to the uniqueness they encode. The documents may have references to eachother but no more than that, so that information novelty is preserved and redundancy is killed.
+		Each fact lives in one file; every other file points to it. Owned by the rule writing/fact-ownership, which Adapt's rules-system copy carries; this dogma points there rather than restating it. The picture behind it: files independent of one another, like linearly independent vectors, none constructible from the others.
 
 	2) Condense, Compress, Refactor
-		Always strive to express information in as dense a way as possible while still preserving meaning and comprehension.
+		Express information as densely as meaning and comprehension allow. Owned by the rule writing/compressed-register; this dogma points there rather than restating it.
 
 	3) Context Is Tax Free
-		Be holistic in expressing ideas. Details are important and you can never have too few details. This seems to run counter to number 2, but the desire is to encode enough information such that a brand new llm-instance may come across the contents of a file or folder where it is to live and work within and have enough information provided that it can use only what's there to completely resurrect past instances' context and start off as effectively as though it were the same instance.
+		Be holistic in expressing ideas. Details are important and you can never have too many details. This seems to run counter to number 2, but the desire is to encode enough information such that a brand new llm-instance may come across the contents of a file or folder where it is to live and work within and have enough information provided that it can use only what's there to completely resurrect past instances' context and start off as effectively as though it were the same instance.
 
 
   When to Trigger:
