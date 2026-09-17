@@ -2,8 +2,8 @@
 
 **Goal:** build the Adapt environment and the Adapt skill: its spec, how its skills are bundled, installed, configured, versioned and shown
 
-- ✅ git and GitHub integration: version the Adapt repo and publish the skills from GitHub · *2026-09-15* `t5`
 - ✅ delete the stale OneDrive copy of Adapt · *2026-09-16* `t14`
+- ✅ viewer: let an answer be longer than 1000 characters · *2026-09-17* `t15`
 - 🔄 **review and revise the Adapt spec, Adaptive Tools.txt** · *since 2026-09-16* `t1`
 - 🔜 an installer script per skill that reads the manifest and terraforms a project `t2`
 - 🔜 fetch the embedding model when no preinstalled copy is found `t3`
@@ -13,15 +13,15 @@
 - 🔜 history friction log line, built with a rule `t8`
 - 🔜 mirror Adapt changes into every project that uses its skills `t13`
 - 🔜 a custom lightweight executable for the task and history viewer `t10`
-- 🔜 viewer: let an answer be longer than 1000 characters `t15`
+- 🔜 build the Adapt skill `t16`
 
 ---
 
 ## Details
 
-**t5** · Asked for by the user 2026-09-14. git init in Adapt with a .gitignore for machine state (search indexes, per-session state, rules-firings.jsonl, __pycache__), a GitHub remote through the gh CLI, and the rules and hooks that go with version control. GitHub also becomes the installer's source: install a skill from a tagged release. Done means Adapt is committed and pushed, and an install from GitHub works.
-
 **t14** · The user said yes to deleting C:\Users\ljcg3\OneDrive\Desktop\Adapt permanently (q7, 2026-09-15), so it cannot be confused with C:\dev\Adapt. Not done in the session that asked: that session ran from the OneDrive folder, and its hooks load from there. Done from a session started in C:\dev\Adapt: confirm nothing there is newer than C:\dev\Adapt, then Remove-Item -Recurse -Force, then log it.
+
+**t15** · The user hit the answer box limit replying to a spec question and had to answer in chat instead. The box should take a long answer, and the question cap of 400 characters should be reconsidered at the same time. Done when a long answer can be typed and submitted in the viewer.
 
 **t1** · Review and revise the Adapt spec with the user. Now run as its own project: spec/ (spec/original.txt, spec/revised.txt); its TASKS.md holds every open item. Done when the spec project is done.
 
@@ -41,4 +41,4 @@
 
 **t10** · Asked for by the user 2026-09-14. A small native window instead of a browser tab, hosting the same page and local server: candidates are a WebView2 host in C++ or C#, pywebview, or Tauri, judged on size, start time and no install step. For the future: the user is still iterating on the viewer (q5, 2026-09-15), so it waits at the back of the queue until they call the look settled. Done means one small executable that replaces the browser tab.
 
-**t15** · The user hit the answer box limit replying to a spec question and had to answer in chat instead. The box should take a long answer, and the question cap of 400 characters should be reconsidered at the same time. Done when a long answer can be typed and submitted in the viewer.
+**t16** · Build Adapt as specified in spec/adapt-spec.md, in the sub-project Adapt/build, following its BUILD-PLAN.md: foundations and test harness first, then install, launcher, agent identity, rules infrastructure, records, skill copies, agents, intake, skill initialization, the round end to end, improvement loops, packaging. Done when a host agent can file a request and receive a verified change from a round.
