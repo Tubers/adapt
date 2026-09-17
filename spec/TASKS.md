@@ -14,7 +14,7 @@
 - 🔜 agent system prompts for manager, specialist-medium and specialist-low `t17`
 - 🔜 protocol rules for specialists and manager, and how they attach at spawn `t18`
 - 🔜 friction entries: history kind, threshold hook, similarity grouping `t19`
-- 🔜 ❓ skill copies, manager-approved merge, and two-way mirroring `t20`
+- 🔜 skill copies, manager-approved merge, and two-way mirroring `t20`
 - 🔜 first-run install: what Adapt init sets up `t21`
 - 🔜 host-side Adapt commands `t22`
 - 🔜 ❓ nested Adapt: an Adapt inside an Adapt `t23`
@@ -79,7 +79,7 @@
 
 **t19** · Needs a friction kind in rules-system history; a hook that notifies an instance after N new friction entries since its last notice, N configurable; grouping of similar entries by meaning with vector-search; manager commands to read specialist histories filtered for friction. Done when kind, hook, config and grouping are defined.
 
-**t20** · Specialists work on copies; the manager approves merges; two-way mirror with Adapt's inner copies. Under B a host skill copy is a git worktree made in the host repo by script, placed outside the workspace start folder and reached through additionalDirectories; isolation worktree would copy the workspace repo instead. Needed: branch naming, conflicts, which side wins. Done when the flow is defined.
+**t20** · Specialists work on host worktrees (one repo per skill, private remotes); the manager approves merges; changes mirror between a host skill and Adapt's inner copy. On conflict the host's version wins and Adapt restarts from it (q26). Needed: branch naming, how drift is detected, the mirroring script, and how a losing Adapt-side change is recorded or re-requested. Done when the flow is defined.
 
 **t21** · First init creates the workspace outside the host repo as its own git repo, writes the shim into the host's .claude/skills/adapt/, marks the workspace trusted by writing hasTrustDialogAccepted for that path, spawns the manager, and runs build scripts: inventory the user's skills, create data folders and configs, load Adapt's own skills, create the manager's records. Needed: where the workspace lives, idempotent re-init, later inits. Done when defined.
 
