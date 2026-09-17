@@ -46,7 +46,7 @@
 - 🔜 retirement: the evidence, the path, and what archiving means `t50`
 - 🔜 trial: a low-model instance running the request interview from a decision tree `t51`
 - 🔜 draft the starting protocols: manager round, specialist work, chore worker `t52`
-- 🔜 ❓ the verifier: a third agent kind, or a mode of the specialist `t56`
+- 🔜 the verifier: a third agent kind, or a mode of the specialist `t56`
 - 🔜 ❓ assignment and parallelism inside a round `t57`
 - 🔜 ❓ who runs the post-merge check, given the scope rule `t58`
 - 🔜 ❓ a surface document per maintained skill `t60`
@@ -150,7 +150,7 @@
 
 **t52** · Answered (q18): work from both ends, iteratively. Each protocol is a collection of rules in a protocols folder with a manager branch and a specialist branch; the chore protocol sits with the specialists'. Each specialist gets its own copy on first assignment, changed only by request. Both protocols must describe the copy map and the made-up path of the agent's copy. Draft all three against the settled workflow, alongside t53 to t55. Done when three first drafts exist.
 
-**t56** · Two roles may be one agent or two: the verifier, with fresh context, that never sees the specialist's account; and a testing specialist, suggested by the user, that writes acceptance tests which cannot be trivially satisfied or gamed, starting from the final test the manager designs. Needed: whether these are one kind or two, their definitions, models and homes. Relates to t30. Done when defined.
+**t56** · Answered in part (q11): the verifier is a medium specialist under a verifier protocol, for now. It drafts the hidden acceptance test, runs it in a clean copy, and reads the skill code the test touches to confirm the result was fairly reached. The implementing specialist never sees the test. Open: whether the manager should author the test instead, the model that is adequate, and where hidden tests live so the implementer cannot read them. Done when those are settled.
 
 **t57** · Needed: whether a specialist is spawned per work item, per skill or per step; whether two may run at once inside one round; and what the manager does while they work: block, poll their records, or wait on messages. Relates to t15, t45. Done when the assignment rule and the manager's waiting behaviour are written.
 
