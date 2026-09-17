@@ -4,10 +4,9 @@
 
 **Parent:** Adapt/ · t16
 
-- ✅ 0.1 package layout: adapt/ (shim, workspace, install), tests/harness, scripts · *2026-09-17* `t1`
 - ✅ 0.2a harness: fixture host maker · *2026-09-17* `t2`
-- 🔄 **0.2b harness: probe runner for claude -p** · *since 2026-09-17* `t3`
-- 🔜 0.2c harness: leave-nothing-behind check `t4`
+- ✅ 0.2b harness: probe runner for claude -p · *2026-09-17* `t3`
+- 🔄 **0.2c harness: leave-nothing-behind check** · *since 2026-09-17* `t4`
 - 🔜 0.3 vendoring: copy rules-system and vector-search into the workspace template `t5`
 - 🔜 0.4a tool fetcher: rtk at a pinned version with checksum `t6`
 - 🔜 0.4b tool fetcher: graphify in a pinned uv environment `t7`
@@ -23,8 +22,6 @@
 ---
 
 ## Details
-
-**t1** · Create the folders BUILD-PLAN.md names, with a short README for adapt/ saying what a host receives. Done when the tree exists and is committed.
 
 **t2** · A function that creates a throwaway host project in the scratch folder: git init, two sample skills (one with a planted bug and a failing case), and removes it afterwards. Done when its own test creates and removes one cleanly.
 
