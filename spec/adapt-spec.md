@@ -261,13 +261,16 @@ When the work ends, the folder moves to `Fulfilled/`, `Aborted/` or `Postponed/`
 
 A round is one start-to-finish cycle on one work item:
 
-1. The manager triages the inbox and creates or updates the work folder.
-2. It designs the acceptance test in plain English, with loose pseudocode.
-3. It spawns the specialists the item needs, and a chore worker if one is worth it.
-4. The specialists work on copies of the skill.
-5. The verifier writes and runs the acceptance test against the copy.
-6. The manager merges on a pass, or sends the work back.
-7. The change is mirrored where needed, the surface document refreshed, the return file written,
+1. The manager reviews the internal requests the previous round's manager and specialists filed,
+   and ratifies or rejects each one; with its fresh context, this is the review those requests
+   were waiting for.
+2. It triages the rest of the inbox and creates or updates the work folder.
+3. It designs the acceptance test in plain English, with loose pseudocode.
+4. It spawns the specialists the item needs, and a chore worker if one is worth it.
+5. The specialists work on copies of the skill.
+6. The verifier writes and runs the acceptance test against the copy.
+7. The manager merges on a pass, or sends the work back.
+8. The change is mirrored where needed, the surface document refreshed, the return file written,
    and the request closed.
 
 What may join a round: only an internal tool that directly improves the delivery of that work item

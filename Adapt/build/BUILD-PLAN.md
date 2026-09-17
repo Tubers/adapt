@@ -199,7 +199,7 @@ Each process lists what it needs (**needs**) and how it is proven (**proof**).
 
 ### Phase 10: The round, end to end
 
-10.1 **Manager protocol, round loop.** Triage, work folder, test design, spawn, work, verify, merge,
+10.1 **Manager protocol, round loop.** Review the previous round's internal requests, triage, work folder, test design, spawn, work, verify, merge,
      mirror, return file, close.
 10.2 **Watcher.** Wake the manager on a new message addressed to it; raise the `-p` idle ceiling if
      needed.

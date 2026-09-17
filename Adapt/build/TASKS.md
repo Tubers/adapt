@@ -5,8 +5,8 @@
 **Parent:** Adapt/ · t16
 
 - ✅ 0.1 package layout: adapt/ (shim, workspace, install), tests/harness, scripts · *2026-09-17* `t1`
-- 🔄 **0.2a harness: fixture host maker** · *since 2026-09-17* `t2`
-- 🔜 0.2b harness: probe runner for claude -p `t3`
+- ✅ 0.2a harness: fixture host maker · *2026-09-17* `t2`
+- 🔄 **0.2b harness: probe runner for claude -p** · *since 2026-09-17* `t3`
 - 🔜 0.2c harness: leave-nothing-behind check `t4`
 - 🔜 0.3 vendoring: copy rules-system and vector-search into the workspace template `t5`
 - 🔜 0.4a tool fetcher: rtk at a pinned version with checksum `t6`
