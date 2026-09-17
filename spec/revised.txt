@@ -349,6 +349,7 @@ Amalgamation (proposed; open: t9):
 
  Memories:
 	(long running context that is constantly condensed and mainly holds a running log of events) This is meant to be very terse, fact based and scant on details.
+	(Revised 2026-09-16: Memories is dropped. The running log is the per-round history, archived into round folders; niche information goes in the notes folder, which persists. Notes above is that notes folder.)
 
  It can ofcourse create additional document files within its folder to help organize and keep abreast of information as it sees fit. This is a place where the manager has autonomy and can create as much documentation as it feels is necessary.
  The manager's history log and tasks file also live in this folder. (open: t6)
