@@ -15,3 +15,8 @@ __pycache__/
 
 # Staging files a caveman-compress run can leave behind.
 *.caveman-staged
+
+# Third-party tools installed per machine, pinned: rtk 0.49.0 binary and the graphify environment.
+tools/
+# graphify's code graph, rebuilt by: tools/graphify-venv/Scripts/graphify.exe extract . --code-only
+graphify-out/
