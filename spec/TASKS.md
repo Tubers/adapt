@@ -34,7 +34,7 @@
 - 🔜 Windows specifics: the mechanisms that carry a Windows footnote `t43`
 - 🔜 who re-indexes vector-search, and what it costs `t44`
 - 🔜 two specialists needing the same file `t45`
-- 🔜 ❓ skill configuration: per-skill options, defaults, and the script that keeps it current `t46`
+- 🔜 skill configuration: per-skill options, defaults, and the script that keeps it current `t46`
 - 🔜 stall notice: tell the user when a round stalls or crashes `t47`
 - 🔜 the manager's questions file as a diagnostic, and turning its entries into rules `t48`
 - 🔜 notes folders: freeform space for the manager and every specialist `t49`
@@ -119,7 +119,7 @@
 
 **t45** · Answered (q32): file locks. A specialist modifying a file holds a lock, released when its task changes. Another specialist that meets the lock reads the holder's log, picks an unblocked task meanwhile, or waits. Needed: where locks live, how a task change releases them, a hook that refuses writes to a locked file and points at the holder's log, and stale-lock cleanup after a crash (t38). Done when two specialists contend for a file safely.
 
-**t46** · Adapt writes a per-skill configuration at init; scripts key newly found skills into it. Where an improvement goes: local (default), global (merged into the skill's own repo), later a retroactive reconciliation. Skills live in private GitHub repos: choose one remote per skill-project pair, or one remote per skill with a branch per project, which suits reconciliation. Needed: that choice, the file, format, defaults and discovery script. Done when the configuration exists.
+**t46** · Adapt writes a per-skill configuration at init; scripts key newly found skills into it. Where an improvement goes: local (default), global (merged into the skill's main branch), later a retroactive reconciliation. Settled (q30): one private GitHub remote per skill, a branch per host project. Needed: branch naming, the configuration file, format, defaults and discovery script. Done when the configuration exists and a skill's project branch is pushed.
 
 **t47** · Answered (q31): a stall is any of no record for 20 minutes, a launcher error exit, or a round ending with its work item open, with room for more indicators. It notifies the host instance and the user: in the viewer when one is open, otherwise a Windows desktop notification. Needed: the detector, the viewer notice, the desktop notification path, and how the host instance is told. Done when a forced stall reaches both.
 
