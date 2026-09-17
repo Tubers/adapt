@@ -116,7 +116,7 @@
 
 **t47** · Answered (q31): a stall is any of no record for 20 minutes, a launcher error exit, or a round ending with its work item open, with room for more indicators. It notifies the host instance and the user: in the viewer when one is open, otherwise a Windows desktop notification. Needed: the detector, the viewer notice, the desktop notification path, and how the host instance is told. Done when a forced stall reaches both.
 
-**t48** · The manager writes a question whenever it does not know what to do, without waiting for an answer. Later review turns each into a structural fix: a rule, a protocol line, a better briefing, or a tool. Needed: the instruction that makes the manager write instead of guess, how the entries are reviewed and grouped, and how a recurring question becomes a rule candidate. Relates to t18 and t31. Done when the loop runs once.
+**t48** · The manager posts what it does not know to the work folder's group channel, marked open, instead of guessing; there is no questions file. Needed: the open marker, how open questions are gathered from channels and the round archive for review, and how a recurring one becomes a rule candidate. Relates to t65 and t31. Done when the loop runs once.
 
 **t49** · Each agent gets a freeform notes folder it organises itself, never read whole at session start. Use is counted per note, and a high count surfaces it to the manager as a candidate finding; graduating one moves its information into a rule scoped to where it will be needed and removes the note. Each specialist gets vector-search files of its own over its notes. Needed: where the folders live, the counter, the graduation path, and the per-specialist index. Done when all four exist.
 

@@ -287,7 +287,7 @@ context. Chaining never crosses to another skill.
 rounds is the inbox, the work folders, the home folders, the rules and the configuration. A host
 agent unhappy with a result files a new request.
 
-**What a round leaves behind.** The manager's history, task and questions files belong to the
+**What a round leaves behind.** The manager's history and task files belong to the
 round. When the next round starts they move into `manager_home/rounds/<round>/`, together with a
 file referencing the work items the round touched, and the manager starts with empty ones. Round
 folders are diagnostic material. A round with nothing to do may read back through them and propose
@@ -339,7 +339,6 @@ Everything is a file, so everything can be read, even while a round runs.
 |---|---|---|---|
 | History log | every agent | its home; the manager's in `manager_home/` | agents: yes; manager: archived to `rounds/` |
 | Task file | every agent | as above | as above |
-| Questions file | every agent | as above | as above |
 | Notes folder | every agent | its home | yes |
 | Metrics file | hooks, per agent | its home | yes |
 | Group channel | agents on a work item | the work folder | with the work folder |
@@ -353,12 +352,14 @@ channels.
 **Status.** The manager's task file is the status surface. The host agent reads it through the
 shim; the user watches it in the rules-system viewer. There is no other status channel.
 
-**Questions.** A specialist writes a question into its own questions file; a hook tells the manager,
-which answers it, passes it to the host agent or the user, or turns it into work. Whatever carries
-the answer, the outcome lands in a history log. While the design settles, the manager's own
-questions file is a diagnostic: when it does not know what to do, it writes the question instead of
-guessing, and those questions are later answered with rules, protocol lines, better briefings or
-tools. A question that keeps returning is a hole in the design.
+**Questions.** No agent keeps a questions file; those belong to interactive sessions where a person
+answers. A question is a message in the work folder's group channel, addressed to whoever should
+answer it: a specialist asks the manager there, and the watcher wakes the manager. The outcome lands
+in a history log. While the design settles, the manager does the same with its own uncertainty:
+when it does not know what to do, it posts the question to the channel, marked open, instead of
+guessing. Open questions are reviewed later, from the channels and the round archive, and answered
+with rules, protocol lines, better briefings or tools. A question that keeps returning is a hole in
+the design.
 
 **Notes.** Every agent has a freeform notes folder it organizes as it likes, for anything niche or
 half-formed. Notes are looked up, never loaded whole. They never become a second home for a fact:
@@ -435,7 +436,7 @@ ratified only by a later round's manager, with fresh context. Constants cannot b
 
 | Tool | What it gives | Who gets it |
 |---|---|---|
-| rules-system | records, tasks, questions, rules, gates, viewer | every agent |
+| rules-system | history, tasks, rules, gates, viewer | every agent |
 | vector-search | search by meaning over rules, history, notes, surfaces, code | every agent |
 | meta-tools | the agents' own small tools | every agent |
 | graphify | code graphs: query, path, explain, affected, god-nodes | code specialists; the manager builds graphs directly |
@@ -641,7 +642,7 @@ Build work and tests, each owned by a task in the spec project (`rules.py tasks 
 | Records | friction entries and grouping | t19 |
 | | metrics file, thresholds, trigger hook | t70 |
 | | notes folders, counts and graduation | t49 |
-| | manager questions as diagnostics | t48 |
+| | open questions in channels, reviewed as diagnostics | t48 |
 | | re-indexing vector-search | t44 |
 | Failure | rollback script and active markers | t38 |
 | | budget, if caps are ever wanted | t37 |

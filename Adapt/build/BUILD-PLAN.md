@@ -78,7 +78,8 @@ Each process lists what it needs (**needs**) and how it is proven (**proof**).
     entry points.
 1.5 **Inventory and configuration.** Scan the host's sibling skills into `config.json`, with
     defaults, and a discovery script that keys in new ones.
-1.6 **Manager records.** Create the manager's history, task and questions files with rules-system.
+1.6 **Manager records.** Create the manager's history and task files with rules-system. Its init
+    also creates a questions file, which Adapt does not use and removes.
 1.7 **Re-running init.** A second init changes nothing and reports that.
     Needs: phase 0. Proof: init on a fixture host produces the whole tree; a second run is a no-op;
     removing the workspace and shim leaves the host exactly as before.
@@ -126,12 +127,13 @@ Each process lists what it needs (**needs**) and how it is proven (**proof**).
 
 ### Phase 5: Records and communication
 
-5.1 **Round record.** Round ids; moving the manager's three files into `rounds/<round>/` at the next
+5.1 **Round record.** Round ids; moving the manager's history and task files into `rounds/<round>/` at the next
     round's start; the reference file.
 5.2 **Inbox.** The raw request schema; one file per request; the automated inbox log; the archive.
 5.3 **Work folder.** Schema; create in NEW, EXTEND or REPAIR; move to Fulfilled, Aborted or
     Postponed; the manager task that points at it.
-5.4 **Group channel.** Post and read-unseen commands, with an addressee on each message.
+5.4 **Group channel.** Post and read-unseen commands, with an addressee on each message, and an
+    open marker for questions nobody has answered yet.
 5.5 **Aggregated history.** Pull the history of every agent on a work item into its log.
 5.6 **Homes on first assignment.** Create a specialist's home, notes folder and rules copy when it
     is first assigned.
