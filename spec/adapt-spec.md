@@ -99,7 +99,9 @@ Claude Code behaviour:
 │  │  ├─ INDEX.md                             gates; written only by the manager
 │  │  ├─ constants.json                       names the five constant rules
 │  │  ├─ protocols/manager/                   the manager's protocol, as a rule collection
-│  │  ├─ protocols/specialist/                the specialists' template protocol, and the chore protocol
+│  │  ├─ protocols/specialist/                the specialists' template protocol
+│  │  ├─ protocols/verifier/                  the verifier's protocol
+│  │  ├─ protocols/chore/                     the chore worker's protocol and its command code
 │  │  ├─ skills/<skill>/                      one specialist's protocol copy and its findings
 │  │  └─ tooling/                             graphify, rtk
 │  ├─ INBOX/                                  raw requests, one file each, and the inbox log
@@ -107,7 +109,9 @@ Claude Code behaviour:
 │  ├─ Fulfilled/  Aborted/  Postponed/        work folders at rest
 │  ├─ manager_home/                           notes/, metrics.json, the round's records, rounds/
 │  ├─ verifier_home/                          notes/, metrics.json, findings
+│  ├─ chore_home/                             metrics.json, and what the chore research has learned
 │  ├─ specialists/<skill>/<home>/             one specialist's home
+│  ├─ tools/bin/                              pinned rtk and graphify launchers; put first on PATH by the launcher
 │  ├─ tools/                                  pinned Python environment (graphify), rtk binary
 │  └─ config.json                             per-skill options
 │
@@ -115,7 +119,8 @@ Claude Code behaviour:
    └─ <skill>-<work id>/                      a worktree of that skill's repository
 ```
 
-The names `adapt-tests`, `verifier_home` and `<host>.adapt-copies` are working names (see Open
+Every kind of agent has its own protocol folder and its own home. The names `adapt-tests`,
+`verifier_home`, `chore_home` and `<host>.adapt-copies` are working names (see Open
 items).
 
 ### How a session learns of Adapt
@@ -173,7 +178,8 @@ A low-model agent for small, direct, stateless tasks, starting with file and fol
 Specialists order it in a short command code designed to cost few tokens. Its context is fresh for
 every batch, so every order must stand on its own. A specialist asks the manager for one; the
 manager decides whether it is worth invoking. What a low model can reliably be trusted with is a
-research question, and its repertoire grows as that research answers it.
+research question, and its repertoire grows as that research answers it. The chore worker's home
+keeps no conversation, only its metrics and what the research has established.
 
 ### What every agent starts with
 
@@ -387,10 +393,11 @@ compressed further (section 7).
 Rules are the main force that guides agents. Adapt ships a starting set, and it will change.
 
 **Protocols.** Each kind of agent has a protocol: a collection of rules that carries the sequence
-of its work, not advice, because a fresh agent has nothing else to go on. The manager's lives in
-`rules/protocols/manager/`; the specialists' template and the chore protocol live in
-`rules/protocols/specialist/`. Each specialist gets its own copy of the template on first
-assignment, in `rules/skills/<skill>/`, so it can be tailored without touching other specialists.
+of its work, not advice, because a fresh agent has nothing else to go on. Each kind of agent has its own
+protocol folder: `rules/protocols/manager/`, `rules/protocols/specialist/`,
+`rules/protocols/verifier/` and `rules/protocols/chore/`, the last also holding the chore command
+code. Each specialist gets its own copy of the specialist template on first assignment, in
+`rules/skills/<skill>/`, so it can be tailored without touching other specialists.
 Protocols are injected at session start, before any path is touched, so a startup mechanism
 delivers the whole collection. The protocols are expected to be rebuilt many times.
 
@@ -442,14 +449,18 @@ documentation its builders want. A tool that outgrows the limits goes through th
 graph a specialist can query. Its install writes two CLAUDE.md files and two hooks. Adapt's install
 script runs it, mines the instruction files into a rule, compares them with the kept source text at
 each upgrade, and deletes them. The hooks go into the code specialist's definition, calling the
-pinned graphify by absolute path. Output always goes into the specialist's home with `--out`. Draft
+pinned graphify by absolute path. Output always goes into the specialist's home with `--out`. Its nudge is worded as a command
+("MANDATORY … you MUST run graphify query") and fires on any search, even an exact symbol lookup or
+a shell listing; Adapt wraps the hook so the nudge reaches only code searches, in milder words. Draft
 rule: `spec/drafts/workspace-rule-tooling-graphify.md`.
 
 **rtk** rewrites every Bash command into a compressed form through a PreToolUse hook. Its project
 init writes only an instruction block, so Adapt mines that into a rule, deletes it, keeps
 `.rtk/filters.toml`, and writes the hook into the workspace settings itself, for every agent.
 Telemetry is disabled. Test output must stay readable for the merge gate: the verifier re-runs with
-`rtk proxy` when condensed output hides a failure. Draft rule:
+`rtk proxy` when condensed output hides a failure. rtk rewrites `python -m pytest` to
+`rtk pytest`, so test runners must be on `PATH` (`tools/bin`) and the rewritten form must be in the
+agents' allowed commands. rtk sees only the Bash tool, so agents are given no other shell tool. Draft rule:
 `spec/drafts/workspace-rule-tooling-rtk.md`.
 
 **caveman** reaches the manager as the workspace's output style. Output styles do not reach
@@ -480,6 +491,10 @@ The run is launched with:
 - `--setting-sources project,local`, which drops the user's personal settings, hooks and plugins
   while keeping the login;
 - `--permission-mode dontAsk`;
+- `tools/bin` placed first on `PATH` in the launcher's process environment. rtk's hook rewrites
+  commands to a bare `rtk`, and graphify's nudge names a bare `graphify`, so both must be on the
+  agents' `PATH`. Probed: a `PATH` set by the launcher reaches the Bash tool of the headless run.
+  Claude Code's `CLAUDE_ENV_FILE` is not used, because it is reported not to be sourced on Windows;
 - `CLAUDE_AGENT_SDK_DISABLE_BUILTIN_AGENTS=1` in the process environment, which removes every
   built-in agent (it has no effect when set in the settings file);
 - the regenerated exclusions below.
