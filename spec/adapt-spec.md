@@ -136,8 +136,8 @@ A headless Claude Code session on Opus 5, started by the shim in the workspace. 
 - is the only agent that spawns or removes a subagent, and the only one that creates work items;
 - designs the acceptance test for each work item;
 - decides merges, on evidence;
-- writes everything that persists beyond a home folder: rules, `INDEX.md`, surface documents,
-  configuration;
+- writes everything shared that persists beyond a home folder: rules, `INDEX.md`, surface
+  documents, configuration;
 - spends its attention on architecture and ergonomics: whether a surface is the right one, whether
   a run of repairs means the implementation should be rebuilt, whether a surface should be
   deprecated for a more stable one that asks for more input.
@@ -307,12 +307,18 @@ someone remembering.
    implementation. The manager's task for the item ends with a one-line outcome and a one-word
    status.
 
-### 4.6 Skill initialization
+### 4.6 Initialization
 
-At init, Adapt takes inventory of the sibling skills. The first time it works on one, that skill is
-initialized before any change: an automated test suite is built for it, robust enough to catch the
-change that quietly breaks something nobody thought to check, and a surface document is written.
-Both are maintained from then on.
+**Adapt's own init comes first.** It creates the workspace and the shim, marks the workspace
+trusted, takes inventory of the sibling skills, and writes a surface document for every one of
+them, because the manager needs all the surfaces before it can answer any request.
+
+**Skill initialization comes later, lazily**, the first time Adapt works on a particular skill, and
+before any change to it. It does every one-off job that skill needs: gathering information about
+the skill and storing what matters as rules for it, making sure its repository, remote and
+worktrees are set up, and building an automated test suite robust enough to catch the change that
+quietly breaks something nobody thought to check. The suite and the surface document are maintained
+from then on.
 
 ---
 
@@ -329,6 +335,11 @@ Everything is a file, so everything can be read, even while a round runs.
 | Metrics file | hooks, per agent | its home | yes |
 | Group channel | agents on a work item | the work folder | with the work folder |
 | Inbox log | automatic | `INBOX/` | yes |
+
+**Shared ground.** Beyond its own home, an agent writes only inside a work folder it is working on,
+and only through that folder's commands: posting to the group channel, taking and releasing file
+locks, and adding to the work item's own files. The manager and specialists alike use those
+channels.
 
 **Status.** The manager's task file is the status surface. The host agent reads it through the
 shim; the user watches it in the rules-system viewer. There is no other status channel.
@@ -509,8 +520,8 @@ access is minimal; the exception is the manager researching a topic to write a g
 ## 9. Skill repositories and where improvements go
 
 **Repositories.** Every sibling skill is its own git repository, with a private remote on GitHub:
-one remote per skill, with a branch per host project. Each project's version of a skill is a branch
-off the original. When the host project is not a git repository, init offers to set this up.
+one remote per skill, and every host project that uses the skill is a branch off that remote's main
+branch. Copies are worktrees of the skill's repository, for every host. When the host project is not a git repository, init offers to set this up.
 
 **Working on a skill.** A specialist changes a skill only on a copy: a worktree of that skill's
 repository, in `<host>.adapt-copies/`, reached through `additionalDirectories`. Copies sit outside
@@ -549,8 +560,9 @@ erased.
 
 ## 10. Failure
 
-**A crashed round is redone, never salvaged.** Rollback comes first, in code: discard the copy's
-branch, remove its worktree, revert a merge already made, clear its copy-map entry and file locks.
+**A crashed round is redone, never salvaged.** Rollback comes first, in code, and it clears
+everything the round did: discard the copy's branch, remove its worktree, revert a merge already
+made, clear its copy-map entry and file locks, and undo anything else the round changed.
 Agents log as they go and mark active worktrees active, so the state is discoverable. When the
 rollback cannot be automatic, the manager establishes what happened and decides what to roll back.
 Then the round runs again from the start.
