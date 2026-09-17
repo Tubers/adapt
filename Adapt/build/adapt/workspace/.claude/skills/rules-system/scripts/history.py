@@ -42,6 +42,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+import records  # noqa: E402
 import upkeep  # noqa: E402
 
 # The skill keeps this repo's records in data/<repo root folder name>/. A sub-agent that borrows the
@@ -125,17 +126,25 @@ def history_file_for(root, rel: str) -> Path:
     root = Path(root)
     parts = Path(rel.strip("/")).parts
     for n in range(len(parts), 0, -1):
-        candidate = root.joinpath(*parts[:n]) / upkeep.HISTORY_NAME
+        candidate = records.path(root.joinpath(*parts[:n]), records.HISTORY)
         if candidate.is_file():
             return candidate
-    if (root / upkeep.HISTORY_NAME).is_file():
-        return root / upkeep.HISTORY_NAME       # the repo root's project is the last stop up the path
-    return root.joinpath(*parts) / upkeep.HISTORY_NAME
+    if records.path(root, records.HISTORY).is_file():
+        return records.path(root, records.HISTORY)   # the repo root's project is the last stop up the path
+    return records.path(root.joinpath(*parts), records.HISTORY)
+
+
+def file_folder(file_rel: str) -> str:
+    """The project folder a history file belongs to: the folder holding its .rs folder."""
+    d = Path(file_rel).parent
+    if d.name == records.RECORDS_DIR:
+        d = d.parent
+    return d.as_posix()
 
 
 def effective_folder(e: dict) -> str:
     """The folder an entry is about: its `folder` key when it was logged from a subfolder, else its file's."""
-    return str(e.get("folder") or Path(e["_file"]).parent.as_posix() + "/").strip("/")
+    return str(e.get("folder") or file_folder(e["_file"]) + "/").strip("/")
 
 
 def append_line(path: Path, record: dict) -> None:
@@ -230,7 +239,7 @@ def one_line(e: dict, show_folder: bool) -> str:
 
 
 def tasks_summary(root, rel: str) -> str:
-    p = Path(root) / rel / TASKS_NAME
+    p = records.path(Path(root) / rel, records.TASKS)
     if not p.is_file():
         return "no TASKS.md"
     rows = [l.strip() for l in p.read_text(encoding="utf-8", errors="replace").splitlines()]
@@ -249,7 +258,7 @@ def tasks_summary(root, rel: str) -> str:
 
 def folder_state(root, rel: str) -> str:
     rel = rel.strip("/") or "."
-    own = [e for e in entries(root, rel) if Path(e["_file"]).parent.as_posix() == rel or effective_folder(e) == rel]
+    own = [e for e in entries(root, rel) if file_folder(e["_file"]) == rel or effective_folder(e) == rel]
     lines = ["FOLDER %s/" % rel, "  tasks       %s" % tasks_summary(root, rel)]
     if own:
         last = own[-1]
@@ -404,18 +413,19 @@ def merge(root, project: str, write: bool = True, when=None) -> dict:
     root = Path(root)
     rel = norm_folder(root, project)
     check_work_folder(root, rel)
-    target = root / rel / upkeep.HISTORY_NAME
+    target = records.path(root / rel, records.HISTORY)
     def in_subproject(p):
         """True when p sits in or under a sub-project: its history is that project's, never folded into this one."""
-        d = p.parent
-        while d != root / rel:
-            if (d / "TASKS.md").is_file() or (d / "QUESTIONS.jsonl").is_file():
+        d = records.project_of_file(p)
+        while d is not None and d != root / rel:
+            if records.present(d) & {records.TASKS, records.QUESTIONS}:
                 return True
             d = d.parent
         return False
 
-    sources = sorted(p for p in (root / rel).rglob(upkeep.HISTORY_NAME)
-                     if p != target and "_backup" not in p.parts and not in_subproject(p))
+    sources = sorted(p for p in (root / rel).rglob(records.HISTORY)
+                     if p != target and records.project_of_file(p) is not None
+                     and "_backup" not in p.parts and not in_subproject(p))
     if not sources:
         raise ValueError("%s/ has no subfolder histories to merge" % rel)
 
@@ -430,7 +440,7 @@ def merge(root, project: str, write: bool = True, when=None) -> dict:
     seen = {}
     rows = []
     for order, src in enumerate(sources):
-        sub = src.parent.relative_to(root).as_posix()
+        sub = records.project_of_file(src).relative_to(root).as_posix()
         for n, line in enumerate(src.read_text(encoding="utf-8", errors="replace").splitlines(), start=1):
             if not line.strip():
                 continue

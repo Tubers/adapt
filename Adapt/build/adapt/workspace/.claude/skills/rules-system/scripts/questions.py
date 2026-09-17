@@ -37,14 +37,15 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+import records  # noqa: E402
 
-QUESTIONS_NAME = "QUESTIONS.jsonl"
+QUESTIONS_NAME = records.QUESTIONS
 MIN_TEXT, MAX_QUESTION, MAX_ANSWER = 8, 1200, 10000
 ACTION = "action"
 
 
 def path(root, project) -> Path:
-    return Path(root) / project / QUESTIONS_NAME
+    return records.path(Path(root) / project, QUESTIONS_NAME)
 
 
 def is_action(q) -> bool:

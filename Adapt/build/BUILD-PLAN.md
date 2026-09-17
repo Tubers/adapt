@@ -78,8 +78,8 @@ Each process lists what it needs (**needs**) and how it is proven (**proof**).
     entry points.
 1.5 **Inventory and configuration.** Scan the host's sibling skills into `config.json`, with
     defaults, and a discovery script that keys in new ones.
-1.6 **Manager records.** Create the manager's history and task files with rules-system. Its init
-    also creates a questions file, which Adapt does not use and removes.
+1.6 **Manager records.** Create the manager's history and task files with rules-system's
+    `init --no-questions`, into `manager_home/.rs/`.
 1.7 **Re-running init.** A second init changes nothing and reports that.
     Needs: phase 0. Proof: init on a fixture host produces the whole tree; a second run is a no-op;
     removing the workspace and shim leaves the host exactly as before.

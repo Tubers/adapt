@@ -102,14 +102,22 @@ COMMANDS = {
               "acts on the project the command runs inside or this session last worked in; a subfolder walks "
               "up. done logs the task in the project's history at once, starts the next task, and lets the "
               "oldest done task leave the window."),
-    "init": ('<project folder> --goal "<goal>" [--task <parent task id>]',
-             "start a project: HISTORY.jsonl, TASKS.md and QUESTIONS.jsonl from the templates",
+    "init": ('<project folder> --goal "<goal>" [--task <parent task id>] [--no-questions]',
+             "start a project: HISTORY.jsonl, TASKS.md and QUESTIONS.jsonl in its .rs folder, from the templates",
+             "--no-questions leaves out QUESTIONS.jsonl, for a project no person answers. "
              "Creates the folder if needed. Refuses a folder inside another project, or one that already has "
              "all three files. A project that has only some of them, such as an older one with only its history, "
              "gets the missing ones and nothing already there is touched. Logs it in the project's history. "
              "Any folder may be a project, the repo root included (init .), and projects nest: records go to the "
              "nearest project file up the path. A project inside another names the parent task it serves with "
              "--task, recorded as its **Parent:** line; the parent's tasks list their sub-projects."),
+    "migrate": ("[--dry-run]",
+                "move every project's record files into its .rs folder",
+                "Records used to sit directly in a project folder. Each project folder now keeps them in "
+                "<folder>/.rs/. migrate finds every project still using the old place, moves each record "
+                "file into .rs (with git mv when git tracks it, so history follows), and logs the move in "
+                "that project's history. It refuses a folder whose .rs already holds a file of the same "
+                "name. --dry-run lists what would move and changes nothing."),
     "park": ('"<fact>" --repo <repo> --in <folder> --run <run> | --no-run WHY',
              "park a possible rule: stamped, passed against every rule, written to its folder and the master",
              "A candidate is written to <folder>/HISTORY.jsonl AND .claude/skills/rules-system/data/<repo>/"
@@ -990,11 +998,14 @@ def cmd_init(root, args):
     import tasks
     try:
         root, args = _scope(args)
+        no_questions = "--no-questions" in args
+        args = [a for a in args if a != "--no-questions"]
         pos = _positional(args, ("--goal", "--task"))
         if len(pos) != 1 or not _opt(args, "--goal"):
-            print('usage: rules.py init <project folder> --goal "<goal>" [--task <parent task id>]')
+            print('usage: rules.py init <project folder> --goal "<goal>" [--task <parent task id>] [--no-questions]')
             return 2
-        r = tasks.init(root, pos[0], _opt(args, "--goal"), task=_opt(args, "--task") or None)
+        r = tasks.init(root, pos[0], _opt(args, "--goal"), task=_opt(args, "--task") or None,
+                       questions=not no_questions)
     except ValueError as e:
         print(e)
         return 2
@@ -1198,6 +1209,52 @@ def cmd_asked(root, args):
     return vector_report("queries", args)
 
 
+def cmd_migrate(root, args):
+    import shutil
+    import subprocess
+    import history
+    import records
+    import upkeep
+    try:
+        root, args = _scope(args)
+    except ValueError as e:
+        print(e)
+        return 2
+    dry = "--dry-run" in args
+    _, _, legacy = upkeep.project_folders(root)
+    if not legacy:
+        print("nothing to migrate: every project keeps its records in its .rs folder")
+        return 0
+    status = 0
+    for rel in legacy:
+        d = root if rel == "." else root / rel
+        files = records.legacy(d)
+        clash = [f.name for f in files if records.path(d, f.name).exists()]
+        if clash:
+            print("%s/: .rs already holds %s; move by hand after comparing" % (rel, ", ".join(clash)))
+            status = 1
+            continue
+        print("%s/: %s -> %s/" % (rel, ", ".join(f.name for f in files), records.RECORDS_DIR))
+        if dry:
+            continue
+        records.folder(d).mkdir(parents=True, exist_ok=True)
+        moved = []
+        for f in files:
+            dst = records.path(d, f.name)
+            tracked = subprocess.run(["git", "ls-files", "--error-unmatch", str(f)], cwd=root,
+                                     capture_output=True).returncode == 0
+            if tracked:
+                subprocess.run(["git", "mv", str(f), str(dst)], cwd=root, check=True, capture_output=True)
+            else:
+                shutil.move(str(f), str(dst))
+            moved.append(f.name)
+        history.add(root, "" if rel == "." else rel, "change",
+                    "record files moved into the project's .rs folder",
+                    what="%s moved from %s/ to %s/%s/ by rules.py migrate"
+                         % (", ".join(moved), rel, rel, records.RECORDS_DIR))
+    return status
+
+
 DISPATCH = {
     "help": cmd_help, "list": cmd_list, "show": cmd_show, "gates": cmd_gates,
     "which": cmd_which, "stats": cmd_stats, "log": cmd_log, "budget": cmd_budget,
@@ -1209,6 +1266,7 @@ DISPATCH = {
     "use": cmd_use,
     "tasks": cmd_tasks,
     "init": cmd_init,
+    "migrate": cmd_migrate,
     "park": cmd_park,
     "candidates": cmd_candidates,
     "decide": cmd_decide,
@@ -1295,7 +1353,7 @@ def main(argv) -> int:
 # Every command takes --repo. These read it themselves (park, candidates and decide require it); main reads it
 # for the rest, so a --repo is never mistaken for an argument, and refuses another ecosystem to any command
 # that still reads this repository's own data: the firing log, accepted findings, the audit worklist, the index.
-SCOPES_ITSELF = {"upkeep", "history", "tasks", "init", "view", "park", "candidates", "decide", "use"}
+SCOPES_ITSELF = {"upkeep", "history", "tasks", "init", "migrate", "view", "park", "candidates", "decide", "use"}
 ANY_ECOSYSTEM = {"list", "show", "gates", "which", "budget"}
 
 

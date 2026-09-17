@@ -36,6 +36,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+import records  # noqa: E402
 
 ICONS = {"✅": "done", "🔄": "now", "⛔": "blocked", "🔜": "next"}
 ICON_OF = {v: k for k, v in ICONS.items()}
@@ -140,8 +141,8 @@ def check(parsed: dict) -> list:
 # writing: every change to a TASKS.md goes through these, so the file never leaves the format
 # --------------------------------------------------------------------------------------------------
 
-TASKS_NAME = "TASKS.md"
-QUESTIONS_NAME = "QUESTIONS.jsonl"
+TASKS_NAME = records.TASKS
+QUESTIONS_NAME = records.QUESTIONS
 RANK = {"done": 0, "now": 1, "blocked": 2, "next": 3}
 MAX_DETAIL = 500
 
@@ -176,7 +177,7 @@ def render(p: dict) -> str:
 
 
 def _path(root, project) -> Path:
-    return Path(root) / project / TASKS_NAME
+    return records.path(Path(root) / project, TASKS_NAME)
 
 
 def load(root, project) -> dict:
@@ -215,6 +216,7 @@ def save(root, project, p: dict) -> None:
         if lost:
             raise ValueError("%s/TASKS.md holds lines the format cannot keep, and writing now would drop them: %s. "
                              "Ask the user how to bring them into the format." % (project, "; ".join(lost)))
+    path.parent.mkdir(parents=True, exist_ok=True)
     tmp = path.with_name(path.name + ".tmp")
     tmp.write_text(render(p), encoding="utf-8")
     os.replace(tmp, path)
@@ -419,8 +421,10 @@ def set_goal(root, project, text) -> dict:
     return p
 
 
-def init(root, folder, goal, task=None) -> dict:
-    """Start a project: HISTORY.jsonl opened with a stamped entry, TASKS.md with its goal, an empty QUESTIONS.jsonl.
+def init(root, folder, goal, task=None, questions=True) -> dict:
+    """Start a project: HISTORY.jsonl opened with a stamped entry, TASKS.md with its goal, an empty QUESTIONS.jsonl,
+    all three in the project's .rs folder. questions=False leaves out QUESTIONS.jsonl, for projects that never
+    wait on a person (Adapt's agents).
 
     Any folder may be a project, the repo root included, and projects nest (the user, 2026-09-14): records go to
     the nearest project file up the path. A project inside another is a sub-project and names the parent task
@@ -435,7 +439,7 @@ def init(root, folder, goal, task=None) -> dict:
     parent = lib.project_of(root, Path(rel).parent.as_posix()) if rel else None
     d = root / rel
     link = None
-    if parent and not (d / TASKS_NAME).exists():
+    if parent and not records.path(d, TASKS_NAME).exists():
         try:
             ptasks = load(root, parent)["tasks"]
         except ValueError:
@@ -448,23 +452,28 @@ def init(root, folder, goal, task=None) -> dict:
             if task not in {k["id"] for k in ptasks}:
                 raise ValueError("%s/ has no task %s in its window: rules.py tasks --in %s" % (parent, task, parent))
             link = {"project": parent, "task": task}
-    existing = [m for m in lib.PROJECT_MARKERS if (d / m).exists()]
-    if len(existing) == len(lib.PROJECT_MARKERS):
-        raise ValueError("%s/ already has %s" % (rel, ", ".join(existing)))
+    if records.legacy(d):
+        raise ValueError("%s/ keeps its records in the old place (%s); move them first: rules.py migrate"
+                         % (shown, ", ".join(p.name for p in records.legacy(d))))
+    wanted = [m for m in records.NAMES if questions or m != QUESTIONS_NAME]
+    existing = [m for m in records.NAMES if records.path(d, m).exists()]
+    if all(m in existing for m in wanted):
+        raise ValueError("%s/ already has %s" % (shown, ", ".join(existing)))
     goal = _clean(goal, "a goal")
     d.mkdir(parents=True, exist_ok=True)
     made = []
     # an older project may have only its history: init completes it, never touching a file already there
-    if QUESTIONS_NAME not in existing:
-        (d / QUESTIONS_NAME).write_text("", encoding="utf-8")
+    records.folder(d).mkdir(parents=True, exist_ok=True)
+    if questions and QUESTIONS_NAME not in existing:
+        records.path(d, QUESTIONS_NAME).write_text("", encoding="utf-8")
         made.append(QUESTIONS_NAME)
     if TASKS_NAME not in existing:
         save(root, rel, {"project": rel or root.name, "goal": goal, "parent": link, "tasks": [], "details": {},
                          "problems": []})
         made.append(TASKS_NAME)
-    if "HISTORY.jsonl" not in existing:
-        (d / "HISTORY.jsonl").touch()     # made first, so a sub-project's start is logged in its own file,
-        made.append("HISTORY.jsonl")      # not the parent's: records go to the nearest file up the path
+    if records.HISTORY not in existing:
+        records.path(d, records.HISTORY).touch()  # made first, so a sub-project's start is logged in its own
+        made.append(records.HISTORY)              # file, not the parent's: records go to the nearest file up the path
     title = ("project started: " if not existing else "project files completed: ") + goal
     entry = history.add(root, rel, "decision", title,
                         what="created %s with rules.py init" % ", ".join(made)
@@ -477,7 +486,7 @@ def init(root, folder, goal, task=None) -> dict:
                     what="a project of its own inside this one, with its own tasks, history and questions",
                     extra={"task": task, "subproject": shown} if link else {"subproject": shown})
     return {"project": shown, "entry": entry, "parent": link,
-            "files": [(rel + "/" if rel else "") + m for m in made]}
+            "files": [(rel + "/" if rel else "") + records.RECORDS_DIR + "/" + m for m in made]}
 
 
 def children(root, project) -> dict:
@@ -489,9 +498,10 @@ def children(root, project) -> dict:
     base = root if proj == "." else root / proj
     out = {}
     for t in sorted(base.rglob(TASKS_NAME)):
-        if t.parent == base or "_backup" in t.parts:
+        owner = records.project_of_file(t)
+        if owner is None or owner == base or "_backup" in t.parts:
             continue
-        parts = t.parent.relative_to(root).parts
+        parts = owner.relative_to(root).parts
         if parts and parts[0].lower() in {x.lower() for x in lib.NOT_PROJECTS}:
             continue
         try:
@@ -499,7 +509,7 @@ def children(root, project) -> dict:
         except OSError:
             continue
         if (par.get("project") or "").strip("/") == proj and par.get("task"):
-            out.setdefault(par["task"], []).append(t.parent.relative_to(root).as_posix())
+            out.setdefault(par["task"], []).append(owner.relative_to(root).as_posix())
     return out
 
 

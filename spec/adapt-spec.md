@@ -333,7 +333,9 @@ from then on.
 
 ## 5. Records and communication
 
-Everything is a file, so everything can be read, even while a round runs.
+Everything is a file, so everything can be read, even while a round runs. rules-system keeps a folder's history
+and task files together in its `.rs` folder, and Adapt starts every agent's records without a
+questions file (`init --no-questions`).
 
 | Record | Kept by | Lives in | Survives the round |
 |---|---|---|---|

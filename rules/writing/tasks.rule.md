@@ -1,4 +1,4 @@
-RULE writing/tasks - TASKS.md is a project's live task window: just done, NOW, next. Every project keeps its own TASKS.md, HISTORY.jsonl and QUESTIONS.jsonl.
+RULE writing/tasks - TASKS.md is a project's live task window: just done, NOW, next. Every project keeps its own TASKS.md, HISTORY.jsonl and QUESTIONS.jsonl in <project>/.rs/.
 - FORMAT: heading "# 📋 TASKS · <project>", a **Goal:** line, a sub-project's **Parent:** <project>/ · <task> line, then one line per task ending in its short id (`t7`).
 - The window: ✅ done, at most 2, date at the end. 🔄 in progress, exactly 1, bold, "since <date>". ⛔ blocked, reason in its details. 🔜 not started, any number, no date. ❓ after the status icon marks an open question, ❗ an action waiting on the user.
 - Below "## Details": EVERY task has one short paragraph: what it is for and what done means. tasks add needs --details.

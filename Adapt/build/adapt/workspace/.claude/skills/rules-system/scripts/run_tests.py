@@ -478,7 +478,8 @@ def test_upkeep(tmp: Path):
         {"id": "2026-09-14-d", "ts": "2026-09-14", "kind": "run", "title": "t",
          "evidence": [no_results + "/"], "refs": ["writing/a"]},
     ]
-    (mech / "HISTORY.jsonl").write_text("\n".join(json.dumps(e) for e in events) + "\n", encoding="utf-8")
+    (mech / ".rs" / "HISTORY.jsonl").parent.mkdir(parents=True, exist_ok=True)
+    (mech / ".rs" / "HISTORY.jsonl").write_text("\n".join(json.dumps(e) for e in events) + "\n", encoding="utf-8")
 
     brief = upkeep.report(root, full=False, running=False)
     by = {c["name"]: c for c in brief}
@@ -495,7 +496,7 @@ def test_upkeep(tmp: Path):
     check("but it is counted in a note", by["RUN"]["note"] and "1 run(s)" in by["RUN"]["note"], by["RUN"]["note"])
     check("valid history reports nothing", by["HISTORY"]["count"] == 0, by["HISTORY"]["items"])
 
-    with open(mech / "HISTORY.jsonl", "a", encoding="utf-8") as f:
+    with open(mech / ".rs" / "HISTORY.jsonl", "a", encoding="utf-8") as f:
         f.write("{not json\n")
         f.write(json.dumps({"id": "x", "ts": "2026-09-14", "kind": "musing", "title": "t"}) + "\n")
         f.write(json.dumps({"id": "y", "kind": "note"}) + "\n")
@@ -559,25 +560,28 @@ def test_project_upkeep(tmp: Path):
     (root / "rules").mkdir(parents=True)
     old = root / "mech" / "old"
     old.mkdir(parents=True)
-    (old / "HISTORY.jsonl").write_text(json.dumps({"id": "a", "ts": "2026-09-01", "kind": "note", "title": "an old note"})
+    (old / ".rs" / "HISTORY.jsonl").parent.mkdir(parents=True, exist_ok=True)
+    (old / ".rs" / "HISTORY.jsonl").write_text(json.dumps({"id": "a", "ts": "2026-09-01", "kind": "note", "title": "an old note"})
                                        + "\n", encoding="utf-8")
     (root / ".claude" / "x").mkdir(parents=True)
-    (root / ".claude" / "x" / "HISTORY.jsonl").write_text("", encoding="utf-8")
+    (root / ".claude" / "x" / ".rs" / "HISTORY.jsonl").parent.mkdir(parents=True, exist_ok=True)
+    (root / ".claude" / "x" / ".rs" / "HISTORY.jsonl").write_text("", encoding="utf-8")
     (root / "_backup" / "y").mkdir(parents=True)
-    (root / "_backup" / "y" / "TASKS.md").write_text("junk\n", encoding="utf-8")
+    (root / "_backup" / "y" / ".rs" / "TASKS.md").parent.mkdir(parents=True, exist_ok=True)
+    (root / "_backup" / "y" / ".rs" / "TASKS.md").write_text("junk\n", encoding="utf-8")
 
     def items(now=None):
         return upkeep.check_projects(root, now=now)["items"]
 
     got = items()
     check("a project with only its history is reported, with the command that completes it",
-          any(i.startswith("mech/old/ has no TASKS.md or QUESTIONS.jsonl") and "rules.py init mech/old" in i for i in got), got)
+          any(i.startswith("mech/old/ has no TASKS.md") and "rules.py init mech/old" in i for i in got), got)
     check("records under .claude/ or _backup/ are no project", not any(".claude" in i or "_backup" in i for i in got), got)
-    before = (old / "HISTORY.jsonl").read_text(encoding="utf-8")
+    before = (old / ".rs" / "HISTORY.jsonl").read_text(encoding="utf-8")
     r = tasks.init(root, "mech/old", "bring the old project into the format")
     check("init completes an older project without touching its history lines",
-          (old / "HISTORY.jsonl").read_text(encoding="utf-8").startswith(before)
-          and r["entry"]["title"].startswith("project files completed") and (old / "QUESTIONS.jsonl").is_file())
+          (old / ".rs" / "HISTORY.jsonl").read_text(encoding="utf-8").startswith(before)
+          and r["entry"]["title"].startswith("project files completed") and (old / ".rs" / "QUESTIONS.jsonl").is_file())
     check("a complete, empty project reports nothing", items() == [], items())
 
     tasks.add(root, "mech/old", "the first task in the window", details="what the first task is for and what done means")
@@ -587,16 +591,17 @@ def test_project_upkeep(tmp: Path):
           items(later))
     check("and not before it", items() == [], items())
 
-    t = old / "TASKS.md"
+    t = old / ".rs" / "TASKS.md"
     t.write_text(t.read_text(encoding="utf-8").replace("**t1** ·", "**t9** ·"), encoding="utf-8")
     check("a TASKS.md out of format is reported with its problems", any("out of format" in i and "t1" in i for i in items()),
           items())
 
     (old / "sub").mkdir()
-    (old / "sub" / "HISTORY.jsonl").write_text("", encoding="utf-8")
+    (old / "sub" / ".rs" / "HISTORY.jsonl").parent.mkdir(parents=True, exist_ok=True)
+    (old / "sub" / ".rs" / "HISTORY.jsonl").write_text("", encoding="utf-8")
     check("a history-only subfolder inside a project is reported, with the merge and init commands",
           any(i.startswith("mech/old/sub/") and "history merge mech/old" in i and "init mech/old/sub" in i for i in items()), items())
-    (old / "sub" / "HISTORY.jsonl").unlink()
+    (old / "sub" / ".rs" / "HISTORY.jsonl").unlink()
     tasks.init(root, "mech/old/sub", "a sub-project made on purpose", task="t1")
     check("a sub-project made by init is not reported", not any(i.startswith("mech/old/sub/") for i in items()), items())
 
@@ -622,18 +627,18 @@ def test_root_and_parent(tmp: Path):
     (root / "other").mkdir()
     r = tasks.init(root, ".", "the whole repository's work")
     check("init . makes the repo root a project",
-          all((root / m).is_file() for m in ("HISTORY.jsonl", "TASKS.md", "QUESTIONS.jsonl")), r)
+          all((root / ".rs" / m).is_file() for m in ("HISTORY.jsonl", "TASKS.md", "QUESTIONS.jsonl")), r)
     check("the root's project is named '.' and is the last stop up the path",
           lib.project_of(root, "") == "." and lib.project_of(root, "other/x.py") == ".")
     check("machinery is never part of the root's project",
           lib.project_of(root, ".claude/x.py") is None and lib.project_of(root, "rules/a.rule.md") is None)
     history.add(root, "other", "note", "a note from a folder with no project of its own")
     check("a folder with no project of its own logs to the root's file, tagged with the folder",
-          any(e["title"] == "a note from a folder with no project of its own" and e["_file"] == "HISTORY.jsonl"
+          any(e["title"] == "a note from a folder with no project of its own" and e["_file"] == ".rs/HISTORY.jsonl"
               and history.effective_folder(e) == "other" for e in history.entries(root, ".")))
     (root / "sub").mkdir()
     check("a sub-project must name the parent task it serves", "--task" in refused(tasks.init, root, "sub", "the sub goal"))
-    check("and nothing is written when it does not", not (root / "sub" / "TASKS.md").exists())
+    check("and nothing is written when it does not", not (root / "sub" / ".rs" / "TASKS.md").exists())
     tasks.add(root, ".", "build the sub thing", details="the task a sub-project will be started for")
     check("the named task must be in the parent's window", "no task t9" in refused(tasks.init, root, "sub", "the sub goal", task="t9"))
     tasks.init(root, "sub", "the sub goal", task="t1")
@@ -691,7 +696,7 @@ def test_history(tmp: Path):
 
     e = history.add(root, "mech", "run", "ran scen_dev at three distances", result="entered at 4.0",
                     evidence=[RUN], refs=["writing/a"])["entry"]
-    check("history add creates the folder's HISTORY.jsonl", (root / "mech" / "HISTORY.jsonl").is_file())
+    check("history add creates the folder's HISTORY.jsonl", (root / "mech" / ".rs" / "HISTORY.jsonl").is_file())
     check("and stamps id, date, time and session", e["id"] == e["ts"] + "-ran-scen-dev-at-three-distances"
           and e["session"] == "test-session-1" and "T" in e["time"], e)
     history.add(root, "mech/sub", "finding", "a finding in the sub folder")
@@ -702,7 +707,7 @@ def test_history(tmp: Path):
 
     evs = history.entries(root, "mech")
     check("subfolder work lands in the project's file, tagged with its subfolder",
-          any(x["_file"] == "mech/HISTORY.jsonl" and history.effective_folder(x) == "mech/sub" for x in evs), evs)
+          any(x["_file"] == "mech/.rs/HISTORY.jsonl" and history.effective_folder(x) == "mech/sub" for x in evs), evs)
     check("and never a sibling folder", not any(x["_file"].startswith("other/") for x in evs))
     def body(text):
         return text.split("\n\n", 1)[-1]        # the entries, after the folder's state
@@ -717,7 +722,8 @@ def test_history(tmp: Path):
     check("every entry is one line", all(len(line) < 240 for line in txt.splitlines()))
     check("grep narrows a slice across the repo", "moved the probes" in history.render_slice(root, None, [], grep="probes"))
     check("a folder slice opens with the folder's state", history.render_slice(root, "mech", []).startswith("FOLDER mech/"))
-    (root / "mech" / "TASKS.md").write_text("TASKS mech - x\n- [x] 2026-09-12 done thing\n"
+    (root / "mech" / ".rs" / "TASKS.md").parent.mkdir(parents=True, exist_ok=True)
+    (root / "mech" / ".rs" / "TASKS.md").write_text("TASKS mech - x\n- [x] 2026-09-12 done thing\n"
                                              "- [ ] NOW 2026-09-13 current thing\n- [ ] next one\n- [ ] next two\n",
                                              encoding="utf-8")
     st = history.folder_state(root, "mech")
@@ -726,7 +732,7 @@ def test_history(tmp: Path):
     check("a project's state counts every entry in its file, subfolder work included", "10 entries" in st, st)
     check("show prints one entry in full", '"result": "entered at 4.0"' in history.show(root, e["id"]))
 
-    path = root / "mech" / "HISTORY.jsonl"
+    path = root / "mech" / ".rs" / "HISTORY.jsonl"
     lines_before = path.read_text(encoding="utf-8").splitlines()
     history.set_keys(path, e["id"], {"status": "closed"})
     after = path.read_text(encoding="utf-8").splitlines()
@@ -751,26 +757,26 @@ def test_project_history(tmp: Path):
     history.add(root, "mech/inv/garrison", "note", "an old garrison note", when="2026-08-01")
     history.add(root, "mech/inv/pickup", "finding", "an old pickup finding", when="2026-08-03")
     check("before a project file exists, a subfolder starts its own",
-          (root / "mech/inv/pickup/HISTORY.jsonl").is_file() and not (root / "mech/inv/HISTORY.jsonl").is_file())
+          (root / "mech/inv/pickup/.rs/HISTORY.jsonl").is_file() and not (root / "mech/inv/.rs/HISTORY.jsonl").is_file())
 
     dry = history.merge(root, "mech/inv", write=False)
-    check("a dry run writes nothing", dry["entries"] == 3 and not (root / "mech/inv/HISTORY.jsonl").is_file(), dry)
+    check("a dry run writes nothing", dry["entries"] == 3 and not (root / "mech/inv/.rs/HISTORY.jsonl").is_file(), dry)
     s = history.merge(root, "mech/inv", when="2026-09-13")
-    merged = [json.loads(l) for l in (root / "mech/inv/HISTORY.jsonl").read_text(encoding="utf-8").splitlines()]
+    merged = [json.loads(l) for l in (root / "mech/inv/.rs/HISTORY.jsonl").read_text(encoding="utf-8").splitlines()]
     check("every entry is merged, in date order, then the merge logs itself",
           [e["title"] for e in merged] == ["an old garrison note", "an old pickup note one", "an old pickup finding",
                                            "merged 2 subfolder histories into this project's HISTORY.jsonl"], merged)
     check("each merged entry keeps its subfolder", merged[0]["folder"] == "mech/inv/garrison/"
           and merged[1]["folder"] == "mech/inv/pickup/", merged[:2])
     check("the originals are moved to a dated backup, not deleted",
-          not (root / "mech/inv/pickup/HISTORY.jsonl").exists()
-          and (root / ".claude/_backup/history-merge-2026-09-13/mech/inv/pickup/HISTORY.jsonl").is_file())
+          not (root / "mech/inv/pickup/.rs/HISTORY.jsonl").exists()
+          and (root / ".claude/_backup/history-merge-2026-09-13/mech/inv/pickup/.rs/HISTORY.jsonl").is_file())
     check("merging again finds nothing to merge", "no subfolder histories" in _err(lambda: history.merge(root, "mech/inv")))
 
     e = history.add(root, "mech/inv/pickup", "note", "a new note from the pickup subfolder")["entry"]
     check("new subfolder work goes to the project's file, with its folder",
-          e["_file"] == "mech/inv/HISTORY.jsonl" and e["folder"] == "mech/inv/pickup/", e)
-    check("no subfolder file is created again", not (root / "mech/inv/pickup/HISTORY.jsonl").exists())
+          e["_file"] == "mech/inv/.rs/HISTORY.jsonl" and e["folder"] == "mech/inv/pickup/", e)
+    check("no subfolder file is created again", not (root / "mech/inv/pickup/.rs/HISTORY.jsonl").exists())
     sub = history.render_slice(root, "mech/inv/pickup", [])
     check("a subfolder slice shows only that subfolder's entries",
           "pickup" in sub and "garrison note" not in sub, sub)
@@ -835,7 +841,7 @@ def test_candidates(tmp: Path):
         def read(p):
             return [json.loads(line) for line in p.read_text(encoding="utf-8").splitlines() if line.strip()]
 
-        folder_file = root / "mech" / "HISTORY.jsonl"
+        folder_file = root / "mech" / ".rs" / "HISTORY.jsonl"
         master = history.master_path(root)
         c = candidates.park(root, FACT, "mech", run=RUN, nearest=near())["candidate"]
         check("the master copy lives in data/<repo root name>/candidates.jsonl",
@@ -1012,7 +1018,8 @@ def test_viewer(tmp: Path):
              "**t1** · The first thing, now done.\n\n**t2** · What is happening, over\ntwo source lines.\n\n"
              "**t3** · Waiting for the dataset.\n\n**t4** · The next one to do.\n\n**t5** · The one after that.\n\n"
              "**t6** · The third one waiting.\n")
-    (root / "mech/inv/TASKS.md").write_text(TASKS, encoding="utf-8")
+    (root / "mech/inv/.rs/TASKS.md").parent.mkdir(parents=True, exist_ok=True)
+    (root / "mech/inv/.rs/TASKS.md").write_text(TASKS, encoding="utf-8")
     p = tasks.parse(TASKS)
     now = [t for t in p["tasks"] if t["status"] == "now"][0]
     check("tasks parse: heading, goal and every status", p["project"] == "mech/inv" and p["goal"].startswith("make items")
@@ -1120,7 +1127,7 @@ def test_tasks_commands(tmp: Path):
     (root / "rules").mkdir(parents=True)
     r = tasks.init(root, "mech/newthing", "make the new thing work")
     base = root / "mech/newthing"
-    check("init creates the three files", all((base / m).exists() for m in ("HISTORY.jsonl", "TASKS.md", "QUESTIONS.jsonl")))
+    check("init creates the three files", all((base / ".rs" / m).exists() for m in ("HISTORY.jsonl", "TASKS.md", "QUESTIONS.jsonl")))
     check("and logs the project's start", r["entry"]["title"] == "project started: make the new thing work")
     p = tasks.load(root, "mech/newthing")
     check("a fresh TASKS.md is in format, with its goal and no tasks", p["goal"] == "make the new thing work"
@@ -1214,14 +1221,14 @@ def test_tasks_commands(tmp: Path):
     check("a question needs a task in the window", "no task" in refused(questions.ask, root, proj, "t99", "is this the right map size?"))
     q = questions.ask(root, proj, now, "should the probe use the small or the large map?")
     check("ask writes a numbered question tied to its task", q["id"] == "q1" and q["task"] == now)
-    raw = (root / proj / "TASKS.md").read_text(encoding="utf-8")
+    raw = (root / proj / ".rs" / "TASKS.md").read_text(encoding="utf-8")
     check("the task line shows the question mark while it is unanswered", "❓" in raw, raw)
     check("the folder state counts the open question", "1 open for the user" in history.folder_state(root, proj))
     check("answers with nothing answered consumes nothing", questions.consume(root, proj) == []
           and len(questions.read(root, proj)) == 1)
     questions.answer(root, proj, "q1", "the small map, it loads in half the time")
     check("an answer is refused twice", "already answered" in refused(questions.answer, root, proj, "q1", "the large map after all"))
-    check("an answered question takes the question mark off", "❓" not in (root / proj / "TASKS.md").read_text(encoding="utf-8"))
+    check("an answered question takes the question mark off", "❓" not in (root / proj / ".rs" / "TASKS.md").read_text(encoding="utf-8"))
     check("the folder state says an answer is waiting", "1 answered, waiting" in history.folder_state(root, proj))
     got = questions.consume(root, proj)
     dec = [e for e in history.entries(root, proj) if e.get("question") == "q1"]
@@ -1260,14 +1267,14 @@ def test_tasks_commands(tmp: Path):
     check("an action needs a task in the window", "no task" in refused(questions.act, root, proj, "t99", "log in to GitHub once"))
     a = questions.act(root, proj, now, "run gh auth login once in a terminal")
     check("act writes a numbered action tied to its task", a["id"] == "a1" and a["task"] == now and a["kind"] == "action")
-    raw = (root / proj / "TASKS.md").read_text(encoding="utf-8")
+    raw = (root / proj / ".rs" / "TASKS.md").read_text(encoding="utf-8")
     check("the task line shows the exclamation mark while the action is open", "❗" in raw and "❓" not in raw, raw)
     check("the parsed window carries the action mark", [k for k in tasks.load(root, proj)["tasks"] if k["id"] == now][0]["action"])
     check("the folder state counts the open action", "1 action for the user" in history.folder_state(root, proj))
     check("an action is not answered like a question", "is an action" in refused(questions.answer, root, proj, a["id"], "done it now"))
     check("a question is not marked done like an action", "is a question" in refused(
         questions.acted, root, proj, questions.ask(root, proj, now, "which of the two maps loads faster?")["id"]))
-    both = (root / proj / "TASKS.md").read_text(encoding="utf-8")
+    both = (root / proj / ".rs" / "TASKS.md").read_text(encoding="utf-8")
     check("a task can carry both marks, question first", "❓ ❗" in both, both)
     check("render and parse round-trip with both marks", tasks.parse(tasks.render(tasks.load(root, proj)))["tasks"]
           == tasks.load(root, proj)["tasks"])
@@ -1276,7 +1283,7 @@ def test_tasks_commands(tmp: Path):
     check("wait does not return for an action still open", questions.wait(root, proj, timeout=0.1, interval=0.05) == [])
     questions.acted(root, proj, a["id"], "logged in as the repo owner")
     check("acted is refused twice", "already done" in refused(questions.acted, root, proj, a["id"]))
-    check("a done action takes the exclamation mark off", "❗" not in (root / proj / "TASKS.md").read_text(encoding="utf-8"))
+    check("a done action takes the exclamation mark off", "❗" not in (root / proj / ".rs" / "TASKS.md").read_text(encoding="utf-8"))
     check("wait returns at once when an action is done", [x["id"] for x in questions.wait(root, proj, timeout=5)] == [a["id"]])
     got = questions.consume(root, proj)
     note = [e for e in history.entries(root, proj) if e.get("action") == a["id"]]
@@ -1317,15 +1324,16 @@ def test_review_fixes(tmp: Path):
     other = tmp / "rootlog_repo"
     other.mkdir()
     history.add(other, ".", "note", "a note for the whole repository")
-    check("the repo root may keep a history of its own (the user, 2026-09-14)", (other / "HISTORY.jsonl").is_file())
-    check("no history file was written outside the repo", not (tmp / "HISTORY.jsonl").exists())
+    check("the repo root may keep a history of its own (the user, 2026-09-14)", (other / ".rs" / "HISTORY.jsonl").is_file())
+    check("no history file was written outside the repo", not (tmp / ".rs" / "HISTORY.jsonl").exists())
     check("--numbers refuses NaN and infinity", "finite" in err(history.add, root, "mech", "note", "a note here", numbers=["x=nan"])
           and "finite" in err(history.add, root, "mech", "note", "a note here", numbers=["x=inf"]))
 
     (root / "mech" / "b").mkdir()
     history.add(root, "mech/a", "note", "a note in a", when="2026-08-01")
-    same = json.loads([l for l in (root / "mech/a/HISTORY.jsonl").read_text(encoding="utf-8").splitlines()][0])
-    (root / "mech/b/HISTORY.jsonl").write_text(json.dumps(same) + "\n", encoding="utf-8")
+    same = json.loads([l for l in (root / "mech/a/.rs/HISTORY.jsonl").read_text(encoding="utf-8").splitlines()][0])
+    (root / "mech/b/.rs/HISTORY.jsonl").parent.mkdir(parents=True, exist_ok=True)
+    (root / "mech/b/.rs/HISTORY.jsonl").write_text(json.dumps(same) + "\n", encoding="utf-8")
     check("merge refuses an id that two source files share", "appears in both" in err(history.merge, root, "mech"))
 
     p = root / "mech/mixed.jsonl"
@@ -1335,9 +1343,9 @@ def test_review_fixes(tmp: Path):
     check("set_keys finds a line in a file with mixed line endings, and keeps each ending",
           b'"status": "closed"}\n{"id": "three"}\r\n' in raw and raw.startswith(b'{"id": "one", "kind": "note"}\r\n'), raw)
 
-    t = root / "mech/TASKS.md"
+    t = root / "mech/.rs/TASKS.md"
     tasks.init(root, "proj", "a goal for the project")
-    tp = root / "proj/TASKS.md"
+    tp = root / "proj/.rs/TASKS.md"
     legacy = tp.read_text(encoding="utf-8").replace("## Details", "- [ ] an old checkbox task\n\nsome prose\n\n## Details")
     tp.write_text(legacy, encoding="utf-8")
     check("a tasks write refuses a file whose lines the format cannot keep", "cannot keep" in err(tasks.add, root, "proj", "a new task", details="a paragraph for the new task"))
@@ -1374,7 +1382,8 @@ def test_review_fixes(tmp: Path):
         master.parent.mkdir(parents=True, exist_ok=True)
         master.write_text("[1, 2]\n", encoding="utf-8")
         check("upkeep reports a master line that is not a candidate", any("not a candidate" in x for x in upkeep.candidate_problems(root, [])))
-        (root / "mech/a/TASKS.md").write_text("", encoding="utf-8")
+        (root / "mech/a/.rs/TASKS.md").parent.mkdir(parents=True, exist_ok=True)
+        (root / "mech/a/.rs/TASKS.md").write_text("", encoding="utf-8")
         check("the viewer payload skips a master line that is not an object", viewer.payload(root, "mech/a")["candidates"] == [])
     finally:
         history.DATA_BASE = real

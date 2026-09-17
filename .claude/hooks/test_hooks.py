@@ -575,7 +575,8 @@ def test_focus(root: Path, state: Path):
     """The router remembers which project a session works in, for rules.py view."""
     print("session focus")
     env = {"CLAUDE_PROJECT_DIR": str(root), "CLAUDE_RULE_STATE_DIR": str(state)}
-    (root / "mechanics" / "HISTORY.jsonl").write_text("", encoding="utf-8")
+    (root / "mechanics" / ".rs" / "HISTORY.jsonl").parent.mkdir(parents=True, exist_ok=True)
+    (root / "mechanics" / ".rs" / "HISTORY.jsonl").write_text("", encoding="utf-8")
     try:
         run("rule_router.py", {"cwd": str(root), "session_id": "focus-1", "tool_name": "Read",
                                "tool_input": {"file_path": str(root / "mechanics" / "thing.xs")}}, env)
@@ -583,7 +584,7 @@ def test_focus(root: Path, state: Path):
         got = json.loads(p.read_text(encoding="utf-8")) if p.is_file() else {}
         check("touching a file in a project records it as the session's focus", got.get("project") == "mechanics", got)
     finally:
-        (root / "mechanics" / "HISTORY.jsonl").unlink()
+        (root / "mechanics" / ".rs" / "HISTORY.jsonl").unlink()
 
 
 def test_no_silent_changes(root: Path, state: Path):
@@ -593,8 +594,10 @@ def test_no_silent_changes(root: Path, state: Path):
     a, b = root / "mechanics", root / "patterns_nsc"
     a.mkdir(exist_ok=True)
     b.mkdir(exist_ok=True)
-    (a / "HISTORY.jsonl").write_text("", encoding="utf-8")
-    (b / "HISTORY.jsonl").write_text("", encoding="utf-8")
+    (a / ".rs" / "HISTORY.jsonl").parent.mkdir(parents=True, exist_ok=True)
+    (a / ".rs" / "HISTORY.jsonl").write_text("", encoding="utf-8")
+    (b / ".rs" / "HISTORY.jsonl").parent.mkdir(parents=True, exist_ok=True)
+    (b / ".rs" / "HISTORY.jsonl").write_text("", encoding="utf-8")
 
     def ctx(sid, tool, path):
         ti = {"file_path": str(path)}
@@ -612,11 +615,12 @@ def test_no_silent_changes(root: Path, state: Path):
         check("reading is never a change", "NO SILENT CHANGES" not in
               ctx("nsc-2", "Read", a / "t.xs") + ctx("nsc-2", "Read", b / "x.py"))
         ctx("nsc-3", "Edit", a / "thing.xs")
-        (a / "HISTORY.jsonl").write_text(json.dumps({"id": "z", "ts": "2099-01-01", "time": "2099-01-01T00:00:00",
+        (a / ".rs" / "HISTORY.jsonl").parent.mkdir(parents=True, exist_ok=True)
+        (a / ".rs" / "HISTORY.jsonl").write_text(json.dumps({"id": "z", "ts": "2099-01-01", "time": "2099-01-01T00:00:00",
                                                      "kind": "change", "title": "logged it"}) + "\n", encoding="utf-8")
         check("a change logged before moving on is not reminded", "NO SILENT CHANGES" not in ctx("nsc-3", "Read", b / "x.py"))
     finally:
-        (a / "HISTORY.jsonl").unlink()
+        (a / ".rs" / "HISTORY.jsonl").unlink()
         shutil.rmtree(b, ignore_errors=True)
 
 
@@ -626,8 +630,10 @@ def test_answers_waiting(root: Path, state: Path):
     env = {"CLAUDE_PROJECT_DIR": str(root), "CLAUDE_RULE_STATE_DIR": str(state)}
     a = root / "mechanics"
     a.mkdir(exist_ok=True)
-    (a / "HISTORY.jsonl").write_text("", encoding="utf-8")
-    (a / "QUESTIONS.jsonl").write_text(json.dumps({"id": "q1", "task": "t1", "question": "which map?", "answer":
+    (a / ".rs" / "HISTORY.jsonl").parent.mkdir(parents=True, exist_ok=True)
+    (a / ".rs" / "HISTORY.jsonl").write_text("", encoding="utf-8")
+    (a / ".rs" / "QUESTIONS.jsonl").parent.mkdir(parents=True, exist_ok=True)
+    (a / ".rs" / "QUESTIONS.jsonl").write_text(json.dumps({"id": "q1", "task": "t1", "question": "which map?", "answer":
                                                    "the small one", "answered": "2026-09-14T10:00:00"}) + "\n",
                                        encoding="utf-8")
 
@@ -642,8 +648,8 @@ def test_answers_waiting(root: Path, state: Path):
               "ANSWERS WAITING" in got and "q1" in got and "tasks --in mechanics answers" in got, got[-300:])
         check("and only once", "ANSWERS WAITING" not in ctx("ans-1"))
     finally:
-        (a / "HISTORY.jsonl").unlink()
-        (a / "QUESTIONS.jsonl").unlink()
+        (a / ".rs" / "HISTORY.jsonl").unlink()
+        (a / ".rs" / "QUESTIONS.jsonl").unlink()
 
 
 def test_changed_rule(root: Path, state: Path):

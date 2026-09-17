@@ -63,9 +63,11 @@ def projects(root) -> list:
     """Every project folder, most recently changed first."""
     root = Path(root)
     found = {}
+    import records
     for p in lib.walk_repo(root, prune_test_runs=True):
-        if p.name in lib.PROJECT_MARKERS:
-            rel = p.parent.relative_to(root).as_posix()
+        owner = records.project_of_file(p)
+        if owner is not None:
+            rel = owner.relative_to(root).as_posix()
             if not rel.startswith(".claude"):
                 found[rel] = max(found.get(rel, 0), p.stat().st_mtime)
     return [k for k, _ in sorted(found.items(), key=lambda kv: -kv[1])]
@@ -103,11 +105,12 @@ def resolve_project(root, folder=None, cwd=None, session=None):
 
 def _watched(root, project):
     root = Path(root)
-    paths = [root / project / m for m in lib.PROJECT_MARKERS]
+    import records
+    paths = [records.path(root / project, m) for m in lib.PROJECT_MARKERS]
     paths.append(history.master_path(root))
     # an unmerged subfolder history is on the page too, so a change to it must redraw the page
-    paths += sorted(p for p in (root / project).rglob("HISTORY.jsonl")
-                    if p.parent != root / project and "_backup" not in p.parts)
+    paths += sorted(p for p in (root / project).rglob(records.HISTORY)
+                    if records.project_of_file(p) not in (None, root / project) and "_backup" not in p.parts)
     return paths
 
 
@@ -129,7 +132,8 @@ def payload(root, project) -> dict:
         clean = {k: v for k, v in e.items() if not k.startswith("_")}
         clean["_folder"] = history.effective_folder(e)
         entries.append(clean)
-    t = root / project / history.TASKS_NAME
+    import records
+    t = records.path(root / project, history.TASKS_NAME)
     parsed = tasks_mod.parse(t.read_text(encoding="utf-8", errors="replace")) if t.is_file() else None
     import questions
     asked = questions.read(root, project)

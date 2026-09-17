@@ -96,8 +96,12 @@ folding a fact into an existing rule is fine. When the pass cannot run, approval
 
 ## What makes a project
 
-A project is a folder in the work tree holding any of HISTORY.jsonl, TASKS.md or QUESTIONS.jsonl; never under
-.claude/, rules/ or test_runs/. Projects nest: `rules.py init <subfolder>` inside a project starts a sub-project
+A project is a folder in the work tree whose `.rs` folder holds any of HISTORY.jsonl, TASKS.md or
+QUESTIONS.jsonl; never under .claude/, rules/ or test_runs/. The three files always live together in
+`<project>/.rs/` (the user, 2026-09-17), found through `scripts/records.py`. QUESTIONS.jsonl is optional:
+`init --no-questions` starts a project no person answers without it, and upkeep does not report it missing.
+Records still sitting directly in a folder are the old layout; `rules.py migrate` moves them, with `git mv`
+when git tracks them, and logs the move in each project. Projects nest: `rules.py init <subfolder>` inside a project starts a sub-project
 with its own tasks, history and questions, and logs that in the parent's history. Records always go to the
 nearest project file up the path from the folder a command names or runs in, and `history merge` never folds in
 a sub-project's history. The repo root can be a project too (`init .`), the last stop up the path. A sub-project

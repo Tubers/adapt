@@ -409,27 +409,31 @@ def _state_path(session_id: str) -> Path:
     return d / f"{safe}.json"
 
 
-PROJECT_MARKERS = ("HISTORY.jsonl", "TASKS.md", "QUESTIONS.jsonl")
+PROJECT_MARKERS = ("HISTORY.jsonl", "TASKS.md", "QUESTIONS.jsonl")   # held in <project>/.rs/: records.py
+RECORDS_DIR = ".rs"
 NOT_PROJECTS = {".claude", "rules", "test_runs"}
 ROOT_PROJECT = "."          # the repo root, when it holds a project's files itself
 
 
 def project_of(root: Path, rel: str):
-    """The project a path belongs to: the nearest folder at or above it holding a HISTORY.jsonl, TASKS.md
-    or QUESTIONS.jsonl, below the repo root. None for a path in no project."""
+    """The project a path belongs to: the nearest folder at or above it whose .rs folder holds a HISTORY.jsonl,
+    TASKS.md or QUESTIONS.jsonl, below the repo root. None for a path in no project. A path inside a .rs folder
+    belongs to the folder holding it."""
     rel = (rel or "").replace("\\", "/").strip().strip("/")
     root = Path(root)
     # the repo root is the last stop up the path when it keeps a project's files itself (the user, 2026-09-14)
-    at_root = ROOT_PROJECT if any((root / m).is_file() for m in PROJECT_MARKERS) else None
+    at_root = ROOT_PROJECT if any((root / RECORDS_DIR / m).is_file() for m in PROJECT_MARKERS) else None
     if not rel or rel == ".":
         return at_root
     parts = Path(rel).parts
+    if RECORDS_DIR in parts:
+        parts = parts[:parts.index(RECORDS_DIR)] + ("_",)   # a record file: its project is the folder above .rs
     if not parts or parts[0].lower() in {x.lower() for x in NOT_PROJECTS} or parts[0] == "..":
         return None             # outside the repo, or machinery that is never a project
     n = len(parts) if root.joinpath(*parts).is_dir() else len(parts) - 1
     for k in range(n, 0, -1):
         d = root.joinpath(*parts[:k])
-        if any((d / m).is_file() for m in PROJECT_MARKERS):
+        if any((d / RECORDS_DIR / m).is_file() for m in PROJECT_MARKERS):
             return Path(*parts[:k]).as_posix()
     return at_root
 
@@ -518,7 +522,7 @@ def note_change(root: Path, session_id: str, tool: str, rels) -> None:
 
 def logged_since(root: Path, project: str, since: str) -> bool:
     """True when the project's history holds an entry stamped at or after `since`."""
-    p = Path(root) / project / "HISTORY.jsonl"
+    p = Path(root) / project / RECORDS_DIR / "HISTORY.jsonl"
     try:
         lines = p.read_text(encoding="utf-8", errors="replace").splitlines()
     except OSError:
@@ -577,7 +581,7 @@ def answers_waiting(root: Path, session_id: str, project) -> str | None:
     if not project:
         return None
     try:
-        lines = (Path(root) / project / "QUESTIONS.jsonl").read_text(encoding="utf-8", errors="replace").splitlines()
+        lines = (Path(root) / project / RECORDS_DIR / "QUESTIONS.jsonl").read_text(encoding="utf-8", errors="replace").splitlines()
     except OSError:
         return None
     ids = []

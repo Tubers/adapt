@@ -47,6 +47,6 @@
 
 **t13** · Scan the host's sibling skills into config.json with default per-skill options, and a discovery script that keys in a skill added later. Done when adding a skill to the fixture and rerunning discovery adds exactly that key.
 
-**t14** · Create the manager's history and task files in manager_home with the vendored rules-system. Its init also creates a questions file, which Adapt does not use: remove it. Done when rules.py tasks on manager_home shows an empty window with the manager's goal and no questions file is left.
+**t14** · Create the manager's records in manager_home with the vendored rules-system: rules.py init <manager_home> --no-questions, which writes only the history and task files into manager_home/.rs/. Done when rules.py tasks on manager_home shows an empty window with the manager's goal and no questions file exists.
 
 **t15** · A second init changes nothing and says so; an uninstall leaves the host byte-identical to before init. Done when both are tested on a fixture host.

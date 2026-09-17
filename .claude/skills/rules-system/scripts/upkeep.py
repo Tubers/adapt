@@ -40,6 +40,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+import records  # noqa: E402
 import rules_lib as lib  # noqa: E402
 
 # R3 applies to runs stamped AFTER this day. 273 runs predate it and 18 of those are linked from any
@@ -152,7 +153,7 @@ def check_index(root: Path, running: bool = False) -> dict:
 def history_files(root: Path):
     out = []
     for p in lib.walk_repo(root, prune_test_runs=True):
-        if p.name != HISTORY_NAME:
+        if p.name != HISTORY_NAME or p.parent.name != records.RECORDS_DIR:
             continue
         parts = p.relative_to(root).parts
         if parts and parts[0] == ".claude":
@@ -369,22 +370,27 @@ def check_candidates(events, now=None, days: int = CANDIDATE_DAYS) -> dict:
             fresh += 1
             continue
         items.append("%s in %s/, pending %d days: %s"
-                     % (e.get("id"), Path(e["_file"]).parent.as_posix(), age, str(e.get("title", ""))[:80]))
+                     % (e.get("id"), Path(e["_file"]).parent.as_posix().removesuffix("/.rs").removesuffix(".rs") or ".", age, str(e.get("title", ""))[:80]))
     note = "%d more parked in the last %d days" % (fresh, days) if fresh else None
     return result("CANDIDATE", items, "rules.py candidates next --repo <repo>", note=note)
 
 
 def project_folders(root: Path):
-    """{project: markers present} and [(subfolder, its project)] for a marker file nested inside a project.
+    """{project: markers present}, [(subfolder, its project)] for a marker file nested inside a project, and
+    [folder] for record files still in the old place, directly in a folder instead of its .rs folder.
 
     A PROJECT is a folder in the work tree holding any of HISTORY.jsonl, TASKS.md or QUESTIONS.jsonl. Projects
     may nest: a sub-project holds its own TASKS.md or QUESTIONS.jsonl (the user, 2026-09-14). Never under
     .claude/, rules/ or test_runs/."""
-    found = {}
+    found, legacy = {}, set()
     for p in lib.walk_repo(root, prune_test_runs=True):
         if p.name not in lib.PROJECT_MARKERS:
             continue
-        parts = p.parent.relative_to(root).parts
+        owner = records.project_of_file(p)
+        if owner is None:
+            legacy.add(p.parent)
+            continue
+        parts = owner.relative_to(root).parts
         if parts and (parts[0].lower() in {x.lower() for x in lib.NOT_PROJECTS} or set(parts) & SKIP_PARTS):
             continue
         found.setdefault(Path(*parts).as_posix() if parts else ".", set()).add(p.name)
@@ -398,22 +404,29 @@ def project_folders(root: Path):
             nested.append((rel, owner))
         else:
             projects[rel] = found[rel]
-    return projects, nested
+    legacy_rels = []
+    for d in sorted(legacy):
+        parts = d.relative_to(root).parts
+        if parts and (parts[0].lower() in {x.lower() for x in lib.NOT_PROJECTS} or set(parts) & SKIP_PARTS):
+            continue
+        legacy_rels.append(Path(*parts).as_posix() if parts else ".")
+    return projects, nested, legacy_rels
 
 
 def check_projects(root: Path, now=None, stale_days: int = STALE_DAYS) -> dict:
     import tasks
     now = now or datetime.date.today()
-    projects, nested = project_folders(root)
-    items = []
+    projects, nested, legacy = project_folders(root)
+    items = ["%s/ keeps its records outside its .rs folder. Move them: rules.py migrate" % rel for rel in legacy]
     for rel, have in projects.items():
-        missing = [m for m in lib.PROJECT_MARKERS if m not in have]
+        # QUESTIONS is optional: a project no person answers is started with init --no-questions
+        missing = [m for m in (records.HISTORY, records.TASKS) if m not in have]
         if missing:
             items.append("%s/ has no %s. Complete it: rules.py init %s --goal \"<goal>\""
                          % (rel, " or ".join(missing), rel))
         if tasks.TASKS_NAME not in have:
             continue
-        p = tasks.parse((root / rel / tasks.TASKS_NAME).read_text(encoding="utf-8", errors="replace"))
+        p = tasks.parse(records.path(root / rel, tasks.TASKS_NAME).read_text(encoding="utf-8", errors="replace"))
         if p["problems"]:
             items.append("%s/TASKS.md is out of format: %s" % (rel, "; ".join(p["problems"])[:200]))
         for k in p["tasks"]:

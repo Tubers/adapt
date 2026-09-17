@@ -50,5 +50,5 @@ Hooks: `.claude/hooks/`, listed in `repo/hooks`. Firing log: `.claude/rules-firi
 Generated from each folder's README by `rules.py sync`. Do not edit by hand.
 
 <!-- BEGIN GENERATED readme-triggers -->
-
+- `Adapt/build/adapt/README.md` | `writing/readme-and-rules.rule.md`
 <!-- END GENERATED readme-triggers -->

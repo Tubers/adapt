@@ -31,7 +31,8 @@ All are `python .claude/skills/rules-system/scripts/rules.py <command>`.
 | `tasks [show\|add\|start\|done\|block\|unblock\|drop\|detail\|goal] [--in F]` | read or change a project's TASKS.md; the only way it is written |
 | `tasks ask <task> "<q>"` / `answer <q> "<a>"` / `questions` / `answers` | a project's questions for the user; `answers` logs each answer as a decision and removes it |
 | `tasks act <task> "<what to do>"` / `acted <a> ["<note>"]` | an action only the user can do; the task shows ❗ until the user marks it done; `answers` logs it as a note |
-| `init <folder> --goal G` | start a project: HISTORY.jsonl, TASKS.md, QUESTIONS.jsonl |
+| `init <folder> --goal G [--no-questions]` | start a project: HISTORY.jsonl, TASKS.md, QUESTIONS.jsonl in `<folder>/.rs/` |
+| `migrate [--dry-run]` | move record files from the old place into each project's `.rs` folder |
 | `view [folder]` | a project's tasks, history and candidates as one live browser page; no folder needed inside a project |
 | `history show <id>` | one history entry in full |
 | `history add <folder> --kind K --title T ...` | write one stamped history entry; the only way entries are made |
@@ -55,6 +56,7 @@ All are `python .claude/skills/rules-system/scripts/rules.py <command>`.
 |---|---|
 | `scripts/rules.py` | the CLI; every command above |
 | `scripts/rules_lib.py` | gate parsing and matching, README discovery, firing log, index sync, budget |
+| `scripts/records.py` | where a project's three record files live: `<project>/.rs/` |
 | `scripts/history.py` | stamped HISTORY.jsonl writes, slices, folder state, the one in-place key change |
 | `scripts/candidates.py` | park, queue and decide; the newness, contradiction and scope checks |
 | `scripts/upkeep.py` | the upkeep classes and `--stats` |
