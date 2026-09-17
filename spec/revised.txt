@@ -360,6 +360,11 @@ Round (proposed; open: t12):
 	A round can grow: the manager may ratify a request raised inside the round and add it as an item.
 	A round can be reordered: when the manager promotes an internal tool above the external request, the external request waits for the next round.
 	For now the user starts a round. Later the manager might start one itself. How much work a single round takes on is still open.
+	Starting and chaining rounds (user, 2026-09-17):
+	- No cold start. When the manager is not running, nothing automatic launches it. Only an external instance invoking the Adapt skill command launches the manager and starts a round.
+	- The invocation can be specific: one round on one named request, or a batch of rounds on several requests for the same skill.
+	- A manager already running may chain further rounds on the same skill, back to back, when it sees inbox requests for that skill that are fit to become work items. Never on another skill.
+	- It may also run rounds on helper tools that serve those work items. Putting a helper tool ahead of a work item is the manager's own priority judgement, and only the manager's.
 	Rounds are stateless with respect to each other (user, 2026-09-16). The instances of a round concern themselves only with that round's work, and a round never carries a follow-up of an earlier round's work. What does persist between rounds is the inbox, the work folders, the home folders and the rules; a later manager ratifying an earlier manager's request is reading the inbox, not inheriting a round. A host agent unhappy with a delivered result therefore files a new request (inferred from statelessness; not yet confirmed).
 	Each round leaves a folder behind, generated automatically, in a rounds folder that belongs to the manager:
 	- a file of references to the work items the round touched, by id or path;

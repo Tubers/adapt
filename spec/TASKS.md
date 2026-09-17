@@ -2,12 +2,11 @@
 
 **Goal:** revise the Adapt skill spec with the user: spec/original.txt is the untouched first draft, spec/revised.txt the working revision
 
-- ✅ separate NEW, EXTEND and REPAIR, and define amalgamation · *2026-09-16* `t9`
 - ✅ place META TOOLS: root folder, inner skill, or both · *2026-09-17* `t25`
+- ✅ define a round · *2026-09-17* `t12`
 - 🔄 **fold in the user's own changes to the spec** · *since 2026-09-15* `t1`
 - 🔜 specify the request form and its python generator `t10`
 - 🔜 fix When to Trigger and the duplicate check `t11`
-- 🔜 ❓ define a round `t12`
 - 🔜 manager launch: --bare or a normal session fenced by settings `t13`
 - 🔜 specialists as subagents, not agent teams; haiku worker lifecycle `t15`
 - 🔜 constant rules: a rules-system config for rules never removed or modified `t16`
@@ -56,17 +55,15 @@
 
 ## Details
 
-**t9** · Categories settled: NEW holds work folders for entirely new skills, wrappers included; EXTEND for extensions of an existing skill; REPAIR for fixes; the original NEW wording is marked revised in the spec. Still open: the amalgamation proposal, merging requests that name the same skill and need into one work folder, awaits the user. Done when it is accepted or changed.
-
 **t25** · The spec keeps META TOOLS as a root folder, and specialists are preloaded with it as a skill, which lives in .claude/skills/. Decide the one real location and how the other refers to it. Done when the spec names it.
+
+**t12** · A round is one start-to-finish cycle on one work item, with the five steps in spec/revised.txt. Only an internal tool that improves delivery of that item may join it, judged on speed, usage and token efficiency, or ease of implementation. The round can grow by ratification and be reordered when a tool is promoted, in which case the external request waits for the next round. Open: when the manager may start a round itself. Done when the user accepts.
 
 **t1** · The user has many changes of their own: some needed, some functional alternatives judged better than the original. Take each in chat, write it into spec/revised.txt, and split out any that opens a new question as its own task. Done when the user says the list is exhausted.
 
 **t10** · The form is an interview invoked from the shim's SKILL.md, with different questions for a new capability, an extension and a repair. It captures the surface: inputs and what they deliver, or for a repair input x, actual z, expected y. It never asks about implementation. It is dynamic, routing on parsed answers (t51), and aims to capture everything in one pass. Needed: the question sets, the generator, where the filled form lands. Done when a request can be filed end to end.
 
 **t11** · When to Trigger now names INBOX (done under t3). Still open: before filing, an instance checks for a similar request; vector-search could do that check by meaning. Done when the trigger conditions and the duplicate check are defined.
-
-**t12** · A round is one start-to-finish cycle on one work item, with the five steps in spec/revised.txt. Only an internal tool that improves delivery of that item may join it, judged on speed, usage and token efficiency, or ease of implementation. The round can grow by ratification and be reordered when a tool is promoted, in which case the external request waits for the next round. Open: when the manager may start a round itself. Done when the user accepts.
 
 **t13** · One claude -p run per round in the workspace, no --bare and no resume. The comparison and the untested list live in spec/launch-options.md. Exclusions regenerated per launch (t26); bundled skills, built-in agents, plugins, auto memory and MCP off (t27). Left here: write the launch command with its permission mode and output capture, test --setting-sources project,local, test crossSessionInbound accept. Done when a run shows nothing host or personal.
 
