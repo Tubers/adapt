@@ -10,7 +10,7 @@
 - 🔜 ❓ define a round `t12`
 - 🔜 manager launch: --bare or a normal session fenced by settings `t13`
 - 🔜 specialists as subagents, not agent teams; haiku worker lifecycle `t15`
-- 🔜 ❓ constant rules: a rules-system config for rules never removed or modified `t16`
+- 🔜 constant rules: a rules-system config for rules never removed or modified `t16`
 - 🔜 agent system prompts for manager, specialist-medium and specialist-low `t17`
 - 🔜 protocol rules for specialists and manager, and how they attach at spawn `t18`
 - 🔜 friction entries: history kind, threshold hook, similarity grouping `t19`
@@ -50,6 +50,7 @@
 - 🔜 surface documents: format, the updater after merge, and the cross-skill index `t69`
 - 🔜 metrics file per home, and the hooks that keep it current `t70`
 - 🔜 caveman and rtk on by default for every agent `t71`
+- 🔜 later: proposals from instances to the central Adapt repository `t72`
 
 ---
 
@@ -71,7 +72,7 @@
 
 **t15** · Docs: agent teams need an interactive session, never -p. Subagents may spawn subagents by default, 3 layers deep; CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH=1 turns it off and so enforces manager-only spawning. The skills field preloads full content but does not restrict; omit Skill from tools to restrict. omitClaudeMd exists. A fresh haiku subagent per batch is stateless. Done when spec fixes the agent model and haiku lifecycle.
 
-**t16** · Constants chosen (q25): Adapt's purpose and single-project scope; an agent controls only its home; no self-ratification; tests gate every merge; instances never modify the central Adapt repository or its starting configuration. Needed: the config naming them, the enforcement point, and who applies a general improvement to the central repository, since no instance may. Done when the config and enforcement exist and the promotion path has an owner.
+**t16** · Constants chosen (q25): purpose and single-project scope; an agent controls only its home; no self-ratification; tests gate every merge; instances never modify the central repository. Promotion (q34): none for now; later a manager-only proposal, pull-request style, reviewed and applied by the user in a central-repo session. Needed: the config naming the constants, the enforcement point, and later the proposal format. Done when the config and enforcement exist.
 
 **t17** · Minimal starting directives that breadcrumb each agent to what it needs: its skill, its rules folder, its records, the commands it uses. Done when three drafts exist and the user approves them.
 
@@ -150,3 +151,5 @@
 **t70** · One small metrics file per home folder holds note lookup counts, friction entry counts and rule firing counts for that agent. Needed: its format, the hooks that increment each count (a read of a note, a friction entry written, a rule injected for that agent), how an agent is identified from inside a hook, and the command that reads the file for the manager's reviews. Relates to t19, t49, t50. Done when all three counts rise without anyone writing them.
 
 **t71** · caveman: outputStyle for the manager, compact rules in every agent definition body. rtk 0.49.0: pinned binary in the workspace, instruction block mined into a rule then deleted, filters kept, PreToolUse Bash hook written into workspace settings, telemetry disabled. Needed: install script, hook ordering test with graphify and the rules router, the verifier's raw-output path, and where rtk's history database lives. Done when every agent's Bash output is condensed and a test failure stays readable.
+
+**t72** · Deferred. An instance may one day send the central repository a pull-request-style proposal, only for a change that benefits every instance. A specialist may start one; only the manager forwards it. The user reviews and applies proposals in a central-repo session. Needed then: the proposal format, the channel it travels by, and where proposals wait for review. Done when one proposal has been reviewed.

@@ -268,7 +268,11 @@ Where an improvement goes (open: t46):
 	- Later, a third: a retroactive reconciliation that takes what every Adapt instance has done to a skill and works it into a branch of that skill in its repository.
 	Defaults exist for every option, and a skill may be set either way.
 	Adapt's own runtime development follows the same shape, per host project by default. Rules created, changed or deleted, findings, and meta tools all stay in the workspace that produced them. This is a core part of the tool: Adapt changes itself out of the bespoke cases it meets, and those cases differ from project to project.
-	When a change to Adapt's own workings looks like a net benefit in the general case, and not only here, it becomes a candidate to push and merge into the main branch of Adapt's repository, so other instances gain it too. It is a promotion on evidence, never an automatic sync. Constant 5 forbids an instance from changing the central repository itself, so the instance can only propose the promotion; applying it is outside any instance's reach (who applies it is open, t16).
+	When a change to Adapt's own workings looks like a net benefit in the general case, and not only here, it becomes a candidate to push and merge into the main branch of Adapt's repository, so other instances gain it too. It is a promotion on evidence, never an automatic sync. Constant 5 forbids an instance from changing the central repository itself (user, 2026-09-17):
+	- For now, no change reaches the central repository from an instance at all.
+	- Later, an instance may send the central repository a proposal, in the manner of a pull request, and only when it believes the change would benefit every Adapt instance.
+	- A proposal may start with a specialist, but it goes up to the manager, and only the manager decides whether it merits a global change and forwards it.
+	- The user then reviews proposals in an ordinary working session in the central repository, like the one that wrote this spec, and applies the ones that benefit the whole.
 
 
 Reading the inbox, and the answer that needs no engineering:
