@@ -71,7 +71,7 @@
 
 **t15** · Docs: agent teams need an interactive session, never -p. Subagents may spawn subagents by default, 3 layers deep; CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH=1 turns it off and so enforces manager-only spawning. The skills field preloads full content but does not restrict; omit Skill from tools to restrict. omitClaudeMd exists. A fresh haiku subagent per batch is stateless. Done when spec fixes the agent model and haiku lifecycle.
 
-**t16** · User wants some rules fixed for good. Needed: the config file and format naming them, and the enforcement point, likely the existing rule-approval hook refusing edits, moves and deletes of a listed rule. Done when format and enforcement are defined.
+**t16** · Constants chosen (q25): Adapt's purpose and single-project scope; an agent controls only its home; no self-ratification; tests gate every merge; instances never modify the central Adapt repository or its starting configuration. Needed: the config naming them, the enforcement point, and who applies a general improvement to the central repository, since no instance may. Done when the config and enforcement exist and the promotion path has an owner.
 
 **t17** · Minimal starting directives that breadcrumb each agent to what it needs: its skill, its rules folder, its records, the commands it uses. Done when three drafts exist and the user approves them.
 

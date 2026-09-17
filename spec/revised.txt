@@ -121,6 +121,13 @@ Rules and protocols:
 	Rules are the main guiding force. They decide much of the interplay between instances and guide their decisions, so they need careful design.
 	- Adapt ships a starting set of rules. They can and probably will be modified, deleted and appended to.
 	- Some rules are constants: never removed or modified. A rules-system config names them. (open: t16)
+	- The constants from day one (user, 2026-09-17):
+	  1. Adapt's purpose is to serve the host agent's skill requests, and its scope is the skills of the one project it is installed in.
+	  2. An agent controls only its own home folder.
+	  3. No instance ratifies its own request.
+	  4. Tests gate every merge.
+	  5. The central Adapt repository and its starting configuration are never modified by instances working in projects. An instance acts only on its own installation, never on the shipped defaults and never on another installation in another repository.
+	  Hiding acceptance tests from implementers, and the ban on always-loaded instruction files, are ordinary rules, not constants.
 	- Protocols are rules assigned to every specialist when it is spawned. They give the specialist its workflow, and they can be tailored per specialist. (open: t18)
 	- Adapt ships three of them, drafted before anything runs: the manager's round protocol, the specialist's work protocol, and the chore protocol for the low-model worker. They are what a fresh instance follows when it has no memory of anything, so they carry the sequence of the work, not advice (open: t52).
 	- A protocol is a collection of rules, not one document. Rules are kept for their modularity and because they all live in one place. The collections sit in a protocols folder with two branches, one for the manager and one for the specialists; the chore worker's protocol sits with the specialists' until it proves it needs a branch of its own.
@@ -238,7 +245,7 @@ Where an improvement goes (open: t46):
 	- Later, a third: a retroactive reconciliation that takes what every Adapt instance has done to a skill and works it into a branch of that skill in its repository.
 	Defaults exist for every option, and a skill may be set either way.
 	Adapt's own runtime development follows the same shape, per host project by default. Rules created, changed or deleted, findings, and meta tools all stay in the workspace that produced them. This is a core part of the tool: Adapt changes itself out of the bespoke cases it meets, and those cases differ from project to project.
-	When a change to Adapt's own workings looks like a net benefit in the general case, and not only here, it becomes a candidate to push and merge into the main branch of Adapt's repository, so other instances gain it too. It is a promotion on evidence, never an automatic sync.
+	When a change to Adapt's own workings looks like a net benefit in the general case, and not only here, it becomes a candidate to push and merge into the main branch of Adapt's repository, so other instances gain it too. It is a promotion on evidence, never an automatic sync. Constant 5 forbids an instance from changing the central repository itself, so the instance can only propose the promotion; applying it is outside any instance's reach (who applies it is open, t16).
 
 
 Reading the inbox, and the answer that needs no engineering:
