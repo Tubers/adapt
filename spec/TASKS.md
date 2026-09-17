@@ -17,7 +17,7 @@
 - 🔜 skill copies, manager-approved merge, and two-way mirroring `t20`
 - 🔜 first-run install: what Adapt init sets up `t21`
 - 🔜 host-side Adapt commands `t22`
-- 🔜 ❓ nested Adapt: an Adapt inside an Adapt `t23`
+- 🔜 nested Adapt: an Adapt inside an Adapt `t23`
 - 🔜 per-specialist rules folders and finding curation `t24`
 - 🔜 ❓ place META TOOLS: root folder, inner skill, or both `t25`
 - 🔜 launcher: regenerate the personal exclusions at every manager launch `t26`
@@ -85,7 +85,7 @@
 
 **t22** · What a host instance can run against Adapt: init, submit a request, start a round, and read the manager's records in filtered slices. The manager's task file is the status surface, watched in the viewer or read through the shim; there is no second status channel. Needed: the command list, each command's output, and how a host instance is told a round finished or stalled. Done when the list is defined.
 
-**t23** · User allows chains of Adapts building tools to build tools. Needed: which Adapt owns which skills, how a nested manager is launched and reports up, and any depth limit. Done when the spec states them.
+**t23** · Answered (q27): experimental, user-configured only, at most two Adapts (host, Adapt, inner Adapt). The inner Adapt reports to the outer manager through the inbox and return files. Needed: where an inner Adapt's workspace lives given that each workspace sits outside what it serves, how the outer Adapt's skills become the inner one's host skills, and a first trial on a complex project. Done when one nested pair has run a round.
 
 **t24** · Each specialist gets rules/<skill name>/ holding its findings; it curates them into rules gated to code files or skill documents. Needed: how this fits rules-system candidates and approval, and who approves a specialist's new rule. Done when defined.
 

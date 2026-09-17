@@ -115,6 +115,11 @@ Sessions and agents:
 	- A watcher does the waiting, not the manager: a small script checks the group channels in the active work folders for new entries addressed to the manager, and hands them to it, or tells it which work folders have new messages for it. A likely carrier is Claude Code's own inbox: a script started by the manager session can post into that session's messaging socket (CLAUDE_CODE_MESSAGING_SOCKET, with its token), which Claude Code delivers and which starts a turn if the session is idle. A -p session stays open while background work runs, up to its idle ceiling, which the launcher may need to raise (open: t65).
 	This resembles Claude Code's agent teams. Agent teams do not run in a headless -p session, and teammates cannot spawn teammates, so Adapt builds the same shape from subagents plus files. (open: t15)
 	Adapt can nest: an Adapt skill may contain another Adapt, forming chains of agents that build tools to help build tools. (open: t23)
+	Nesting (user, 2026-09-17) is experimental, to be tried on more complex projects before it counts as a supported arrangement:
+	- Only when the user configures it.
+	- At most two Adapts: host, then Adapt, then an inner Adapt, and no deeper.
+	- The inner Adapt reports to the outer Adapt's manager, the way a host agent reports to Adapt: through the inbox and return files.
+	- The workspace layout may have to change to allow it, since each Adapt keeps its workspace outside the thing it serves; where an inner Adapt's workspace goes is open.
 
 
 Rules and protocols:
