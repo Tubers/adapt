@@ -1,0 +1,40 @@
+{
+  "source": ".claude/skills",
+  "commit": "b8f0a3813646193e417735f1d3483b391532d5c9",
+  "skills": {
+    "rules-system": {
+      "docs/records.md": "8a0c092cc36035bb",
+      "docs/refactoring.md": "0f74c016b7563bc3",
+      "docs/rules.md": "8824974af24ec04c",
+      "docs/upkeep.md": "fb76b6ca8d7cf6f4",
+      "scripts/accepted.py": "643965b15d636ee1",
+      "scripts/audit_worklist.py": "06ba964415ef2693",
+      "scripts/candidates.py": "e3a117457ac9abb8",
+      "scripts/history.py": "bd4a36cab1df0ec6",
+      "scripts/questions.py": "3e910f903d935ddb",
+      "scripts/reconcile.py": "87d00d99c9b4f7b9",
+      "scripts/rules.py": "80b2942fbfdd525a",
+      "scripts/rules_lib.py": "40ce99d1e5d4b022",
+      "scripts/run_tests.py": "8cca20cdf5ea1387",
+      "scripts/sync_index.py": "f5f82ed21f65b43b",
+      "scripts/tasks.py": "b79edc1140020625",
+      "scripts/upkeep.py": "b1858e17bc783a31",
+      "scripts/viewer.py": "f9dedd1dc20667fb",
+      "SKILL.md": "7f43c0ca44eae7fb",
+      "web/view.css": "04af37f9ef8e20e1",
+      "web/view.html": "bd57933a682e4ba1",
+      "web/view.js": "ac833407b0cebbf2"
+    },
+    "vector-search": {
+      "scripts/ask.py": "e6786ed7985c8e2e",
+      "scripts/corpus.py": "334d459f98269d40",
+      "scripts/embed.py": "79130487c6d9c011",
+      "scripts/index.py": "dc3ca80a5faeaa33",
+      "scripts/qlog.py": "16994888fcadd1f2",
+      "scripts/report.py": "81ecf13b8ed147b6",
+      "scripts/run_tests.py": "011a0d48d10059f2",
+      "scripts/search.py": "0d49346022a25182",
+      "SKILL.md": "551176b97d1ccaf9"
+    }
+  }
+}

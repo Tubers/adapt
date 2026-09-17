@@ -4,12 +4,13 @@
 
 **Parent:** Adapt/ · t16
 
-- ✅ 0.2b harness: probe runner for claude -p · *2026-09-17* `t3`
 - ✅ 0.2c harness: leave-nothing-behind check · *2026-09-17* `t4`
-- 🔄 **0.3 vendoring: copy rules-system and vector-search into the workspace template** · *since 2026-09-17* `t5`
+- ✅ 0.3 vendoring: copy rules-system and vector-search into the workspace template · *2026-09-17* `t5`
+- 🔄 **0.3b portable tests for the vendored vector-search** · *since 2026-09-17* `t16`
 - 🔜 0.4a tool fetcher: rtk at a pinned version with checksum `t6`
 - 🔜 0.4b tool fetcher: graphify in a pinned uv environment `t7`
 - 🔜 0.4c tool fetcher: tools/bin launchers `t8`
+- 🔜 0.4d embedding model: where the workspace finds it, and fetching it `t17`
 - 🔜 1.1 install: create the workspace beside the host `t9`
 - 🔜 1.2 install: base workspace settings `t10`
 - 🔜 1.3 install: trust and reach `t11`
@@ -22,17 +23,19 @@
 
 ## Details
 
-**t3** · Start claude -p on the cheapest model in a given folder with given flags and environment, capture stream-json, parse the init event (model, skills, agents, plugins, permission mode) and the result, then delete the run's transcript and any config entry it created. Done when a probe in a fixture returns parsed data and leaves nothing behind.
-
 **t4** · Snapshot the user's Claude config folders, the scratch folder and the machine's rtk and graphify data folders before a test run and compare after; fail the run on any residue. Done when a deliberately leaky test is caught.
 
 **t5** · A script that copies both skills from this repo into adapt/workspace/.claude/skills/, excluding machine data, and reports drift between the copies and the originals. Done when both skills' own test suites pass inside the template copy.
+
+**t16** · vector-search's run_tests.py assumes this repository's own rules (it expects lifecycle/handoff among them) and its golden set asks about them, so it fails inside the workspace template. Needed: split plumbing checks from repository-specific ones, and give the workspace copy a fixture rule set and a small golden set of its own. Done when the vendored copy's suite passes against a fixture workspace.
 
 **t6** · Download the pinned rtk release for the platform with gh or https, verify it against the release checksums, place it in a workspace's tools/bin. Done when a fixture workspace runs tools/bin/rtk --version and a bad checksum is refused.
 
 **t7** · Create tools/graphify-venv with uv and install graphifyy at the pinned version; fail clearly when uv or Python 3.10+ is missing. Done when a fixture workspace runs the environment's graphify.
 
 **t8** · Write the graphify launchers (sh and cmd) that call the pinned environment relative to their own location. Done when tools/bin/graphify --help works from Git Bash and PowerShell in a fixture workspace.
+
+**t17** · vector-search defaults to a model folder on this machine's OneDrive desktop (voyage-4-nano-onnx), overridable by RULE_SEARCH_MODEL. A workspace must name its model location explicitly and fetch the model when it is missing. Relates to Adapt task t3. Done when a fixture workspace runs a search with the model found or fetched, and a missing model gives a clear message.
 
 **t9** · Create <host>.adapt/ beside the host, git init it, lay out INBOX, NEW, EXTEND, REPAIR, Fulfilled, Aborted, Postponed, the homes, rules and tools. Done when init on a fixture host produces the tree.
 

@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Project records</title>
+<style>/*CSS*/</style>
+</head>
+<body>
+<header class="top">
+  <div class="title">
+    <span class="repo" id="repo"></span>
+    <h1 id="project">Loading…</h1>
+  </div>
+  <div class="live" id="live"><span class="dot"></span><span id="live-text">connecting</span></div>
+</header>
+
+<nav class="tabs" role="tablist">
+  <button role="tab" data-tab="tasks">Tasks <span class="n" id="n-tasks"></span></button>
+  <button role="tab" data-tab="history">History <span class="n" id="n-history"></span></button>
+  <button role="tab" data-tab="candidates">Candidates <span class="n" id="n-candidates"></span></button>
+</nav>
+
+<main>
+  <section id="tab-tasks" class="panel" role="tabpanel"></section>
+
+  <section id="tab-history" class="panel" role="tabpanel" hidden>
+    <div class="filters" id="filters"></div>
+    <div class="count" id="h-count"></div>
+    <ol class="entries" id="entries"></ol>
+  </section>
+
+  <section id="tab-candidates" class="panel" role="tabpanel" hidden>
+    <div class="chips" id="c-status"></div>
+    <ol class="entries" id="cands"></ol>
+  </section>
+</main>
+
+<script>/*BOOT*/</script>
+<script>/*JS*/</script>
+</body>
+</html>
