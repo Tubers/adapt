@@ -4,10 +4,9 @@
 
 **Parent:** Adapt/ · t16
 
-- ✅ 0.2a harness: fixture host maker · *2026-09-17* `t2`
 - ✅ 0.2b harness: probe runner for claude -p · *2026-09-17* `t3`
-- 🔄 **0.2c harness: leave-nothing-behind check** · *since 2026-09-17* `t4`
-- 🔜 0.3 vendoring: copy rules-system and vector-search into the workspace template `t5`
+- ✅ 0.2c harness: leave-nothing-behind check · *2026-09-17* `t4`
+- 🔄 **0.3 vendoring: copy rules-system and vector-search into the workspace template** · *since 2026-09-17* `t5`
 - 🔜 0.4a tool fetcher: rtk at a pinned version with checksum `t6`
 - 🔜 0.4b tool fetcher: graphify in a pinned uv environment `t7`
 - 🔜 0.4c tool fetcher: tools/bin launchers `t8`
@@ -22,8 +21,6 @@
 ---
 
 ## Details
-
-**t2** · A function that creates a throwaway host project in the scratch folder: git init, two sample skills (one with a planted bug and a failing case), and removes it afterwards. Done when its own test creates and removes one cleanly.
 
 **t3** · Start claude -p on the cheapest model in a given folder with given flags and environment, capture stream-json, parse the init event (model, skills, agents, plugins, permission mode) and the result, then delete the run's transcript and any config entry it created. Done when a probe in a fixture returns parsed data and leaves nothing behind.
 

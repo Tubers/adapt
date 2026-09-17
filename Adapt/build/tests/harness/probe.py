@@ -95,10 +95,18 @@ def _remove_session_traces(session_id: str) -> list:
         if path.parent.parent == CLAUDE_HOME / "projects":
             parents.add(path.parent)
     for project_dir in parents:                    # a project folder the run itself emptied
-        if project_dir.is_dir() and not any(project_dir.iterdir()):
-            project_dir.rmdir()
+        if project_dir.is_dir() and _only_empty_memory(project_dir):
+            shutil.rmtree(project_dir, ignore_errors=True)
             removed.append(str(project_dir))
     return removed
+
+
+def _only_empty_memory(project_dir: Path) -> bool:
+    """True when nothing is left but, at most, the empty auto-memory folder every session creates."""
+    for child in project_dir.iterdir():
+        if not (child.is_dir() and child.name == "memory" and not any(child.iterdir())):
+            return False
+    return True
 
 
 def run(cwd: Path, prompt: str, *flags: str, model: str = DEFAULT_MODEL,
