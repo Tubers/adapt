@@ -256,6 +256,7 @@ Working on skills:
 	- Before matching, the router rewrites a real path under a mapped folder into its made-up path. Gates for a skill's code are written against the made-up path, copies/my-skill/**/*.py, so they carry no machine-specific paths and survive a move. The made-up path leaves out .claude/skills/ on purpose, because the router never gates anything under that prefix.
 	- Agents are told the map exists, because their work can depend on it. The protocols of both the manager and the specialists say where the map is, what it does, and which made-up path belongs to the copy an agent works on. A specialist seeding a rule for its skill writes the gate against the made-up path, never the real one. An agent puzzled that a rule did or did not arrive checks the map first.
 	When a specialist changes a sibling skill that Adapt also carries a copy of, the change is mirrored to Adapt's copy. A change to Adapt's copy is mirrored back the same way. (open: t20)
+	Two specialists and one file (user, 2026-09-17): a file being modified is locked, and the lock is released when the holder's task moves on. A specialist that finds a file locked reads the holder's log to see what it is doing, and works on another task from its list that is not blocked behind that file. If it has none, it waits. Simple for now; it may change with experience (open: t45).
 	When the two have drifted apart and conflict, the host's version wins (user, 2026-09-17). Adapt adapts to the host's skill and takes it as the starting point, rather than pressing its own copy back onto the host.
 
 

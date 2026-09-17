@@ -33,7 +33,7 @@
 - 🔜 recovery: what happens to a round that dies mid-way `t38`
 - 🔜 Windows specifics: the mechanisms that carry a Windows footnote `t43`
 - 🔜 who re-indexes vector-search, and what it costs `t44`
-- 🔜 ❓ two specialists needing the same file `t45`
+- 🔜 two specialists needing the same file `t45`
 - 🔜 ❓ skill configuration: per-skill options, defaults, and the script that keeps it current `t46`
 - 🔜 stall notice: tell the user when a round stalls or crashes `t47`
 - 🔜 the manager's questions file as a diagnostic, and turning its entries into rules `t48`
@@ -117,7 +117,7 @@
 
 **t44** · Separate index per kind of agent, and in time a per-specialist index over that specialist's notes, so it can find detail it would otherwise miss. Still needed: when each index is rebuilt and by whom, whether a specialist re-indexes its own skill after a merge, what the note index costs to keep current, and the embedding pass cost in time. Done when the triggers and the owner are written.
 
-**t45** · Each specialist owns one skill, but a change can touch a shared file or a second skill. Needed: who arbitrates, whether the manager serialises that work, and what stops two worktrees merging conflicting edits. Done when the arbitration is written.
+**t45** · Answered (q32): file locks. A specialist modifying a file holds a lock, released when its task changes. Another specialist that meets the lock reads the holder's log, picks an unblocked task meanwhile, or waits. Needed: where locks live, how a task change releases them, a hook that refuses writes to a locked file and points at the holder's log, and stale-lock cleanup after a crash (t38). Done when two specialists contend for a file safely.
 
 **t46** · Adapt writes a per-skill configuration at init; scripts key newly found skills into it. Where an improvement goes: local (default), global (merged into the skill's own repo), later a retroactive reconciliation. Skills live in private GitHub repos: choose one remote per skill-project pair, or one remote per skill with a branch per project, which suits reconciliation. Needed: that choice, the file, format, defaults and discovery script. Done when the configuration exists.
 
