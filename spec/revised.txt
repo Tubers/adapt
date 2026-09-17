@@ -332,8 +332,12 @@ Round (proposed; open: t12):
 	The round folders are diagnostic material: for the user refining the skill, and for the instances refining their own workflows. A round with no work items to do may, by the manager's protocol, read back through the round folders and propose improvements to the system from what it finds, as requests like any other.
 
 
-Amalgamation (proposed; open: t9):
+Amalgamation (accepted, user, 2026-09-16):
 	Inbox requests that name the same skill and the same need merge into one work item. The same need means the same defect for REPAIR, or the same missing capability for EXTEND or NEW. vector-search suggests likely matches by meaning, and the manager confirms each merge. The work item keeps every source request's id, and it appends each submitter's added details instead of rewriting them. This is also how a piggyback request joins an existing one.
+	- The original request files stay in the work folder untouched. Beside them the manager drafts one condensed request that combines them all: the salient information from each, plus its own insight into the underlying issue. It works from that file, and from it drafts the procedure.
+	- The manager looks one step past what was asked. Several fix requests against the same surface may mean the implementation itself is the wrong approach, and that a rebuild is the better answer than another repair. That is the heavy option, but a legitimate one when it creates the work item: rebuild, refactor, remove complexity.
+	- It serves the host agent as a client, and still may demote or deprecate a surface in favour of a new one that asks for more input and returns a more stable result.
+	- These are the decisions the manager's attention belongs on: architectural design and ergonomic design.
 
 
  Root Sub Folders:
