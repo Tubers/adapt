@@ -28,7 +28,7 @@
 - 🔜 skill initialization: build a skill's automated test suite before the first change `t32`
 - 🔜 request archive: every request kept, automatically `t34`
 - 🔜 ratification: enforcing that no instance ratifies its own request `t35`
-- 🔜 ❓ permissions posture: what agents may run and touch `t36`
+- 🔜 permissions posture: what agents may run and touch `t36`
 - 🔜 budget for a round: caps, and what happens at the usage limit `t37`
 - 🔜 recovery: what happens to a round that dies mid-way `t38`
 - 🔜 Windows specifics: the mechanisms that carry a Windows footnote `t43`
@@ -49,6 +49,7 @@
 - 🔜 task links: manager task to work folder to specialist sub-tasks `t68`
 - 🔜 surface documents: format, the updater after merge, and the cross-skill index `t69`
 - 🔜 metrics file per home, and the hooks that keep it current `t70`
+- 🔜 caveman and rtk on by default for every agent `t71`
 
 ---
 
@@ -106,7 +107,7 @@
 
 **t35** · A manager may not ratify a request written in the round that wrote it; that takes a later round with fresh context. A specialist's request is reviewed by the manager. Needed: a round id and an author stamped on every request, the check that refuses same-round ratification, and where it lives: a rule, a hook, or the request tool itself. Done when the check exists and is tested.
 
-**t36** · Specialists (q21): least privilege per skill; more tools are requested from the manager with a reason, ratified, and kept in the specialist's home so later instances inherit them; enforced by the agent definition and a permission hook. Open: the unattended permission mode, re-asked plainly; the allowlist file format; whether the manager's own tool set follows the same scheme. Done when the mode is chosen and a request-to-use cycle works.
+**t36** · Settled: headless agents run in dontAsk mode (q35), so anything off the approved list is refused and must be requested; may change if that proves too slow. Specialists get least privilege per skill; the manager ratifies tool requests, and approvals persist per specialist in its home, enforced by the agent definition and a permission hook. Open: the allowlist format, and whether the manager's own tools follow the same scheme. Done when a request-to-use cycle works.
 
 **t37** · Answered (q2): no caps for now, keep it simple. A round that stops because the plan's included usage ran out is treated exactly as a crash: the same automated rollback, then the round is redone from the known state. Left open: whether the launcher should notice the limit and stop cleanly rather than being cut off mid-tool, and whether caps are wanted once rounds have been run a few times. Done when the stop path shares the rollback of t38.
 
@@ -147,3 +148,5 @@
 **t69** · Every maintained skill gets a terse, machine-facing surface document. Needed: its format and place, the step in the merge path that refreshes it, how it is generated at skill initialization, the scoped rule that delivers it, and a vector-search namespace spanning all surface documents for capability search. Relates to t32, t44, t67. Done when one skill has a current surface document the manager can search.
 
 **t70** · One small metrics file per home folder holds note lookup counts, friction entry counts and rule firing counts for that agent. Needed: its format, the hooks that increment each count (a read of a note, a friction entry written, a rule injected for that agent), how an agent is identified from inside a hook, and the command that reads the file for the manager's reviews. Relates to t19, t49, t50. Done when all three counts rise without anyone writing them.
+
+**t71** · caveman: outputStyle for the manager, compact rules in every agent definition body. rtk 0.49.0: pinned binary in the workspace, instruction block mined into a rule then deleted, filters kept, PreToolUse Bash hook written into workspace settings, telemetry disabled. Needed: install script, hook ordering test with graphify and the rules router, the verifier's raw-output path, and where rtk's history database lives. Done when every agent's Bash output is condensed and a test failure stays readable.

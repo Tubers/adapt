@@ -102,6 +102,21 @@ Code intelligence for specialists:
 	- Its SKILL.md is about 41KB and its description claims "any question about a codebase", so it is preloaded only into specialists that work on code, and kept away from the manager.
 
 
+Compressed speech and commands (user, 2026-09-17; open: t71):
+	caveman and rtk are on by default for every Adapt agent: speech is compressed, and so is what commands print.
+	- caveman. The manager gets it as the workspace's output style, outputStyle caveman, because an output style sets the main session's prompt. It does not reach subagents, whose prompt is their own definition, so each agent definition carries the caveman rules in its body, compactly, rather than preloading the whole skill. Speech is compressed; files keep the register their rules require, which for records is compressed-register: full, never ultra.
+	- rtk (github.com/rtk-ai/rtk, Apache 2.0, a Rust binary). A command proxy: a hook rewrites a Bash command into its rtk form (git status becomes rtk git status) and the output comes back condensed. It needs ripgrep, which is installed. Version 0.49.0 was trialled on 2026-09-17 in scratch, its download checksum verified, and everything deleted afterwards.
+	How Adapt installs rtk, shaped like graphify:
+	- The binary sits in the workspace's tools, pinned to a version.
+	- `rtk init` in a project writes only an instruction block into CLAUDE.md and a .rtk/filters.toml, and no hook. Only `rtk init -g` installs the hook, and it does so by editing the user's own settings, which Adapt never touches.
+	- So Adapt mines the instruction block into a rule and deletes the file, keeps .rtk/filters.toml in the workspace, and writes the hook itself into the workspace settings: PreToolUse on Bash, running the pinned rtk with `hook claude`. In the workspace settings it applies to the manager and every specialist, which is what "all agents" asks for. Draft rule: spec/drafts/workspace-rule-tooling-rtk.md.
+	- Telemetry is off unless consented to, and the workspace also sets RTK_TELEMETRY_DISABLED=1. rtk keeps a history database under the user's local app data folder; where Adapt points it is open.
+	Cautions:
+	- The hook sees only Bash. Read, Grep and Glob are untouched.
+	- Several PreToolUse hooks now touch Bash: rtk rewrites the command, graphify nudges, and the rules router matches command text. The order they run in, and whether the router sees the original or the rewritten command, must be tested.
+	- The verifier's evidence is test output. Condensed output must not hide a failure's detail: the verifier re-runs with `rtk proxy` when it needs the raw result, or its filters exclude test runners from rewriting.
+
+
 Sessions and agents:
 	THE MANAGER is a headless session, not a subagent. An Adapt command launches it inside the workspace, on the Opus 5 model, bare bones (a requirement). For now it is not launched with --bare, so it can use the subscription login instead of an API key billed directly. It is kept bare instead by the workspace sitting outside the host, and by its settings (open: t13). Its home folder holds its continuity files (see THE MANAGER below).
 	The manager is the only instance that spawns or removes a subagent. By default a subagent may spawn its own subagents, up to three layers deep, so Adapt's settings set CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH to 1 to enforce this. It is also the only instance that creates the work items the specialists work on. It decides whether a skill is actually broken (REPAIR), needs extending (EXTEND), or whether a new skill is needed or is preferable to extending another (NEW).
