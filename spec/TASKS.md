@@ -36,7 +36,7 @@
 - 🔜 who re-indexes vector-search, and what it costs `t44`
 - 🔜 ❓ two specialists needing the same file `t45`
 - 🔜 ❓ skill configuration: per-skill options, defaults, and the script that keeps it current `t46`
-- 🔜 ❓ stall notice: tell the user when a round stalls or crashes `t47`
+- 🔜 stall notice: tell the user when a round stalls or crashes `t47`
 - 🔜 the manager's questions file as a diagnostic, and turning its entries into rules `t48`
 - 🔜 notes folders: freeform space for the manager and every specialist `t49`
 - 🔜 retirement: the evidence, the path, and what archiving means `t50`
@@ -123,7 +123,7 @@
 
 **t46** · Adapt writes a per-skill configuration at init; scripts key newly found skills into it. Where an improvement goes: local (default), global (merged into the skill's own repo), later a retroactive reconciliation. Skills live in private GitHub repos: choose one remote per skill-project pair, or one remote per skill with a branch per project, which suits reconciliation. Needed: that choice, the file, format, defaults and discovery script. Done when the configuration exists.
 
-**t47** · While Adapt is young the user wants to hear about a stalled or crashed round directly, not by watching a file. Needed: what counts as a stall (no record written for N minutes, a launcher that exited non-zero, a round that ended without closing its work item), how the notice reaches the user, and when the safeguard can be retired. Done when the detector and the notice exist.
+**t47** · Answered (q31): a stall is any of no record for 20 minutes, a launcher error exit, or a round ending with its work item open, with room for more indicators. It notifies the host instance and the user: in the viewer when one is open, otherwise a Windows desktop notification. Needed: the detector, the viewer notice, the desktop notification path, and how the host instance is told. Done when a forced stall reaches both.
 
 **t48** · The manager writes a question whenever it does not know what to do, without waiting for an answer. Later review turns each into a structural fix: a rule, a protocol line, a better briefing, or a tool. Needed: the instruction that makes the manager write instead of guess, how the entries are reviewed and grouped, and how a recurring question becomes a rule candidate. Relates to t18 and t31. Done when the loop runs once.
 

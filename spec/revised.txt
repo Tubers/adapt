@@ -163,6 +163,7 @@ Who Adapt answers to:
 	- The manager owns everything below that line: the internal design, and what each choice costs in effort, delay and tokens for the fixes and capabilities delivered back up.
 	The manager's task file stays the status surface. The host agent reads it; the user watches it when they want to.
 	One exception, while the skill is young: if a round stalls or crashes, the user is told directly. These are the days when that information is worth interrupting for, because the skill is still being built. The notice is a safeguard for this period, not part of the design's shape, and it can be retired once Adapt has proved itself (open: t47).
+	What counts as a stall (user, 2026-09-16): any of no record written for 20 minutes, the launcher exiting with an error, or a round ending with its work item still open; more indicators may be added. A stall notifies both the host instance and the user. The user is told in the viewer when a viewer is open, and by a Windows desktop notification when it is not.
 
 
 Scope, and the home folders:
