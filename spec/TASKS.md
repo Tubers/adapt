@@ -2,8 +2,8 @@
 
 **Goal:** revise the Adapt skill spec with the user: spec/original.txt is the untouched first draft, spec/revised.txt the working revision
 
-- ✅ a surface document per maintained skill · *2026-09-16* `t60`
 - ✅ counters: one metrics store or three · *2026-09-16* `t61`
+- ✅ a host project that is not a git repository · *2026-09-16* `t62`
 - 🔄 **fold in the user's own changes to the spec** · *since 2026-09-15* `t1`
 - 🔜 reconcile Documentation Dogma with the existing writing rules `t4`
 - 🔜 define THE MANAGER without a persistent instance `t6`
@@ -47,7 +47,6 @@
 - 🔜 trial: a low-model instance running the request interview from a decision tree `t51`
 - 🔜 draft the starting protocols: manager round, specialist work, chore worker `t52`
 - 🔜 the verifier: a third agent kind, or a mode of the specialist `t56`
-- 🔜 ❓ a host project that is not a git repository `t62`
 - 🔜 router: rewrite paths under a mapped copy before matching gates `t64`
 - 🔜 group channel: an append-only message file per work item `t65`
 - 🔜 aggregated history: fixtures that pull specialist history into the work item `t66`
@@ -60,9 +59,9 @@
 
 ## Details
 
-**t60** · The manager needs a high-level understanding of every sibling skill's surface, first to answer a request with an existing skill and only then to weigh engineering. A surface document per skill, kept current after each merge, is the likely carrier. Needed: its shape, what it holds, who updates it, and how it relates to the skill's graph. Relates to t67. Done when the document has a shape and an owner.
-
 **t61** · Note lookups, friction entries and rule firings are all counted by different parts of the spec. Needed: whether they share one small store, where it lives, who increments it, and whether it is per agent or per workspace. Relates to t19, t49. Done when the store and its writers are defined.
+
+**t62** · Answered (q17): when the host is not a git repository, init offers to run git init and create private repositories for the skills, so worktrees work. Open: one repository for the host's skill folder, or one per skill; and whether private means a local repository only or a private remote on GitHub. Done when both are settled.
 
 **t1** · The user has many changes of their own: some needed, some functional alternatives judged better than the original. Take each in chat, write it into spec/revised.txt, and split out any that opens a new question as its own task. Done when the user says the list is exhausted.
 
@@ -134,7 +133,7 @@
 
 **t45** · Each specialist owns one skill, but a change can touch a shared file or a second skill. Needed: who arbitrates, whether the manager serialises that work, and what stops two worktrees merging conflicting edits. Done when the arbitration is written.
 
-**t46** · Adapt writes a configuration at init with options per skill, and scripts key a newly discovered skill into it when it is found. The first option is where an improvement goes: local (default), global (merged into the skill's own repo), and later a retroactive reconciliation onto a branch of that repo. Needed: the file, its format and place, the defaults, the discovery script, and what else belongs per skill. Relates to Adapt t6. Done when the configuration exists.
+**t46** · Adapt writes a per-skill configuration at init; scripts key newly found skills into it. Where an improvement goes: local (default), global (merged into the skill's own repo), later a retroactive reconciliation. Skills live in private GitHub repos: choose one remote per skill-project pair, or one remote per skill with a branch per project, which suits reconciliation. Needed: that choice, the file, format, defaults and discovery script. Done when the configuration exists.
 
 **t47** · While Adapt is young the user wants to hear about a stalled or crashed round directly, not by watching a file. Needed: what counts as a stall (no record written for N minutes, a launcher that exited non-zero, a round that ended without closing its work item), how the notice reaches the user, and when the safeguard can be retired. Done when the detector and the notice exist.
 
@@ -149,8 +148,6 @@
 **t52** · Answered (q18): work from both ends, iteratively. Each protocol is a collection of rules in a protocols folder with a manager branch and a specialist branch; the chore protocol sits with the specialists'. Each specialist gets its own copy on first assignment, changed only by request. Both protocols must describe the copy map and the made-up path of the agent's copy. Draft all three against the settled workflow, alongside t53 to t55. Done when three first drafts exist.
 
 **t56** · Settled: the verifier is a medium specialist under a verifier protocol, with its own home. The manager designs each test in plain English with loose pseudocode; the verifier adapts it to the skill and environment, writes it into the sibling test skill, runs it before merge, checks the code it touches for fairness, and posts results to the group channel. Open: the test skill's name and layout, and the read denial for implementers. Done when those exist.
-
-**t62** · Answered (q17): when the host is not a git repository, init offers to run git init and create private repositories for the skills, so worktrees work. Open: one repository for the host's skill folder, or one per skill; and whether private means a local repository only or a private remote on GitHub. Done when both are settled.
 
 **t64** · Build option 1b of t63. The copy script writes .claude/copy-map.json entries pairing a copy's real folder with copies/<skill>/; merge, discard and rollback remove them. rule_router rewrites a real path under a mapped folder into its made-up path before matching, outside the never-gate-skills prefix. Tests: a gated rule fires on a copy, a removed entry stops it, a stale entry is cleared by rollback. Done when the tests pass in the workspace's rules-system copy.
 
