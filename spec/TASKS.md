@@ -2,27 +2,27 @@
 
 **Goal:** revise the Adapt skill spec with the user: spec/original.txt is the untouched first draft, spec/revised.txt the working revision
 
-- ✅ counters: one metrics store or three · *2026-09-16* `t61`
 - ✅ a host project that is not a git repository · *2026-09-16* `t62`
+- ✅ meta tool exemption: the size and line limit below which scrutiny is reduced · *2026-09-16* `t33`
 - 🔄 **fold in the user's own changes to the spec** · *since 2026-09-15* `t1`
-- 🔜 reconcile Documentation Dogma with the existing writing rules `t4`
-- 🔜 define THE MANAGER without a persistent instance `t6`
-- 🔜 separate NEW, EXTEND and REPAIR, and define amalgamation `t9`
+- 🔜 ❓ reconcile Documentation Dogma with the existing writing rules `t4`
+- 🔜 ❓ define THE MANAGER without a persistent instance `t6`
+- 🔜 ❓ separate NEW, EXTEND and REPAIR, and define amalgamation `t9`
 - 🔜 specify the request form and its python generator `t10`
 - 🔜 fix When to Trigger and the duplicate check `t11`
-- 🔜 define a round `t12`
+- 🔜 ❓ define a round `t12`
 - 🔜 manager launch: --bare or a normal session fenced by settings `t13`
 - 🔜 specialists as subagents, not agent teams; haiku worker lifecycle `t15`
-- 🔜 constant rules: a rules-system config for rules never removed or modified `t16`
+- 🔜 ❓ constant rules: a rules-system config for rules never removed or modified `t16`
 - 🔜 agent system prompts for manager, specialist-medium and specialist-low `t17`
 - 🔜 protocol rules for specialists and manager, and how they attach at spawn `t18`
 - 🔜 friction entries: history kind, threshold hook, similarity grouping `t19`
-- 🔜 skill copies, manager-approved merge, and two-way mirroring `t20`
+- 🔜 ❓ skill copies, manager-approved merge, and two-way mirroring `t20`
 - 🔜 first-run install: what Adapt init sets up `t21`
 - 🔜 host-side Adapt commands `t22`
-- 🔜 nested Adapt: an Adapt inside an Adapt `t23`
+- 🔜 ❓ nested Adapt: an Adapt inside an Adapt `t23`
 - 🔜 per-specialist rules folders and finding curation `t24`
-- 🔜 place META TOOLS: root folder, inner skill, or both `t25`
+- 🔜 ❓ place META TOOLS: root folder, inner skill, or both `t25`
 - 🔜 launcher: regenerate the personal exclusions at every manager launch `t26`
 - 🔜 strip the manager down: bundled skills, built-in agents, user plugins `t27`
 - 🔜 let a specialist add its own LSP plugin without the interactive plugin command `t28`
@@ -30,17 +30,16 @@
 - 🔜 quality assurance: how a round proves it delivered `t30`
 - 🔜 the briefing: what each agent is given, and in what order `t31`
 - 🔜 skill initialization: build a skill's automated test suite before the first change `t32`
-- 🔜 meta tool exemption: the size and line limit below which scrutiny is reduced `t33`
 - 🔜 request archive: every request kept, automatically `t34`
 - 🔜 ratification: enforcing that no instance ratifies its own request `t35`
-- 🔜 permissions posture: what agents may run and touch `t36`
+- 🔜 ❓ permissions posture: what agents may run and touch `t36`
 - 🔜 budget for a round: caps, and what happens at the usage limit `t37`
 - 🔜 recovery: what happens to a round that dies mid-way `t38`
 - 🔜 Windows specifics: the mechanisms that carry a Windows footnote `t43`
 - 🔜 who re-indexes vector-search, and what it costs `t44`
-- 🔜 two specialists needing the same file `t45`
-- 🔜 skill configuration: per-skill options, defaults, and the script that keeps it current `t46`
-- 🔜 stall notice: tell the user when a round stalls or crashes `t47`
+- 🔜 ❓ two specialists needing the same file `t45`
+- 🔜 ❓ skill configuration: per-skill options, defaults, and the script that keeps it current `t46`
+- 🔜 ❓ stall notice: tell the user when a round stalls or crashes `t47`
 - 🔜 the manager's questions file as a diagnostic, and turning its entries into rules `t48`
 - 🔜 notes folders: freeform space for the manager and every specialist `t49`
 - 🔜 retirement: the evidence, the path, and what archiving means `t50`
@@ -59,9 +58,9 @@
 
 ## Details
 
-**t61** · Note lookups, friction entries and rule firings are all counted by different parts of the spec. Needed: whether they share one small store, where it lives, who increments it, and whether it is per agent or per workspace. Relates to t19, t49. Done when the store and its writers are defined.
-
 **t62** · Answered (q17): when the host is not a git repository, init offers to run git init and create private repositories for the skills, so worktrees work. Open: one repository for the host's skill folder, or one per skill; and whether private means a local repository only or a private remote on GitHub. Done when both are settled.
+
+**t33** · A small meta tool is narrow, internal-facing and built by the agents for themselves, so it carries less process: documentation is whatever its builders need. Needed: the actual limit in files, lines and blast radius, what scrutiny still applies (a smoke test, a name, an owner), and what happens when a tool grows past the limit. Done when the limit and the remaining checks are written.
 
 **t1** · The user has many changes of their own: some needed, some functional alternatives judged better than the original. Take each in chat, write it into spec/revised.txt, and split out any that opens a new question as its own task. Done when the user says the list is exhausted.
 
@@ -114,8 +113,6 @@
 **t31** · No agent carries context between sessions, so the briefing is the design. Order: own system prompt, protocol rules for its kind, work item with acceptance criteria, pointers to where it works and what it may touch, nothing else. Everything further is looked up, and what is worth keeping is written back before the agent ends. Relates to t17 and t18. Done when the order is fixed and each part has an owner.
 
 **t32** · At init Adapt inventories the sibling skills. The first time it extends or repairs one, that skill goes through initialization: an automated suite is built first, robust enough to catch a quiet regression, and maintained afterwards. Needed: what the suite must cover, who writes it, how long it may take, what happens when a skill resists testing, and how the suite is kept current. Done when the process is defined and one skill has been through it.
-
-**t33** · A small meta tool is narrow, internal-facing and built by the agents for themselves, so it carries less process: documentation is whatever its builders need. Needed: the actual limit in files, lines and blast radius, what scrutiny still applies (a smoke test, a name, an owner), and what happens when a tool grows past the limit. Done when the limit and the remaining checks are written.
 
 **t34** · Requests are archived automatically so what was asked survives the work item it became. Needed: where the archive lives, the id a request keeps from submission through amalgamation to the closing report, what a submitter can look up later, and retention. Relates to t9 and t10. Done when the lifecycle of one request is written end to end.
 

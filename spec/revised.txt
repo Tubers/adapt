@@ -214,7 +214,8 @@ Tests and skill initialization:
 	- The first time Adapt works on one of them, extending or repairing, that skill first goes through skill initialization: an automated test suite is built for it, before the change (open: t32).
 	- The suites are meant to be robust: their job is to catch the change that quietly breaks something no instance thought to check.
 	- They are maintained from then on. Work that adds behaviour adds its tests, and a repair adds the test that reproduces the fault.
-	- Small meta tools carry less scrutiny. A meta tool under a size and line limit is narrow, highly specialised and internal-facing, and its documentation is whatever the agents that built it decide they need (open: t33).
+	- Small meta tools carry less scrutiny. A meta tool is narrow, highly specialised and internal-facing, and its documentation is whatever the agents that built it decide they need.
+	- What makes something a meta tool (user, 2026-09-16): a single file, at most 200 lines, at most 12KB, no network access, and used only by Adapt's own agents. The byte cap exists because lines can be arbitrarily long; 12KB is 200 lines at about 60 bytes each. All conditions must hold for a tool to be a meta tool and to stay one. A tool that grows past any of them loses the exemption and goes through the full process like any skill.
 
 
 Working on skills:
