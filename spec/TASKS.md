@@ -106,7 +106,7 @@
 
 **t35** · A manager may not ratify a request written in the round that wrote it; that takes a later round with fresh context. A specialist's request is reviewed by the manager. Needed: a round id and an author stamped on every request, the check that refuses same-round ratification, and where it lives: a rule, a hook, or the request tool itself. Done when the check exists and is tested.
 
-**t36** · Unwritten today: whether a specialist may run arbitrary shell, install packages, reach the network, push to git, or edit host files outside .claude/skills/; and which unattended mode the manager runs in (dontAsk, auto, bypassPermissions). Inbox requests are written by other agents, so this is also the prompt-injection surface. The user is writing an answer in chat. Done when the posture is written into the spec.
+**t36** · Specialists (q21): least privilege per skill; more tools are requested from the manager with a reason, ratified, and kept in the specialist's home so later instances inherit them; enforced by the agent definition and a permission hook. Open: the unattended permission mode, re-asked plainly; the allowlist file format; whether the manager's own tool set follows the same scheme. Done when the mode is chosen and a request-to-use cycle works.
 
 **t37** · Answered (q2): no caps for now, keep it simple. A round that stops because the plan's included usage ran out is treated exactly as a crash: the same automated rollback, then the round is redone from the known state. Left open: whether the launcher should notice the limit and stop cleanly rather than being cut off mid-tool, and whether caps are wanted once rounds have been run a few times. Done when the stop path shares the rollback of t38.
 
