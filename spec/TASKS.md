@@ -2,8 +2,8 @@
 
 **Goal:** revise the Adapt skill spec with the user: spec/original.txt is the untouched first draft, spec/revised.txt the working revision
 
-- ✅ define the round record: its id and what it leaves behind · *2026-09-16* `t55`
 - ✅ the closing report: what the host agent receives · *2026-09-16* `t59`
+- ✅ assignment and parallelism inside a round · *2026-09-16* `t57`
 - 🔄 **fold in the user's own changes to the spec** · *since 2026-09-15* `t1`
 - 🔜 reconcile Documentation Dogma with the existing writing rules `t4`
 - 🔜 define THE MANAGER without a persistent instance `t6`
@@ -47,7 +47,6 @@
 - 🔜 trial: a low-model instance running the request interview from a decision tree `t51`
 - 🔜 draft the starting protocols: manager round, specialist work, chore worker `t52`
 - 🔜 the verifier: a third agent kind, or a mode of the specialist `t56`
-- 🔜 ❓ assignment and parallelism inside a round `t57`
 - 🔜 ❓ who runs the post-merge check, given the scope rule `t58`
 - 🔜 ❓ a surface document per maintained skill `t60`
 - 🔜 ❓ counters: one metrics store or three `t61`
@@ -62,9 +61,9 @@
 
 ## Details
 
-**t55** · A round id makes several rules enforceable: fresh-context ratification, the crash markers, the archive, the closing report. Needed: whether a round has its own folder or lives only in the manager's history, what is stamped with its id, and how the next round finds the last one. Relates to t12, t35, t38. Done when a round can be identified after the fact.
-
 **t59** · The round closes by restating the request and naming the criterion that answered it, but the report has no form. Needed: whether it is a file, a line in the manager's task window or a message; what it contains; and what the host agent does when the delivered surface still does not serve its intent: reopen, new request, or appeal. Relates to t22, t30. Done when the form and the appeal path are written.
+
+**t57** · Needed: whether a specialist is spawned per work item, per skill or per step; whether two may run at once inside one round; and what the manager does while they work: block, poll their records, or wait on messages. Relates to t15, t45. Done when the assignment rule and the manager's waiting behaviour are written.
 
 **t1** · The user has many changes of their own: some needed, some functional alternatives judged better than the original. Take each in chat, write it into spec/revised.txt, and split out any that opens a new question as its own task. Done when the user says the list is exhausted.
 
@@ -152,8 +151,6 @@
 
 **t56** · Answered in part (q11): the verifier is a medium specialist under a verifier protocol, for now. It drafts the hidden acceptance test, runs it in a clean copy, and reads the skill code the test touches to confirm the result was fairly reached. The implementing specialist never sees the test. Open: whether the manager should author the test instead, the model that is adequate, and where hidden tests live so the implementer cannot read them. Done when those are settled.
 
-**t57** · Needed: whether a specialist is spawned per work item, per skill or per step; whether two may run at once inside one round; and what the manager does while they work: block, poll their records, or wait on messages. Relates to t15, t45. Done when the assignment rule and the manager's waiting behaviour are written.
-
 **t58** · Quality assurance says the skill's own tests run where it actually lives, which means executing code inside the host project; the scope rule says Adapt changes nothing outside its home folders. Needed: who runs that check, the shim, the manager or the host agent, and how the result comes back. Relates to t30, t36. Done when the runner and the path back are written.
 
 **t60** · The manager needs a high-level understanding of every sibling skill's surface, first to answer a request with an existing skill and only then to weigh engineering. A surface document per skill, kept current after each merge, is the likely carrier. Needed: its shape, what it holds, who updates it, and how it relates to the skill's graph. Relates to t67. Done when the document has a shape and an owner.
@@ -164,7 +161,7 @@
 
 **t64** · Build option 1b of t63. The copy script writes .claude/copy-map.json entries pairing a copy's real folder with copies/<skill>/; merge, discard and rollback remove them. rule_router rewrites a real path under a mapped folder into its made-up path before matching, outside the never-gate-skills prefix. Tests: a gated rule fires on a copy, a removed entry stops it, a stale entry is cleared by rollback. Done when the tests pass in the workspace's rules-system copy.
 
-**t65** · Every instance on a work item posts to one sequence of messages and reads only what it has not yet seen, in order. Needed: the file shape, per-reader position tracking, the post and read commands, and how it relates to the questions file and to instance-to-instance messaging. Likely a small rules-system extension. Done when two agents can talk through it.
+**t65** · Per work folder, an append-only message sequence that every instance posts to with a command and reads in order, fetching only unseen entries. Messages carry an addressee, so a watcher can find new ones addressed to the manager and deliver them, likely by posting into the manager session's messaging socket, which starts a turn when it is idle. Needed: the file shape, read positions, post and read commands, the watcher, and the -p idle ceiling. Done when a specialist wakes the manager.
 
 **t66** · A work item's history log gathers the entries of every specialist working on it. Needed: whether entries are copied or referenced, when the pull runs (on each write, at round end, or on read), how duplicates and ordering are handled, and whether rules-system gains an aggregate command. Done when a work item shows one ordered log of its specialists' events.
 

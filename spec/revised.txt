@@ -108,6 +108,11 @@ Sessions and agents:
 	There are two kinds of subagent. Both are defined in .claude/agents/ with minimal starting directives, and both are preloaded with rules-system, vector-search and meta-tools:
 	- Specialist, medium model (Sonnet). Each one is assigned one sibling skill and writes code for it. Specialists may work together on larger projects, such as building a brand new skill on request.
 	- Specialist, lower model (Haiku). It carries out small file and folder operations for a medium specialist. Its context is wiped between every action, so every task given to it must be stateless. Tasks may be lumped together and done in batches. A medium specialist asks the manager for one when none exists, and the manager decides whether invoking it is worth it relative to the work. At least one should be kept available.
+	Assignment (user, 2026-09-16):
+	- One specialist per skill, for now.
+	- Specialists of different skills may run at the same time, to collaborate on an extension or a new skill that uses functions from existing skills. A brand new skill gets a specialist of its own, spun up in a new home folder and tasked with building it from scratch.
+	- While specialists work, the manager stays idle. It wakes when a message addressed to it arrives.
+	- A watcher does the waiting, not the manager: a small script checks the group channels in the active work folders for new entries addressed to the manager, and hands them to it, or tells it which work folders have new messages for it. A likely carrier is Claude Code's own inbox: a script started by the manager session can post into that session's messaging socket (CLAUDE_CODE_MESSAGING_SOCKET, with its token), which Claude Code delivers and which starts a turn if the session is idle. A -p session stays open while background work runs, up to its idle ceiling, which the launcher may need to raise (open: t65).
 	This resembles Claude Code's agent teams. Agent teams do not run in a headless -p session, and teammates cannot spawn teammates, so Adapt builds the same shape from subagents plus files. (open: t15)
 	Adapt can nest: an Adapt skill may contain another Adapt, forming chains of agents that build tools to help build tools. (open: t23)
 
