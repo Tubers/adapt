@@ -270,7 +270,7 @@ Making sure a round delivered (open: t30):
 	4. A separate verifier subagent, with a fresh context, receives the work item, the acceptance criteria and the diff, and never the specialist's narrative. It re-runs the tests in a clean copy and tries to break the claim. Its job is to fail the work, not to agree with it.
 	5. The manager merges on the verifier's pass and on the criteria being covered, never on either agent saying it is done. It sends the work back otherwise.
 	6. After the merge, the host-side check runs the skill's own tests where it actually lives. A failure reverts the merge, and the round reopens rather than closing.
-	7. There is no closing report (user, 2026-09-16). The manager's task for the work item ends with its one-line outcome and single-word status, and the host agent reads that from the manager's task file.
+	7. The host agent receives a return file (user, 2026-09-16). It is terse, and it only says what the host can now expect: "repaired: <command> now outputs y given x", or a reference to a new surface on a new or extended skill. It never mentions implementation. The file also serves as diagnostic data. Alongside it, the manager's task for the work item ends with its one-line outcome and single-word status.
 	Rollback is always available because the work is done on a copy: an unmerged branch is discarded, and a merged one is reverted.
 
 Budget (open: t37):

@@ -3,7 +3,7 @@
 **Goal:** revise the Adapt skill spec with the user: spec/original.txt is the untouched first draft, spec/revised.txt the working revision
 
 - ✅ define the round record: its id and what it leaves behind · *2026-09-16* `t55`
-- ✅ ❓ the closing report: what the host agent receives · *2026-09-16* `t59`
+- ✅ the closing report: what the host agent receives · *2026-09-16* `t59`
 - 🔄 **fold in the user's own changes to the spec** · *since 2026-09-15* `t1`
 - 🔜 reconcile Documentation Dogma with the existing writing rules `t4`
 - 🔜 define THE MANAGER without a persistent instance `t6`
