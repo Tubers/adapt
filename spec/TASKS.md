@@ -2,8 +2,8 @@
 
 **Goal:** revise the Adapt skill spec with the user: spec/original.txt is the untouched first draft, spec/revised.txt the working revision
 
-- ✅ who runs the post-merge check, given the scope rule · *2026-09-16* `t58`
 - ✅ a surface document per maintained skill · *2026-09-16* `t60`
+- ✅ counters: one metrics store or three · *2026-09-16* `t61`
 - 🔄 **fold in the user's own changes to the spec** · *since 2026-09-15* `t1`
 - 🔜 reconcile Documentation Dogma with the existing writing rules `t4`
 - 🔜 define THE MANAGER without a persistent instance `t6`
@@ -47,7 +47,6 @@
 - 🔜 trial: a low-model instance running the request interview from a decision tree `t51`
 - 🔜 draft the starting protocols: manager round, specialist work, chore worker `t52`
 - 🔜 the verifier: a third agent kind, or a mode of the specialist `t56`
-- 🔜 ❓ counters: one metrics store or three `t61`
 - 🔜 ❓ a host project that is not a git repository `t62`
 - 🔜 router: rewrite paths under a mapped copy before matching gates `t64`
 - 🔜 group channel: an append-only message file per work item `t65`
@@ -55,14 +54,15 @@
 - 🔜 manager-built graphs for skills with no specialist yet `t67`
 - 🔜 task links: manager task to work folder to specialist sub-tasks `t68`
 - 🔜 surface documents: format, the updater after merge, and the cross-skill index `t69`
+- 🔜 metrics file per home, and the hooks that keep it current `t70`
 
 ---
 
 ## Details
 
-**t58** · Quality assurance says the skill's own tests run where it actually lives, which means executing code inside the host project; the scope rule says Adapt changes nothing outside its home folders. Needed: who runs that check, the shim, the manager or the host agent, and how the result comes back. Relates to t30, t36. Done when the runner and the path back are written.
-
 **t60** · The manager needs a high-level understanding of every sibling skill's surface, first to answer a request with an existing skill and only then to weigh engineering. A surface document per skill, kept current after each merge, is the likely carrier. Needed: its shape, what it holds, who updates it, and how it relates to the skill's graph. Relates to t67. Done when the document has a shape and an owner.
+
+**t61** · Note lookups, friction entries and rule firings are all counted by different parts of the spec. Needed: whether they share one small store, where it lives, who increments it, and whether it is per agent or per workspace. Relates to t19, t49. Done when the store and its writers are defined.
 
 **t1** · The user has many changes of their own: some needed, some functional alternatives judged better than the original. Take each in chat, write it into spec/revised.txt, and split out any that opens a new question as its own task. Done when the user says the list is exhausted.
 
@@ -150,8 +150,6 @@
 
 **t56** · Settled: the verifier is a medium specialist under a verifier protocol, with its own home. The manager designs each test in plain English with loose pseudocode; the verifier adapts it to the skill and environment, writes it into the sibling test skill, runs it before merge, checks the code it touches for fairness, and posts results to the group channel. Open: the test skill's name and layout, and the read denial for implementers. Done when those exist.
 
-**t61** · Note lookups, friction entries and rule firings are all counted by different parts of the spec. Needed: whether they share one small store, where it lives, who increments it, and whether it is per agent or per workspace. Relates to t19, t49. Done when the store and its writers are defined.
-
 **t62** · Answered (q17): when the host is not a git repository, init offers to run git init and create private repositories for the skills, so worktrees work. Open: one repository for the host's skill folder, or one per skill; and whether private means a local repository only or a private remote on GitHub. Done when both are settled.
 
 **t64** · Build option 1b of t63. The copy script writes .claude/copy-map.json entries pairing a copy's real folder with copies/<skill>/; merge, discard and rollback remove them. rule_router rewrites a real path under a mapped folder into its made-up path before matching, outside the never-gate-skills prefix. Tests: a gated rule fires on a copy, a removed entry stops it, a stale entry is cleared by rollback. Done when the tests pass in the workspace's rules-system copy.
@@ -165,3 +163,5 @@
 **t68** · The manager's task points at a work folder; each specialist processifies the item into its own tasks linked back to that folder. rules-system links a sub-project to a parent task today (init --task, Parent line, viewer drill-down). Needed: check whether that covers a work folder as the link target and several specialists under one item, and extend it if not. Done when the viewer walks from the manager's task to every specialist's sub-tasks.
 
 **t69** · Every maintained skill gets a terse, machine-facing surface document. Needed: its format and place, the step in the merge path that refreshes it, how it is generated at skill initialization, the scoped rule that delivers it, and a vector-search namespace spanning all surface documents for capability search. Relates to t32, t44, t67. Done when one skill has a current surface document the manager can search.
+
+**t70** · One small metrics file per home folder holds note lookup counts, friction entry counts and rule firing counts for that agent. Needed: its format, the hooks that increment each count (a read of a note, a friction entry written, a rule injected for that agent), how an agent is identified from inside a hook, and the command that reads the file for the manager's reviews. Relates to t19, t49, t50. Done when all three counts rise without anyone writing them.
