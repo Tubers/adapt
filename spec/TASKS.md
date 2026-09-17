@@ -148,7 +148,7 @@
 
 **t52** · Answered (q18): work from both ends, iteratively. Each protocol is a collection of rules in a protocols folder with a manager branch and a specialist branch; the chore protocol sits with the specialists'. Each specialist gets its own copy on first assignment, changed only by request. Both protocols must describe the copy map and the made-up path of the agent's copy. Draft all three against the settled workflow, alongside t53 to t55. Done when three first drafts exist.
 
-**t56** · Answered in part: the verifier is a medium specialist under a verifier protocol, for now. It drafts the hidden acceptance test in the sibling test skill, runs it before merge, reads the skill code the test touches to confirm fairness, and posts results to the group channel. Implementers are denied read access to the test skill. Open: whether the manager should author the test instead, which model is adequate, and the test skill's name and layout. Done when those are settled.
+**t56** · Settled: the verifier is a medium specialist under a verifier protocol, with its own home. The manager designs each test in plain English with loose pseudocode; the verifier adapts it to the skill and environment, writes it into the sibling test skill, runs it before merge, checks the code it touches for fairness, and posts results to the group channel. Open: the test skill's name and layout, and the read denial for implementers. Done when those exist.
 
 **t61** · Note lookups, friction entries and rule firings are all counted by different parts of the spec. Needed: whether they share one small store, where it lives, who increments it, and whether it is per agent or per workspace. Relates to t19, t49. Done when the store and its writers are defined.
 
