@@ -2,8 +2,8 @@
 
 **Goal:** revise the Adapt skill spec with the user: spec/original.txt is the untouched first draft, spec/revised.txt the working revision
 
-- ✅ define THE MANAGER without a persistent instance · *2026-09-16* `t6`
 - ✅ separate NEW, EXTEND and REPAIR, and define amalgamation · *2026-09-16* `t9`
+- ✅ place META TOOLS: root folder, inner skill, or both · *2026-09-17* `t25`
 - 🔄 **fold in the user's own changes to the spec** · *since 2026-09-15* `t1`
 - 🔜 specify the request form and its python generator `t10`
 - 🔜 fix When to Trigger and the duplicate check `t11`
@@ -19,7 +19,6 @@
 - 🔜 host-side Adapt commands `t22`
 - 🔜 nested Adapt: an Adapt inside an Adapt `t23`
 - 🔜 per-specialist rules folders and finding curation `t24`
-- 🔜 ❓ place META TOOLS: root folder, inner skill, or both `t25`
 - 🔜 launcher: regenerate the personal exclusions at every manager launch `t26`
 - 🔜 strip the manager down: bundled skills, built-in agents, user plugins `t27`
 - 🔜 let a specialist add its own LSP plugin without the interactive plugin command `t28`
@@ -55,9 +54,9 @@
 
 ## Details
 
-**t6** · The manager's history, task and questions files now rotate per round into the rounds folder; its notes folder persists. Still open: whether the original draft's Notes and Memories survive as separate things, or are replaced by the notes folder (niche information) and the round archive (the running log). Done when the manager's home layout is fixed.
-
 **t9** · Categories settled: NEW holds work folders for entirely new skills, wrappers included; EXTEND for extensions of an existing skill; REPAIR for fixes; the original NEW wording is marked revised in the spec. Still open: the amalgamation proposal, merging requests that name the same skill and need into one work folder, awaits the user. Done when it is accepted or changed.
+
+**t25** · The spec keeps META TOOLS as a root folder, and specialists are preloaded with it as a skill, which lives in .claude/skills/. Decide the one real location and how the other refers to it. Done when the spec names it.
 
 **t1** · The user has many changes of their own: some needed, some functional alternatives judged better than the original. Take each in chat, write it into spec/revised.txt, and split out any that opens a new question as its own task. Done when the user says the list is exhausted.
 
@@ -88,8 +87,6 @@
 **t23** · Answered (q27): experimental, user-configured only, at most two Adapts (host, Adapt, inner Adapt). The inner Adapt reports to the outer manager through the inbox and return files. Needed: where an inner Adapt's workspace lives given that each workspace sits outside what it serves, how the outer Adapt's skills become the inner one's host skills, and a first trial on a complex project. Done when one nested pair has run a round.
 
 **t24** · Each specialist gets rules/<skill name>/ holding its findings; it curates them into rules gated to code files or skill documents. Needed: how this fits rules-system candidates and approval, and who approves a specialist's new rule. Done when defined.
-
-**t25** · The spec keeps META TOOLS as a root folder, and specialists are preloaded with it as a skill, which lives in .claude/skills/. Decide the one real location and how the other refers to it. Done when the spec names it.
 
 **t26** · The launcher scans the user's skills and agents folders, writes a skillOverrides off entry per skill name and a permissions.deny Agent(name) entry per agent name into the workspace settings, keeps a manifest of names already nullified, and logs any name it has not seen. Also test --setting-sources project,local, which should drop the personal settings file and its hooks while leaving the login alone. Done when the launcher exists and a run shows nothing personal.
 

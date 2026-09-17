@@ -403,7 +403,8 @@ The SPECIALISTS folder has sub folders within it that are organized by the name 
 
  META TOOLS:
  An interesting part of the "Adapt" skill is its circular recursive nature. The skill manager and its sub agents are allowed to request features (new skills and skill improvements) to their own suite of skills that are stored within the META TOOLS folder. This folder will contain tools that THE MANAGER and the sub-agents can use to perform their given tasks and goals. The tools within this folder are typically python scripts that are engineered by the sub-agents for their own use in carrying out INBOX requests. If sub-agents find themselves doing a particular pattern of activity that changes in only a few select ways or never, then it can identify the task as a good candidate for a meta tool and build out this meta tool and store the source script, exe, interface api, documentation all within this folder as a new sub folder with an expressive folder name for the tool. Sub-agents are allowed to use each other's meta tools to work on their own specific task if the tool is useful to their own work domain.
- META TOOLS is also a skill that every specialist is preloaded with. (open: t25)
+ META TOOLS is also a skill that every specialist is preloaded with.
+ (Revised 2026-09-17: META TOOLS is not a root folder. It lives only as meta-tools, in the workspace's own insulated .claude/skills/, where Adapt's agents treat it as their own bespoke skill. The placement can move later if it conflicts with something or a more sensible home appears.)
 
  RULES:
  Scope: the Documentation Dogma below applies only to the rules that govern THE MANAGER and the SPECIALISTS sub-agents, and to the documents they keep. It does not apply to the skills themselves or to the rest of the repo.
