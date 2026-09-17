@@ -2,19 +2,17 @@
 
 **Goal:** revise the Adapt skill spec with the user: spec/original.txt is the untouched first draft, spec/revised.txt the working revision
 
-- ✅ place META TOOLS: root folder, inner skill, or both · *2026-09-17* `t25`
-- ✅ define a round · *2026-09-17* `t12`
+- ✅ manager launch: --bare or a normal session fenced by settings · *2026-09-17* `t13`
+- ✅ first-run install: what Adapt init sets up · *2026-09-17* `t21`
 - 🔄 **fold in the user's own changes to the spec** · *since 2026-09-15* `t1`
 - 🔜 specify the request form and its python generator `t10`
 - 🔜 fix When to Trigger and the duplicate check `t11`
-- 🔜 manager launch: --bare or a normal session fenced by settings `t13`
 - 🔜 specialists as subagents, not agent teams; haiku worker lifecycle `t15`
 - 🔜 constant rules: a rules-system config for rules never removed or modified `t16`
 - 🔜 agent system prompts for manager, specialist-medium and specialist-low `t17`
 - 🔜 protocol rules for specialists and manager, and how they attach at spawn `t18`
 - 🔜 friction entries: history kind, threshold hook, similarity grouping `t19`
 - 🔜 skill copies, manager-approved merge, and two-way mirroring `t20`
-- 🔜 first-run install: what Adapt init sets up `t21`
 - 🔜 host-side Adapt commands `t22`
 - 🔜 nested Adapt: an Adapt inside an Adapt `t23`
 - 🔜 per-specialist rules folders and finding curation `t24`
@@ -50,22 +48,21 @@
 - 🔜 metrics file per home, and the hooks that keep it current `t70`
 - 🔜 caveman and rtk on by default for every agent `t71`
 - 🔜 later: proposals from instances to the central Adapt repository `t72`
+- 🔜 research: what a low model can reliably do, and the chore command code `t73`
 
 ---
 
 ## Details
 
-**t25** · The spec keeps META TOOLS as a root folder, and specialists are preloaded with it as a skill, which lives in .claude/skills/. Decide the one real location and how the other refers to it. Done when the spec names it.
+**t13** · One claude -p run per round in the workspace, no --bare and no resume. The comparison and the untested list live in spec/launch-options.md. Exclusions regenerated per launch (t26); bundled skills, built-in agents, plugins, auto memory and MCP off (t27). Left here: write the launch command with its permission mode and output capture, test --setting-sources project,local, test crossSessionInbound accept. Done when a run shows nothing host or personal.
 
-**t12** · A round is one start-to-finish cycle on one work item, with the five steps in spec/revised.txt. Only an internal tool that improves delivery of that item may join it, judged on speed, usage and token efficiency, or ease of implementation. The round can grow by ratification and be reordered when a tool is promoted, in which case the external request waits for the next round. Open: when the manager may start a round itself. Done when the user accepts.
+**t21** · First init creates the workspace outside the host repo as its own git repo, writes the shim into the host's .claude/skills/adapt/, marks the workspace trusted by writing hasTrustDialogAccepted for that path, spawns the manager, and runs build scripts: inventory the user's skills, create data folders and configs, load Adapt's own skills, create the manager's records. Needed: where the workspace lives, idempotent re-init, later inits. Done when defined.
 
 **t1** · The user has many changes of their own: some needed, some functional alternatives judged better than the original. Take each in chat, write it into spec/revised.txt, and split out any that opens a new question as its own task. Done when the user says the list is exhausted.
 
 **t10** · The form is an interview invoked from the shim's SKILL.md, with different questions for a new capability, an extension and a repair. It captures the surface: inputs and what they deliver, or for a repair input x, actual z, expected y. It never asks about implementation. It is dynamic, routing on parsed answers (t51), and aims to capture everything in one pass. Needed: the question sets, the generator, where the filled form lands. Done when a request can be filed end to end.
 
 **t11** · When to Trigger now names INBOX (done under t3). Still open: before filing, an instance checks for a similar request; vector-search could do that check by meaning. Done when the trigger conditions and the duplicate check are defined.
-
-**t13** · One claude -p run per round in the workspace, no --bare and no resume. The comparison and the untested list live in spec/launch-options.md. Exclusions regenerated per launch (t26); bundled skills, built-in agents, plugins, auto memory and MCP off (t27). Left here: write the launch command with its permission mode and output capture, test --setting-sources project,local, test crossSessionInbound accept. Done when a run shows nothing host or personal.
 
 **t15** · Docs: agent teams need an interactive session, never -p. Subagents may spawn subagents by default, 3 layers deep; CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH=1 turns it off and so enforces manager-only spawning. The skills field preloads full content but does not restrict; omit Skill from tools to restrict. omitClaudeMd exists. A fresh haiku subagent per batch is stateless. Done when spec fixes the agent model and haiku lifecycle.
 
@@ -79,8 +76,6 @@
 
 **t20** · Specialists work on host worktrees (one repo per skill, private remotes); the manager approves merges; changes mirror between a host skill and Adapt's inner copy. On conflict the host's version wins and Adapt restarts from it (q26). Needed: branch naming, how drift is detected, the mirroring script, and how a losing Adapt-side change is recorded or re-requested. Done when the flow is defined.
 
-**t21** · First init creates the workspace outside the host repo as its own git repo, writes the shim into the host's .claude/skills/adapt/, marks the workspace trusted by writing hasTrustDialogAccepted for that path, spawns the manager, and runs build scripts: inventory the user's skills, create data folders and configs, load Adapt's own skills, create the manager's records. Needed: where the workspace lives, idempotent re-init, later inits. Done when defined.
-
 **t22** · What a host instance can run against Adapt: init, submit a request, start a round, and read the manager's records in filtered slices. The manager's task file is the status surface, watched in the viewer or read through the shim; there is no second status channel. Needed: the command list, each command's output, and how a host instance is told a round finished or stalled. Done when the list is defined.
 
 **t23** · Answered (q27): experimental, user-configured only, at most two Adapts (host, Adapt, inner Adapt). The inner Adapt reports to the outer manager through the inbox and return files. Needed: where an inner Adapt's workspace lives given that each workspace sits outside what it serves, how the outer Adapt's skills become the inner one's host skills, and a first trial on a complex project. Done when one nested pair has run a round.
@@ -89,7 +84,7 @@
 
 **t26** · The launcher scans the user's skills and agents folders, writes a skillOverrides off entry per skill name and a permissions.deny Agent(name) entry per agent name into the workspace settings, keeps a manifest of names already nullified, and logs any name it has not seen. Also test --setting-sources project,local, which should drop the personal settings file and its hooks while leaving the login alone. Done when the launcher exists and a run shows nothing personal.
 
-**t27** · Test disableBundledSkills for the bundled skills such as code-review and loop; CLAUDE_AGENT_SDK_DISABLE_BUILTIN_AGENTS=1 for Explore, Plan and general-purpose in a -p session; and whether workspace settings can switch off a plugin enabled in the user's settings. Then define how a capability comes back: one at a time, on evidence it is needed, each re-enable recorded. Done when the stripped baseline is defined and tested.
+**t27** · Probed 2026-09-17: disableBundledSkills plus skillOverrides off for design and doctor leaves no skills; built-in agents go only via the launcher's process environment; user plugins go with --setting-sources project,local. Left: fold these into the workspace settings and launcher, and confirm auto memory off. Done when a launched manager lists only Adapt's own skills and agents.
 
 **t28** · A specialist needs code intelligence for its skill's language. Plugins can carry .lsp.json, and the official marketplace has TypeScript, Python, Go and Rust plugins. Plugins load at session start, so an install reaches the next session. Investigate: claude plugin CLI subcommands, writing enabledPlugins and marketplaces into the workspace settings, --plugin-dir at launch, and skills-directory plugins that auto-load. Done when a specialist can request one and the next launch has it.
 
@@ -145,8 +140,10 @@
 
 **t69** · Every maintained skill gets a terse, machine-facing surface document. Needed: its format and place, the step in the merge path that refreshes it, how it is generated at skill initialization, the scoped rule that delivers it, and a vector-search namespace spanning all surface documents for capability search. Relates to t32, t44, t67. Done when one skill has a current surface document the manager can search.
 
-**t70** · One small metrics file per home folder holds note lookup counts, friction entry counts and rule firing counts for that agent. Needed: its format, the hooks that increment each count (a read of a note, a friction entry written, a rule injected for that agent), how an agent is identified from inside a hook, and the command that reads the file for the manager's reviews. Relates to t19, t49, t50. Done when all three counts rise without anyone writing them.
+**t70** · One metrics file per home: note lookups, friction entries, rule firings, maintained by hooks. When a count crosses its threshold a hook instructs the agent to review it: a hot note is a rule candidate; many similar friction entries mean asking the manager to look. Needed: the format, the incrementing hooks, the thresholds, the trigger hook and its instruction text. Done when a threshold crossing produces the instruction.
 
 **t71** · caveman: outputStyle for the manager, compact rules in every agent definition body. rtk 0.49.0: pinned binary in the workspace, instruction block mined into a rule then deleted, filters kept, PreToolUse Bash hook written into workspace settings, telemetry disabled. Needed: install script, hook ordering test with graphify and the rules router, the verifier's raw-output path, and where rtk's history database lives. Done when every agent's Bash output is condensed and a test failure stays readable.
 
 **t72** · Deferred. An instance may one day send the central repository a pull-request-style proposal, only for a change that benefits every instance. A specialist may start one; only the manager forwards it. The user reviews and applies proposals in a central-repo session. Needed then: the proposal format, the channel it travels by, and where proposals wait for review. Done when one proposal has been reviewed.
+
+**t73** · The chore worker runs on a low model. Needed: a short command code specialists use to order it, designed to cost few tokens; a trial set of candidate chores (file and folder operations first) run on the low model and checked for correctness; and a list of what it can be trusted with, extended over time. Done when the code exists and a first scope is measured.

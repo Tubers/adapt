@@ -14,7 +14,7 @@ Ethos:
 Where Adapt lives (configuration B, the current best contender):
 	Adapt comes in two parts. The goal of a self-contained skill folder is dropped.
 	- The shim: a thin skill inside the host project, at <host>/.claude/skills/adapt/. It holds only SKILL.md and the scripts a host instance runs: init, submit a request, read the manager's records, start a round (open: t22). It has no .claude tree of its own.
-	- The workspace: everything else, in a folder outside the host repository, created at first init. Examples are ~/.adapt/<host name>/ or a folder beside the host; the exact place is open (t21). It holds Adapt's own .claude tree, its rules, and the capitalized root folders below.
+	- The workspace: everything else, in a folder outside the host repository, created at first init. It sits beside the host, as a sibling folder named after it (for example <host>.adapt/ next to <host>/), so it stays close to the project it serves and is easy to identify (user, 2026-09-17). It is never inside the host repository. It holds Adapt's own .claude tree, its rules, and the capitalized root folders below.
 	The other skills in the host's .claude/skills/ are Adapt's sibling skills. They serve the host project, and they are the skills Adapt repairs, extends and adds to.
 	Adapt comes bundled with its own copies of two skills from this repo: rules-system and vector-search. It also carries a third skill of its own, META TOOLS. The handoff skill may join later; for now Adapt ships with these three. All three live in the workspace.
 	Why B: every fence rests on documented Claude Code behavior.
@@ -57,10 +57,10 @@ The workspace's .claude tree:
 Stripping the manager:
 	The manager starts with as little as possible. A capability comes back only when a need for it shows up, one at a time, and each one that comes back is recorded with what needed it.
 	- Personal skills and agents: the launcher regenerates the exclusions at every launch. It scans the user's skills and agents folders, writes a skillOverrides "off" entry for every skill name it finds and a permissions.deny entry of Agent(<name>) for every agent name, then starts the manager. It keeps a manifest of the names it has already nullified, so a name it has not seen before is nullified AND logged, and nothing new slips in unnoticed.
-	- Personal settings and hooks: the user's settings file also carries their model choice, status line and hooks, and those hooks would run in the manager. --setting-sources project,local drops that file while leaving the login alone, because credentials are stored outside it. Untested (t13).
-	- Bundled skills, such as code-review and loop, always load. The docs name disableBundledSkills to drop them. Untested (t27).
-	- Built-in agents: CLAUDE_AGENT_SDK_DISABLE_BUILTIN_AGENTS=1 removes Explore, Plan and general-purpose in a -p session. Every Agent call must then name one of Adapt's own specialists.
-	- Plugins enabled in the user's settings still load their skills, commands and agents. Whether the workspace can switch one off is untested (t27).
+	- Personal settings and hooks: the user's settings file also carries their model choice, status line and hooks, and those hooks would run in the manager. --setting-sources project,local drops that file while leaving the login alone, because credentials are stored outside it. Probed 2026-09-17: the login held and the user-enabled plugin disappeared from the session.
+	- Bundled skills. disableBundledSkills removes most of them; design and doctor survive it and are switched off by name with skillOverrides. Probed 2026-09-17: with both, the session listed no skills at all.
+	- Built-in agents: CLAUDE_AGENT_SDK_DISABLE_BUILTIN_AGENTS=1 removes every built-in agent in a -p session, leaving only Adapt's own. Every Agent call must then name one of them. Probed 2026-09-17: it works only in the launcher's process environment; set in the settings file's env block it had no effect.
+	- Plugins enabled in the user's settings live in the user's settings file, so --setting-sources project,local drops them with it (probed 2026-09-17).
 	- Auto memory: off in the workspace settings, so nothing the manager or a specialist learns is written outside Adapt's own records.
 	- MCP servers: none. The workspace ships no .mcp.json, and no MCP server is inherited, because MCP configuration is not read from parent folders.
 	The aim is one set of moving parts, Adapt's own. Every variable that comes from outside the workspace is one more thing that can change under the manager without anyone changing Adapt.
@@ -74,6 +74,8 @@ Launching the manager:
 	Kept in view: claude --bg, the only candidate that survives between rounds, can be attached to and messaged, and restarts itself after a crash. Before adopting it, test that a background session moves itself into a worktree under .claude/worktrees/ before editing files, which would move the manager out of the workspace it was started in.
 	A -p session binds a messaging inbox, so the host can message a running manager; it cannot show an approval dialog, so the launcher passes crossSessionInbound accept for held messages to be delivered (untested).
 	Agent teams are never an option here: they need an interactive session and do not spawn in -p.
+	Probed 2026-09-17 from this session acting as a host: a claude -p run started by Bash in a scratch workspace used the same subscription login (no API key), ran in dontAsk mode, spawned a custom subagent from the workspace's own agents folder, and stayed open until that background subagent returned its answer.
+	The host and a running round (user, 2026-09-17): the round draws on the same subscription usage as the host. The host may carry on with work that does not depend on the requested change, or wait; waiting is the better choice when usage is already high, so the round has the remainder. The host never works on skills itself while Adapt exists: keeping skill work out of the host's context is the reason Adapt exists.
 	Keeping startup context small, for the manager and for every specialist:
 	- No CLAUDE.md, no unscoped rules, no bundled skills, no personal skills or agents, no MCP servers, no auto memory.
 	- Rules arrive only when a gate matches what the agent touches.
@@ -123,6 +125,7 @@ Sessions and agents:
 	There are two kinds of subagent. Both are defined in .claude/agents/ with minimal starting directives, and both are preloaded with rules-system, vector-search and meta-tools:
 	- Specialist, medium model (Sonnet). Each one is assigned one sibling skill and writes code for it. Specialists may work together on larger projects, such as building a brand new skill on request.
 	- Specialist, lower model (Haiku). It carries out small file and folder operations for a medium specialist. Its context is wiped between every action, so every task given to it must be stateless. Tasks may be lumped together and done in batches. A medium specialist asks the manager for one when none exists, and the manager decides whether invoking it is worth it relative to the work. At least one should be kept available.
+	  The chore worker stays (user, 2026-09-17). Specialists give it orders in a short command code, designed to cost as few tokens as possible, and its repertoire grows over time. What a low model can reliably be given, and still return the right result, is a research question in its own right (open: t73).
 	Assignment (user, 2026-09-16):
 	- One specialist per skill, for now.
 	- Specialists of different skills may run at the same time, to collaborate on an extension or a new skill that uses functions from existing skills. A brand new skill gets a specialist of its own, spun up in a new home folder and tasked with building it from scratch.
@@ -154,7 +157,7 @@ Rules and protocols:
 	- Each specialist gets its own copy of the specialist protocol on its first assignment, kept with its skill's rules, so it can be changed for that skill without disturbing any other specialist. The common branch is the template each copy starts from. A change to a copy still goes through the request scheme like any rule change.
 	- A protocol is injected nearly at session start, before the agent has touched anything. A path gate cannot deliver it, because nothing has been touched yet, so the whole collection arrives through a startup mechanism (open: t18).
 	- The work proceeds from both ends. The folder structures and the objects they hold (t53, t54, t55) are laid out while the protocols are drafted against the workflow already settled in this spec, and both are revisited often: the protocols are expected to be rebuilt many times before they work properly.
-	- Every specialist has its own folder in rules/, named after the skill it is responsible for. All of that specialist's findings live there. The specialist curates its own findings and turns them into rules gated to particular code files or skill documents. (open: t24)
+	- Every specialist has its own folder of rules at rules/skills/<skill name>/. All of that specialist's findings live there. The specialist curates its own findings and turns them into rules gated to particular code files or skill documents. (open: t24)
 	- vector-search finds niche rules for a specialist to inject while it works on code. It also runs the audit tools that keep the rule set healthy: information independence (no redundancy), concise descriptions and proper scope.
 	- vector-search also helps specialists navigate the code of the skill they work on, and the documentation they have collected on it that does not merit a finding.
 	- Agent system prompts breadcrumb the knowledge each specialist needs, so it starts from a good point. (open: t17)
@@ -174,6 +177,7 @@ Records and communication:
 	- Graduation removes the note. When the manager promotes one, the information moves into a rule, scoped to the parts of the skill where it will be needed, so it arrives at the moment it applies rather than waiting to be searched for. The note itself goes.
 	- In time each specialist gets vector-search files of its own over its notes, so it can find the detail it would otherwise never locate, or assume was never written down.
 	- Counters are kept per home folder, which means per agent, the verifier included (user, 2026-09-16). Each home holds one small metrics file with all three counts: note lookups, friction entries and rule firings. Hooks and other automatic features keep it current; no agent writes it by hand. They exist so that a future stateless agent benefits from what past agents in the same home measured, and changes the home or its rules on that evidence.
+	- Thresholds trigger action. When a count crosses its threshold, a hook tells the agent to review the indicator and consider acting on it: a hot note is a candidate to become a rule; many similar friction entries are a reason to ask the manager to look at the issue (open: t70).
 	- A newly started agent records how hard it was to take up its task: what it had to hunt for, what it misread, what its home folder or rules failed to tell it. These are acclimatization findings, and they are the evidence for making the next agent's start easier. The manager records the same about its own starting state and its states mid-round.
 	- The skill will be refined while it runs, so the records carry enough detail to refine from. The history logs and task windows are that detail; nothing separate is written for the user's benefit.
 	- The manager's questions file doubles as a diagnostic while the design settles. When the manager does not know what to do, it writes the question there rather than guessing, and nobody has to answer at the time. The questions are read afterwards and answered structurally: a rule, a line in a protocol, a better briefing, or a tool. A question that keeps returning is a hole in the design, not a failing of the manager (open: t48).
@@ -359,9 +363,8 @@ Round (proposed; open: t12):
 	One work item per round. The only work that may join it is an internal tool that directly improves the delivery of that item, judged on three things: speed, usage and token efficiency, and ease of implementation, meaning less complexity to build and less chance of future breakage and repair. A tool that improves none of them waits for its own round.
 	A round can grow: the manager may ratify a request raised inside the round and add it as an item.
 	A round can be reordered: when the manager promotes an internal tool above the external request, the external request waits for the next round.
-	For now the user starts a round. Later the manager might start one itself. How much work a single round takes on is still open.
 	Starting and chaining rounds (user, 2026-09-17):
-	- No cold start. When the manager is not running, nothing automatic launches it. Only an external instance invoking the Adapt skill command launches the manager and starts a round.
+	- No cold start. When the manager is not running, nothing automatic launches it. For now the user or the host agent starts a round, by invoking the Adapt skill command; in future only the host agent will (user, 2026-09-17).
 	- The invocation can be specific: one round on one named request, or a batch of rounds on several requests for the same skill.
 	- A manager already running may chain further rounds on the same skill, back to back, when it sees inbox requests for that skill that are fit to become work items. Never on another skill.
 	- It may also run rounds on helper tools that serve those work items. Putting a helper tool ahead of a work item is the manager's own priority judgement, and only the manager's.
